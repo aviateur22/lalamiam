@@ -1,0 +1,5 @@
+pro(id, email, phone, created_at, updated_at)
+store(id, #pro_id, name, adress, city, cp, presentation, phone, photo, created_at, updated_at)
+command(id, client_phone, slot_time, preparation_time, price, created_at, updated_at)
+product(id, #store_id, name, price, description, preparationTime, photo, created_at, updated_at)
+cook(id, #store_id, #command_id, #product_id, created_at, updated_at)
