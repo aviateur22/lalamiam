@@ -1,8 +1,9 @@
 package ctoutweb.lalamiam.repository.entity;
 
+import ctoutweb.lalamiam.model.schema.AddProfessionalSchema;
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import jakarta.persistence.Table;
+import org.hibernate.annotations.*;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -11,7 +12,8 @@ import java.time.LocalDateTime;
 @Table(name = "pro")
 public class ProEntity {
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE)
+  @SequenceGenerator(name="proPkSeq", sequenceName="PRO_PK_SEQ", allocationSize=1, initialValue = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "proPkSeq")
   private BigInteger id;
 
   @Column(name = "email")
@@ -23,7 +25,7 @@ public class ProEntity {
   @Column(name = "password")
   private String password;
 
-  @CreationTimestamp
+  @Generated(GenerationTime.INSERT)
   @Column(name = "created_at")
   private LocalDateTime createdAt;
 
@@ -35,6 +37,21 @@ public class ProEntity {
    *
    */
   public ProEntity() {
+  }
+
+  public ProEntity(BigInteger id, String email, String phone, String password, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    this.id = id;
+    this.email = email;
+    this.phone = phone;
+    this.password = password;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
+  }
+
+  public ProEntity(AddProfessionalSchema addProfessionalSchema) {
+    this.email = addProfessionalSchema.email();
+    this.phone = addProfessionalSchema.phone();
+    this.password = addProfessionalSchema.password();
   }
 
   public BigInteger getId() {
@@ -84,4 +101,6 @@ public class ProEntity {
   public void setPassword(String password) {
     this.password = password;
   }
+
+
 }

@@ -1,11 +1,11 @@
 package ctoutweb.lalamiam.service;
 
-import ctoutweb.lalamiam.model.AddProfessionalSchema;
-import ctoutweb.lalamiam.model.dto.ProInformation;
+import ctoutweb.lalamiam.model.schema.AddProfessionalSchema;
+import ctoutweb.lalamiam.model.dto.ProInformationDto;
 
 import java.math.BigInteger;
 
 public interface ProService {
-  public void addProfessional(AddProfessionalSchema addProfessionalSchema);
-  public ProInformation getProfessionalInformation(BigInteger professionalId);
+  public ProInformationDto addProfessional(AddProfessionalSchema addProfessionalSchema);
+  public ProInformationDto getProfessionalInformation(BigInteger professionalId);
 }

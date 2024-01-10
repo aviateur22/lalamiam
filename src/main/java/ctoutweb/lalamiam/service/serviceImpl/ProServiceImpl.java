@@ -1,15 +1,14 @@
 package ctoutweb.lalamiam.service.serviceImpl;
 
 import ctoutweb.lalamiam.mapper.ProInformationMapper;
-import ctoutweb.lalamiam.model.AddProfessionalSchema;
-import ctoutweb.lalamiam.model.dto.ProInformation;
+import ctoutweb.lalamiam.model.schema.AddProfessionalSchema;
+import ctoutweb.lalamiam.model.dto.ProInformationDto;
 import ctoutweb.lalamiam.repository.ProRepository;
 import ctoutweb.lalamiam.repository.entity.ProEntity;
 import ctoutweb.lalamiam.service.ProService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
-import java.util.Optional;
 
 @Service
 public class ProServiceImpl implements ProService {
@@ -23,14 +22,20 @@ public class ProServiceImpl implements ProService {
   }
 
   @Override
-  public void addProfessional(AddProfessionalSchema addProfessionalSchema) {
+  public ProInformationDto addProfessional(AddProfessionalSchema addProfessionalInfo) {
 
+    String password = addProfessionalInfo.password();
+    String email = addProfessionalInfo.email();
+    if(password == null || password.isEmpty() || email == null || email.isEmpty())
+      throw new RuntimeException("Données Professionnelles incomplete");
+
+    ProEntity addPro = proRepository.save(new ProEntity(addProfessionalInfo));
+    return proInformationMapper.apply(addPro);
   }
 
   @Override
-  public ProInformation getProfessionalInformation(BigInteger professionalId) {
+  public ProInformationDto getProfessionalInformation(BigInteger professionalId) {
     ProEntity proEntity = proRepository.findById(professionalId).orElseThrow(()-> new RuntimeException("pas connu"));
-
     return proInformationMapper.apply(proEntity);
   }
 }
