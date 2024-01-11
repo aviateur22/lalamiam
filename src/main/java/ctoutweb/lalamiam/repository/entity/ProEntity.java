@@ -7,6 +7,7 @@ import org.hibernate.annotations.*;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Table(name = "pro")
@@ -33,6 +34,9 @@ public class ProEntity {
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
 
+  @OneToMany(mappedBy = "pro")
+  private Set<StoreEntity> stores;
+
   /**
    *
    */
@@ -52,6 +56,10 @@ public class ProEntity {
     this.email = addProfessionalSchema.email();
     this.phone = addProfessionalSchema.phone();
     this.password = addProfessionalSchema.password();
+  }
+
+  public ProEntity(BigInteger proId) {
+    this.id = proId;
   }
 
   public BigInteger getId() {
@@ -102,5 +110,11 @@ public class ProEntity {
     this.password = password;
   }
 
+  public Set<StoreEntity> getStores() {
+    return stores;
+  }
 
+  public void setStores(Set<StoreEntity> stores) {
+    this.stores = stores;
+  }
 }

@@ -2,17 +2,19 @@ package ctoutweb.lalamiam.test;
 
 import ctoutweb.lalamiam.model.dto.ProInformationDto;
 import ctoutweb.lalamiam.model.schema.AddProfessionalSchema;
+import ctoutweb.lalamiam.model.schema.AddStoreSchema;
 import ctoutweb.lalamiam.repository.ProRepository;
 import ctoutweb.lalamiam.repository.entity.ProEntity;
-import ctoutweb.lalamiam.repository.entity.ProEntityBuilder;
+import ctoutweb.lalamiam.repository.entity.StoreEntity;
 import ctoutweb.lalamiam.service.ProService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.util.Assert;
 
+import java.beans.IntrospectionException;
+import java.math.BigInteger;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -46,8 +48,8 @@ public class ProServiceTest {
 
   @Test
   void should_register_pro_without_phone() {
-    AddProfessionalSchema addProfessionalInformation1 = new AddProfessionalSchema("", "password", "aaa");
-    ProInformationDto proInformationDto = proService.addProfessional(addProfessionalInformation1);
+    AddProfessionalSchema addProfessionalInformation = new AddProfessionalSchema("", "password", "aaa");
+    proService.addProfessional(addProfessionalInformation);
     List<ProEntity> professionalList = proRepository.findAll();
     int proCountInDatabase = proRepository.countProInDatabase();
 
@@ -64,5 +66,17 @@ public class ProServiceTest {
     List<ProEntity> pro = proRepository.findAll();
     int proCountInDatabase = proRepository.countProInDatabase();
     Assertions.assertEquals(1, proCountInDatabase);
+  }
+
+  @Test
+  void should_create_store() throws IntrospectionException {
+    // Creation Pro
+    AddProfessionalSchema addProfessionalInformation = new AddProfessionalSchema("", "password", "aaa");
+    ProInformationDto createdPro = proService.addProfessional(addProfessionalInformation);
+
+    AddStoreSchema addStoreSchema = new AddStoreSchema(new ProEntity(createdPro.id()), "magasin", "rue des carriere", "auterive", "31190");
+    StoreEntity createdStore =  proService.createStore(addStoreSchema);
+    Assertions.assertNotNull(createdStore);
+
   }
 }

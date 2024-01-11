@@ -17,9 +17,9 @@ create table IF NOT EXISTS sc_lalamiam.store(
  "adress" TEXT NOT NULL,
  "city" TEXT NOT NULL,
  "cp" TEXT NOT NULL,
- "photo" TEXT NOT NULL,
- "presentation" TEXT NOT NULL,
- "phone" TEXT NOT NULL,
+ "photo" TEXT,
+ "presentation" TEXT,
+ "phone" TEXT,
  "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
  "updated_at" TIMESTAMPTZ
 );
@@ -60,15 +60,20 @@ ALTER table IF EXISTS sc_lalamiam.command OWNER TO lalamiam;
 ALTER table IF EXISTS sc_lalamiam.store OWNER TO lalamiam;
 ALTER table IF EXISTS sc_lalamiam.pro OWNER TO lalamiam;
 ALTER SCHEMA sc_lalamiam OWNER TO lalamiam;
+
 GRANT ALL ON TABLE sc_lalamiam.cook TO lalamiam;
 GRANT ALL ON TABLE sc_lalamiam.product TO lalamiam;
 GRANT ALL ON TABLE sc_lalamiam.command TO lalamiam;
 GRANT ALL ON TABLE sc_lalamiam.store TO lalamiam;
 GRANT ALL ON TABLE sc_lalamiam.pro TO lalamiam;
 GRANT ALL ON SCHEMA sc_lalamiam TO lalamiam;
+
 CREATE SEQUENCE if not exists sc_lalamiam.pro_pk_seq START WITH 1 INCREMENT BY 1 NO CYCLE;
 ALTER SEQUENCE if exists sc_lalamiam.pro_pk_seq OWNER TO lalamiam;
 ALTER SEQUENCE if exists sc_lalamiam.pro_pk_seq owned by sc_lalamiam.pro.id;
 
+CREATE SEQUENCE if not exists sc_lalamiam.store_pk_seq START WITH 1 INCREMENT BY 1 NO CYCLE;
+ALTER SEQUENCE if exists sc_lalamiam.store_pk_seq OWNER TO lalamiam;
+ALTER SEQUENCE if exists sc_lalamiam.store_pk_seq OWNED by sc_lalamiam.store.id;
 
 COMMIT;
