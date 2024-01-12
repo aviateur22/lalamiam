@@ -1,5 +1,6 @@
 package ctoutweb.lalamiam.repository.entity;
 
+import ctoutweb.lalamiam.model.schema.AddProductSchema;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -11,14 +12,15 @@ import java.time.LocalDateTime;
 @Table(name = "product")
 public class ProductEntity {
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE)
+  @SequenceGenerator(name="productPkSeq", sequenceName="PRODUCT_PK_SEQ", allocationSize=1, initialValue = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "productPkSeq")
   private BigInteger id;
 
   @Column(name = "name")
   private String name;
 
   @Column(name = "price")
-  private float price;
+  private Double price;
 
   @Column(name = "description")
   private String description;
@@ -27,7 +29,7 @@ public class ProductEntity {
   private Integer preparationTime;
 
   @Column(name = "photo")
-  private Integer photo;
+  private String photo;
 
   @CreationTimestamp
   @Column(name = "created_at")
@@ -37,11 +39,24 @@ public class ProductEntity {
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
 
+  @ManyToOne
+  @JoinColumn(name = "store_id", nullable = false)
+  private StoreEntity store;
+
   /**
    *
    */
 
   public ProductEntity() {
+  }
+
+  public ProductEntity(AddProductSchema addProductSchema) {
+    this.name = addProductSchema.name();
+    this.store = addProductSchema.store();
+    this.photo = addProductSchema.photo();
+    this.preparationTime = addProductSchema.preparationTime();
+    this.description = addProductSchema.description();
+    this.price = addProductSchema.price();
   }
 
   public BigInteger getId() {
@@ -60,11 +75,11 @@ public class ProductEntity {
     this.name = name;
   }
 
-  public float getPrice() {
+  public Double getPrice() {
     return price;
   }
 
-  public void setPrice(float price) {
+  public void setPrice(Double price) {
     this.price = price;
   }
 
@@ -84,11 +99,11 @@ public class ProductEntity {
     this.preparationTime = preparationTime;
   }
 
-  public Integer getPhoto() {
+  public String getPhoto() {
     return photo;
   }
 
-  public void setPhoto(Integer photo) {
+  public void setPhoto(String photo) {
     this.photo = photo;
   }
 
@@ -106,5 +121,13 @@ public class ProductEntity {
 
   public void setUpdatedAt(LocalDateTime updatedAt) {
     this.updatedAt = updatedAt;
+  }
+
+  public StoreEntity getStore() {
+    return store;
+  }
+
+  public void setStore(StoreEntity store) {
+    this.store = store;
   }
 }

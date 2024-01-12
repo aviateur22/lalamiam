@@ -9,6 +9,7 @@ import ctoutweb.lalamiam.repository.StoreRepository;
 import ctoutweb.lalamiam.repository.entity.ProEntity;
 import ctoutweb.lalamiam.repository.entity.StoreEntity;
 import ctoutweb.lalamiam.service.ProService;
+import ctoutweb.lalamiam.util.CommonFunction;
 import org.springframework.stereotype.Service;
 
 import java.beans.BeanInfo;
@@ -51,6 +52,19 @@ public class ProServiceImpl implements ProService {
 
   @Override
   public StoreEntity createStore(AddStoreSchema addStoreSchema) {
+
+    String name = addStoreSchema.name();
+    String adress = addStoreSchema.Adress();
+    String city = addStoreSchema.city();
+    String cp = addStoreSchema.cp();
+    ProEntity pro = addStoreSchema.pro();
+
+    if(CommonFunction.isNullOrEmpty(name)||
+            CommonFunction.isNullOrEmpty(adress) ||
+            CommonFunction.isNullOrEmpty(city) ||
+            CommonFunction.isNullOrEmpty(cp) ||
+            pro == null) throw new RuntimeException("données manquante");
+
     StoreEntity createdStore = storeRepository.save(new StoreEntity(addStoreSchema));
 
     return createdStore;

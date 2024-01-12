@@ -7,6 +7,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Table(name = "store")
@@ -45,6 +46,10 @@ public class StoreEntity {
   @ManyToOne
   @JoinColumn(name="pro_id", nullable=false)
   private ProEntity pro;
+
+  @OneToMany(mappedBy = "store")
+  Set<ProductEntity> products;
+
 
 
   /**

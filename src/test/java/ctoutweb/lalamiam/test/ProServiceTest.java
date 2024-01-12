@@ -4,6 +4,7 @@ import ctoutweb.lalamiam.model.dto.ProInformationDto;
 import ctoutweb.lalamiam.model.schema.AddProfessionalSchema;
 import ctoutweb.lalamiam.model.schema.AddStoreSchema;
 import ctoutweb.lalamiam.repository.ProRepository;
+import ctoutweb.lalamiam.repository.StoreRepository;
 import ctoutweb.lalamiam.repository.entity.ProEntity;
 import ctoutweb.lalamiam.repository.entity.StoreEntity;
 import ctoutweb.lalamiam.service.ProService;
@@ -27,6 +28,9 @@ public class ProServiceTest {
 
   @Autowired
   ProRepository proRepository;
+
+  @Autowired
+  StoreRepository storeRepository;
 
   @BeforeEach
   void beforeEach() {
@@ -76,7 +80,24 @@ public class ProServiceTest {
 
     AddStoreSchema addStoreSchema = new AddStoreSchema(new ProEntity(createdPro.id()), "magasin", "rue des carriere", "auterive", "31190");
     StoreEntity createdStore =  proService.createStore(addStoreSchema);
-    Assertions.assertNotNull(createdStore);
 
+    long storeCountInDatabase = storeRepository.countAll();
+
+    Assertions.assertNotNull(createdStore);
+    Assertions.assertEquals(1, storeCountInDatabase);
+  }
+
+  @Test
+  void should_not_create_store_with_incomplete_info() {
+    // Creation Pro
+    AddProfessionalSchema addProfessionalInformation = new AddProfessionalSchema("", "password", "aaa");
+    ProInformationDto createdPro = proService.addProfessional(addProfessionalInformation);
+
+    AddStoreSchema addStoreSchema = new AddStoreSchema(new ProEntity(createdPro.id()), "", "rue des carriere", "auterive", "31190");
+
+    Assertions.assertThrows(RuntimeException.class, ()-> proService.createStore(addStoreSchema));
+
+    long storeCountInDatabase = storeRepository.countAll();
+    Assertions.assertEquals(0, storeCountInDatabase);
   }
 }
