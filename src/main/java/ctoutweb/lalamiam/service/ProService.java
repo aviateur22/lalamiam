@@ -11,7 +11,5 @@ import java.math.BigInteger;
 public interface ProService {
   public ProInformationDto addProfessional(AddProfessionalSchema addProfessionalSchema);
   public ProInformationDto getProfessionalInformation(BigInteger professionalId);
-  public StoreEntity createStore(AddStoreSchema addStoreSchema);
 
-  //public StoreInformationDto getStoreInformation(AddStoreSchema addStoreSchema);
 }

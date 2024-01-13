@@ -7,6 +7,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Table(name = "product")
@@ -43,6 +44,9 @@ public class ProductEntity {
   @JoinColumn(name = "store_id", nullable = false)
   private StoreEntity store;
 
+  @OneToMany(mappedBy = "product")
+  Set<CookEntity> cooks;
+
   /**
    *
    */
@@ -50,9 +54,13 @@ public class ProductEntity {
   public ProductEntity() {
   }
 
+  public ProductEntity(BigInteger productId) {
+    this.id = productId;
+  }
+
   public ProductEntity(AddProductSchema addProductSchema) {
     this.name = addProductSchema.name();
-    this.store = addProductSchema.store();
+    this.store = new StoreEntity(addProductSchema.storeId());
     this.photo = addProductSchema.photo();
     this.preparationTime = addProductSchema.preparationTime();
     this.description = addProductSchema.description();
@@ -129,5 +137,13 @@ public class ProductEntity {
 
   public void setStore(StoreEntity store) {
     this.store = store;
+  }
+
+  public Set<CookEntity> getCooks() {
+    return cooks;
+  }
+
+  public void setCooks(Set<CookEntity> cooks) {
+    this.cooks = cooks;
   }
 }

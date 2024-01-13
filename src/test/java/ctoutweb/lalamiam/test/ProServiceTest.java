@@ -8,6 +8,7 @@ import ctoutweb.lalamiam.repository.StoreRepository;
 import ctoutweb.lalamiam.repository.entity.ProEntity;
 import ctoutweb.lalamiam.repository.entity.StoreEntity;
 import ctoutweb.lalamiam.service.ProService;
+import ctoutweb.lalamiam.service.StoreService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,9 @@ public class ProServiceTest {
 
   @Autowired
   StoreRepository storeRepository;
+
+  @Autowired
+  StoreService storeService;
 
   @BeforeEach
   void beforeEach() {
@@ -78,8 +82,8 @@ public class ProServiceTest {
     AddProfessionalSchema addProfessionalInformation = new AddProfessionalSchema("", "password", "aaa");
     ProInformationDto createdPro = proService.addProfessional(addProfessionalInformation);
 
-    AddStoreSchema addStoreSchema = new AddStoreSchema(new ProEntity(createdPro.id()), "magasin", "rue des carriere", "auterive", "31190");
-    StoreEntity createdStore =  proService.createStore(addStoreSchema);
+    AddStoreSchema addStoreSchema = new AddStoreSchema(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
+    StoreEntity createdStore =  storeService.createStore(addStoreSchema);
 
     long storeCountInDatabase = storeRepository.countAll();
 
@@ -93,9 +97,18 @@ public class ProServiceTest {
     AddProfessionalSchema addProfessionalInformation = new AddProfessionalSchema("", "password", "aaa");
     ProInformationDto createdPro = proService.addProfessional(addProfessionalInformation);
 
-    AddStoreSchema addStoreSchema = new AddStoreSchema(new ProEntity(createdPro.id()), "", "rue des carriere", "auterive", "31190");
+    AddStoreSchema addStoreSchema = new AddStoreSchema(createdPro.id(), "", "rue des carriere", "auterive", "31190");
 
-    Assertions.assertThrows(RuntimeException.class, ()-> proService.createStore(addStoreSchema));
+    Assertions.assertThrows(RuntimeException.class, ()-> storeService.createStore(addStoreSchema));
+
+    long storeCountInDatabase = storeRepository.countAll();
+    Assertions.assertEquals(0, storeCountInDatabase);
+  }
+
+  @Test
+  void should_not_create_store_with_pro_not_existing() {
+    AddStoreSchema addStoreSchema = new AddStoreSchema(BigInteger.valueOf(0), "d", "rue des carriere", "auterive", "31190");
+    Assertions.assertThrows(RuntimeException.class, ()-> storeService.createStore(addStoreSchema));
 
     long storeCountInDatabase = storeRepository.countAll();
     Assertions.assertEquals(0, storeCountInDatabase);

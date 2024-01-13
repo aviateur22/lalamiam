@@ -50,7 +50,8 @@ public class StoreEntity {
   @OneToMany(mappedBy = "store")
   Set<ProductEntity> products;
 
-
+  @OneToMany(mappedBy = "store")
+  Set<CookEntity> cooks;
 
   /**
    *
@@ -59,11 +60,15 @@ public class StoreEntity {
   }
 
   public StoreEntity(AddStoreSchema addStoreSchema) {
-    this.pro = addStoreSchema.pro();
+    this.pro = new ProEntity(addStoreSchema.proId());
     this.adress = addStoreSchema.Adress();
     this.city = addStoreSchema.city();
     this.name = addStoreSchema.name();
     this.cp = addStoreSchema.cp();
+  }
+
+  public StoreEntity(BigInteger storeId) {
+    this.id = storeId;
   }
 
   public BigInteger getId() {
@@ -152,5 +157,21 @@ public class StoreEntity {
 
   public void setPro(ProEntity pro) {
     this.pro = pro;
+  }
+
+  public Set<ProductEntity> getProducts() {
+    return products;
+  }
+
+  public void setProducts(Set<ProductEntity> products) {
+    this.products = products;
+  }
+
+  public Set<CookEntity> getCooks() {
+    return cooks;
+  }
+
+  public void setCooks(Set<CookEntity> cooks) {
+    this.cooks = cooks;
   }
 }

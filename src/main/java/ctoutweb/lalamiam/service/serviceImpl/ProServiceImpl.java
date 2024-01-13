@@ -49,24 +49,4 @@ public class ProServiceImpl implements ProService {
     ProEntity proEntity = proRepository.findById(professionalId).orElseThrow(()-> new RuntimeException("pas connu"));
     return proInformationMapper.apply(proEntity);
   }
-
-  @Override
-  public StoreEntity createStore(AddStoreSchema addStoreSchema) {
-
-    String name = addStoreSchema.name();
-    String adress = addStoreSchema.Adress();
-    String city = addStoreSchema.city();
-    String cp = addStoreSchema.cp();
-    ProEntity pro = addStoreSchema.pro();
-
-    if(CommonFunction.isNullOrEmpty(name)||
-            CommonFunction.isNullOrEmpty(adress) ||
-            CommonFunction.isNullOrEmpty(city) ||
-            CommonFunction.isNullOrEmpty(cp) ||
-            pro == null) throw new RuntimeException("données manquante");
-
-    StoreEntity createdStore = storeRepository.save(new StoreEntity(addStoreSchema));
-
-    return createdStore;
-  }
 }
