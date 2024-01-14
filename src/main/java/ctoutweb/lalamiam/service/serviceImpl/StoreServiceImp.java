@@ -25,7 +25,7 @@ public class StoreServiceImp implements StoreService {
   @Override
   public StoreEntity createStore(AddStoreSchema addStoreSchema) {
     String name = addStoreSchema.name();
-    String adress = addStoreSchema.Adress();
+    String adress = addStoreSchema.adress();
     String city = addStoreSchema.city();
     String cp = addStoreSchema.cp();
     BigInteger proId = addStoreSchema.proId();
@@ -34,7 +34,7 @@ public class StoreServiceImp implements StoreService {
             CommonFunction.isNullOrEmpty(adress) ||
             CommonFunction.isNullOrEmpty(city) ||
             CommonFunction.isNullOrEmpty(cp) ||
-            proId == null) throw new RuntimeException("données manquante");
+            proId == null) throw new RuntimeException("données manquantes");
 
     // Vérification existence pro
     proRepository.findById(addStoreSchema.proId()).orElseThrow(()->new RuntimeException("Le professionel n'existe pas"));

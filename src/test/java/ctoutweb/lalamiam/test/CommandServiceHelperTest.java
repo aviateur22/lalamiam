@@ -1,13 +1,13 @@
 package ctoutweb.lalamiam.test;
 
 import ctoutweb.lalamiam.helper.CommandServiceHelper;
+import ctoutweb.lalamiam.model.dto.AddProductDto;
 import ctoutweb.lalamiam.model.dto.ProInformationDto;
 import ctoutweb.lalamiam.model.schema.AddProductSchema;
 import ctoutweb.lalamiam.model.schema.AddProfessionalSchema;
 import ctoutweb.lalamiam.model.schema.AddStoreSchema;
-import ctoutweb.lalamiam.repository.CommandRepository;
+import ctoutweb.lalamiam.model.schema.ProductInCommand;
 import ctoutweb.lalamiam.repository.ProRepository;
-import ctoutweb.lalamiam.repository.ProductRepository;
 import ctoutweb.lalamiam.repository.entity.ProductEntity;
 import ctoutweb.lalamiam.repository.entity.StoreEntity;
 import ctoutweb.lalamiam.service.ProService;
@@ -77,14 +77,14 @@ public class CommandServiceHelperTest {
             "s",
             store.getId());
 
-    ProductEntity addProduct1 =  productService.addProduct(addProductSchema1);
-    ProductEntity addProduct2 =  productService.addProduct(addProductSchema2);
-    ProductEntity addProduct3 =  productService.addProduct(addProductSchema3);
+    AddProductDto addProduct1 =  productService.addProduct(addProductSchema1);
+    AddProductDto addProduct2 =  productService.addProduct(addProductSchema2);
+    AddProductDto addProduct3 =  productService.addProduct(addProductSchema3);
 
     List<BigInteger> productsId = new ArrayList<>();
-    productsId.add(addProduct1.getId());
-    productsId.add(addProduct2.getId());
-    productsId.add(addProduct3.getId());
+    productsId.add(addProduct1.id());
+    productsId.add(addProduct2.id());
+    productsId.add(addProduct3.id());
 
     Assertions.assertEquals(3, storeServiceHelper.findProductListById(productsId).size());
   }
@@ -118,23 +118,23 @@ public class CommandServiceHelperTest {
             "s",
             store.getId());
 
-    ProductEntity addProduct1 =  productService.addProduct(addProductSchema1);
-    ProductEntity addProduct2 =  productService.addProduct(addProductSchema2);
-    ProductEntity addProduct3 =  productService.addProduct(addProductSchema3);
+    AddProductDto addProduct1 =  productService.addProduct(addProductSchema1);
+    AddProductDto addProduct2 =  productService.addProduct(addProductSchema2);
+    AddProductDto addProduct3 =  productService.addProduct(addProductSchema3);
 
     // ajout des id dans une liste
     BigInteger randomProductId = BigInteger.valueOf(0);
     List<BigInteger> productsId = new ArrayList<>();
-    productsId.add(addProduct1.getId());
-    productsId.add(addProduct2.getId());
-    productsId.add(addProduct3.getId());
+    productsId.add(addProduct1.id());
+    productsId.add(addProduct2.id());
+    productsId.add(addProduct3.id());
     productsId.add(randomProductId);
 
     Assertions.assertThrows(RuntimeException.class,()-> storeServiceHelper.findProductListById(productsId).size());
   }
 
   @Test
-  void should_calculate_command_price() {
+  void should_calculate_command_price() throws Exception {
     // Creation Pro
     ProInformationDto createdPro = proService.addProfessional(new AddProfessionalSchema("", "password", "aaa"));
 
@@ -162,14 +162,14 @@ public class CommandServiceHelperTest {
             "s",
             store.getId());
 
-    ProductEntity addProduct1 =  productService.addProduct(addProductSchema1);
-    ProductEntity addProduct2 =  productService.addProduct(addProductSchema2);
-    ProductEntity addProduct3 =  productService.addProduct(addProductSchema3);
+    AddProductDto addProduct1 =  productService.addProduct(addProductSchema1);
+    AddProductDto addProduct2 =  productService.addProduct(addProductSchema2);
+    AddProductDto addProduct3 =  productService.addProduct(addProductSchema3);
 
-    List<ProductEntity> products = new ArrayList<>();
-    products.add(addProduct1);
-    products.add(addProduct2);
-    products.add(addProduct3);
+    List<ProductInCommand> products = new ArrayList<>();
+    products.add(new ProductInCommand(addProduct1.id(), 1));
+    products.add(new ProductInCommand(addProduct2.id(), 1));
+    products.add(new ProductInCommand(addProduct3.id(), 1));
 
     Assertions.assertEquals(13.85, storeServiceHelper.calculateCommandPrice(products));
   }
@@ -203,16 +203,16 @@ public class CommandServiceHelperTest {
             "s",
             store.getId());
 
-    ProductEntity addProduct1 =  productService.addProduct(addProductSchema1);
-    ProductEntity addProduct2 =  productService.addProduct(addProductSchema2);
-    ProductEntity addProduct3 =  productService.addProduct(addProductSchema3);
+    AddProductDto addProduct1 =  productService.addProduct(addProductSchema1);
+    AddProductDto addProduct2 =  productService.addProduct(addProductSchema2);
+    AddProductDto addProduct3 =  productService.addProduct(addProductSchema3);
 
-    List<ProductEntity> products = new ArrayList<>();
-    products.add(addProduct1);
-    products.add(addProduct2);
-    products.add(addProduct3);
+    List<ProductInCommand> products = new ArrayList<>();
+    products.add(new ProductInCommand(addProduct1.id(), 1));
+    products.add(new ProductInCommand(addProduct2.id(), 1));
+    products.add(new ProductInCommand(addProduct3.id(), 2));
 
-    Assertions.assertEquals(17, commandServiceHelper.calculatCommandPreparationTime(products));
+    Assertions.assertEquals(27, commandServiceHelper.calculateCommandPreparationTime(products));
 
   }
 }

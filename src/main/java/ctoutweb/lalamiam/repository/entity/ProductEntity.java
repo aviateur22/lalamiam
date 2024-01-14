@@ -1,5 +1,7 @@
 package ctoutweb.lalamiam.repository.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import ctoutweb.lalamiam.model.schema.AddProductSchema;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -7,6 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -131,6 +134,7 @@ public class ProductEntity {
     this.updatedAt = updatedAt;
   }
 
+  @JsonBackReference
   public StoreEntity getStore() {
     return store;
   }
@@ -139,11 +143,41 @@ public class ProductEntity {
     this.store = store;
   }
 
+  @JsonManagedReference
   public Set<CookEntity> getCooks() {
     return cooks;
   }
 
   public void setCooks(Set<CookEntity> cooks) {
     this.cooks = cooks;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    ProductEntity product = (ProductEntity) o;
+    return Objects.equals(id, product.id) && Objects.equals(name, product.name) && Objects.equals(price, product.price) && Objects.equals(description, product.description) && Objects.equals(preparationTime, product.preparationTime) && Objects.equals(photo, product.photo) && Objects.equals(createdAt, product.createdAt) && Objects.equals(updatedAt, product.updatedAt) && Objects.equals(store, product.store) && Objects.equals(cooks, product.cooks);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, name, price, description, preparationTime, photo, createdAt, updatedAt, store, cooks);
+  }
+
+  @Override
+  public String toString() {
+    return "ProductEntity{" +
+            "id=" + id +
+            ", name='" + name + '\'' +
+            ", price=" + price +
+            ", description='" + description + '\'' +
+            ", preparationTime=" + preparationTime +
+            ", photo='" + photo + '\'' +
+            ", createdAt=" + createdAt +
+            ", updatedAt=" + updatedAt +
+            ", store=" + store +
+            //", cooks=" + cooks +
+            '}';
   }
 }

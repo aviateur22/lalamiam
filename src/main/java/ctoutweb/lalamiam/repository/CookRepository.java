@@ -6,14 +6,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface CookRepository extends JpaRepository<CookEntity, BigInteger> {
   @Query(value = "select count(*) from sc_lalamiam.cook", nativeQuery = true)
   public long countAll();
-  @Query(
-          value = "" +
+  @Query( value = "" +
                   "select * " +
                   "from sc_lalamiam.cook " +
                   "where store_id = ?1 and command_id = ?2 and product_id = ?3 " +
@@ -23,6 +23,13 @@ public interface CookRepository extends JpaRepository<CookEntity, BigInteger> {
           BigInteger storeId,
           BigInteger commandId,
           BigInteger produtcId);
+
+  @Query(value = "select * " +
+          "from sc_lalamiam.cook " +
+          "where store_id = ?1 and command_id = ?2 "+
+          "order by created_at desc",
+        nativeQuery = true)
+  public List<CookEntity> findByCommandIdAndStoreId(BigInteger storeId, BigInteger commandId);
 
 
 }

@@ -1,12 +1,11 @@
 package ctoutweb.lalamiam.service;
 
+import ctoutweb.lalamiam.model.dto.AddCommandDto;
+import ctoutweb.lalamiam.model.dto.UpdateProductQuantityInCommandDto;
 import ctoutweb.lalamiam.model.schema.AddCommandSchema;
-import ctoutweb.lalamiam.model.schema.ProductInCommand;
-import ctoutweb.lalamiam.model.schema.UpdateProductCommandSchema;
-import ctoutweb.lalamiam.repository.entity.CommandEntity;
+import ctoutweb.lalamiam.model.schema.UpdateProductQuantityInCommandSchema;
 
 public interface CommandService {
-  CommandEntity addCommand(AddCommandSchema addCommandSchema);
-
-  ProductInCommand updateProductCommand(UpdateProductCommandSchema updateCommandSchema);
+  AddCommandDto addCommand(AddCommandSchema addCommandSchema);
+  UpdateProductQuantityInCommandDto updateProductQuantityInCommand(UpdateProductQuantityInCommandSchema updateCommandSchema);
 }

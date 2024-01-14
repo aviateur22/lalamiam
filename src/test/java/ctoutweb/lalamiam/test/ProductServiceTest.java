@@ -1,5 +1,6 @@
 package ctoutweb.lalamiam.test;
 
+import ctoutweb.lalamiam.model.dto.AddProductDto;
 import ctoutweb.lalamiam.model.dto.ProInformationDto;
 import ctoutweb.lalamiam.model.schema.AddProductSchema;
 import ctoutweb.lalamiam.model.schema.AddProfessionalSchema;
@@ -54,7 +55,7 @@ public class ProductServiceTest {
 
     // Ajout produit
     AddProductSchema addProductSchema = new AddProductSchema("melon", 1.9, "jolie melon", 5, "ddd", store.getId());
-    ProductEntity addProduct =  productService.addProduct(addProductSchema);
+    AddProductDto addProduct =  productService.addProduct(addProductSchema);
 
     /**
      * Then
@@ -148,11 +149,11 @@ public class ProductServiceTest {
             5,
             "s"
             , store.getId());
-    ProductEntity addProduct =  productService.addProduct(addProductSchema);
+    AddProductDto addProduct =  productService.addProduct(addProductSchema);
 
     // Update du produit
     UpdateProductSchema updateProductSchema = new UpdateProductSchema(
-            addProduct.getId(),
+            addProduct.id(),
             "mise a jour",
             10D,
             "update description",
@@ -189,7 +190,7 @@ public class ProductServiceTest {
             5,
             "s",
             store.getId());
-    ProductEntity addProduct =  productService.addProduct(addProductSchema);
+    AddProductDto addProduct =  productService.addProduct(addProductSchema);
 
     // Update du produit
     UpdateProductSchema updateProductSchema = new UpdateProductSchema(
@@ -202,7 +203,6 @@ public class ProductServiceTest {
             store.getId());
     Assertions.assertThrows(RuntimeException.class, ()->productService.updateProduct(updateProductSchema));
   }
-
   @Test
   void should_not_update_product_without_description() {
     // Creation Pro
@@ -214,14 +214,14 @@ public class ProductServiceTest {
 
     // Ajout produit
     AddProductSchema addProductSchema = new AddProductSchema("initial name", 0D, "initial description", 5, "s", store.getId());
-    ProductEntity addProduct =  productService.addProduct(addProductSchema);
+    AddProductDto addProduct =  productService.addProduct(addProductSchema);
 
     // Update du produit
-    UpdateProductSchema updateProductSchema = new UpdateProductSchema(addProduct.getId(), "mise a jour", 10D, "", 15, "x", store.getId());
+    UpdateProductSchema updateProductSchema = new UpdateProductSchema(addProduct.id(), "mise a jour", 10D, "", 15, "x", store.getId());
     Assertions.assertThrows(RuntimeException.class, ()->productService.updateProduct(updateProductSchema));
 
     // Vérification des données du produit
-    ProductEntity findProduct = productRepository.findById(addProduct.getId()).orElseThrow(()->new RuntimeException(""));
+    ProductEntity findProduct = productRepository.findById(addProduct.id()).orElseThrow(()->new RuntimeException(""));
 
     Assertions.assertEquals(1, productRepository.countAll());
     Assertions.assertEquals(addProductSchema.name(), findProduct.getName());
@@ -241,14 +241,14 @@ public class ProductServiceTest {
 
     // Ajout produit
     AddProductSchema addProductSchema = new AddProductSchema("initial name", 0D, "initial description", 5, "s", store.getId());
-    ProductEntity addProduct =  productService.addProduct(addProductSchema);
+    AddProductDto addProduct =  productService.addProduct(addProductSchema);
 
     // Update du produit
-    UpdateProductSchema updateProductSchema = new UpdateProductSchema(addProduct.getId(), "", 10D, "desription", 15, "x", store.getId());
+    UpdateProductSchema updateProductSchema = new UpdateProductSchema(addProduct.id(), "", 10D, "desription", 15, "x", store.getId());
     Assertions.assertThrows(RuntimeException.class, ()->productService.updateProduct(updateProductSchema));
 
     // Vérification des données du produit
-    ProductEntity findProduct = productRepository.findById(addProduct.getId()).orElseThrow(()->new RuntimeException(""));
+    ProductEntity findProduct = productRepository.findById(addProduct.id()).orElseThrow(()->new RuntimeException(""));
 
     Assertions.assertEquals(1, productRepository.countAll());
     Assertions.assertEquals(addProductSchema.name(), findProduct.getName());
@@ -268,14 +268,14 @@ public class ProductServiceTest {
 
     // Ajout produit
     AddProductSchema addProductSchema = new AddProductSchema("initial name", 0D, "initial description", 5, "s", store.getId());
-    ProductEntity addProduct =  productService.addProduct(addProductSchema);
+    AddProductDto addProduct =  productService.addProduct(addProductSchema);
 
     // Update du produit
-    UpdateProductSchema updateProductSchema = new UpdateProductSchema(addProduct.getId(), "mise a jour", 10D, "description", 15, "", store.getId());
+    UpdateProductSchema updateProductSchema = new UpdateProductSchema(addProduct.id(), "mise a jour", 10D, "description", 15, "", store.getId());
     Assertions.assertThrows(RuntimeException.class, ()->productService.updateProduct(updateProductSchema));
 
     // Vérification des données du produit
-    ProductEntity findProduct = productRepository.findById(addProduct.getId()).orElseThrow(()->new RuntimeException(""));
+    ProductEntity findProduct = productRepository.findById(addProduct.id()).orElseThrow(()->new RuntimeException(""));
 
     Assertions.assertEquals(1, productRepository.countAll());
     Assertions.assertEquals(addProductSchema.name(), findProduct.getName());
@@ -295,13 +295,13 @@ public class ProductServiceTest {
 
     // Ajout produit
     AddProductSchema addProductSchema = new AddProductSchema("initial name", 0D, "initial description", 5, "s", store.getId());
-    ProductEntity addProduct =  productService.addProduct(addProductSchema);
+    AddProductDto addProduct =  productService.addProduct(addProductSchema);
 
     // Suppression
-    productService.deleteProduct(addProduct.getId());
+    productService.deleteProduct(addProduct.id());
 
     // Recherche produit supprimé
-    Assertions.assertThrows(RuntimeException.class, ()->productService.findProduct(addProduct.getId()));
+    Assertions.assertThrows(RuntimeException.class, ()->productService.findProduct(addProduct.id()));
   }
 
   @Test

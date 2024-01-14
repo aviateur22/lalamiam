@@ -1,5 +1,8 @@
 package ctoutweb.lalamiam.repository.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import ctoutweb.lalamiam.model.schema.AddCommandSchema;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -7,6 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -29,7 +33,11 @@ public class CommandEntity {
   @Column(name = "slot_time")
   private LocalDateTime slotTime;
 
-  @OneToMany(mappedBy = "command")
+  @Column(name = "command_code")
+  private String commandCode;
+
+  @JsonIgnore
+  @OneToMany(mappedBy = "command", fetch = FetchType.LAZY)
   Set<CookEntity> cooks;
 
   @CreationTimestamp
@@ -118,5 +126,40 @@ public class CommandEntity {
 
   public void setUpdatedAt(LocalDateTime updatedAt) {
     this.updatedAt = updatedAt;
+  }
+
+  public String getCommandCode() {
+    return commandCode;
+  }
+
+  public void setCommandCode(String commandCode) {
+    this.commandCode = commandCode;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    CommandEntity that = (CommandEntity) o;
+    return Objects.equals(id, that.id) && Objects.equals(clientPhone, that.clientPhone) && Objects.equals(preparationTime, that.preparationTime) && Objects.equals(orderPrice, that.orderPrice) && Objects.equals(slotTime, that.slotTime) && Objects.equals(cooks, that.cooks) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, clientPhone, preparationTime, orderPrice, slotTime, cooks, createdAt, updatedAt);
+  }
+
+  @Override
+  public String toString() {
+    return "CommandEntity{" +
+            "id=" + id +
+            ", clientPhone='" + clientPhone + '\'' +
+            ", preparationTime=" + preparationTime +
+            ", orderPrice=" + orderPrice +
+            ", slotTime=" + slotTime +
+            ", cooks=" + cooks +
+            ", createdAt=" + createdAt +
+            ", updatedAt=" + updatedAt +
+            '}';
   }
 }

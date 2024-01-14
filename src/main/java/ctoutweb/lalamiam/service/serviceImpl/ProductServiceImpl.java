@@ -1,5 +1,7 @@
 package ctoutweb.lalamiam.service.serviceImpl;
 
+import ctoutweb.lalamiam.mapper.AddProductMapper;
+import ctoutweb.lalamiam.model.dto.AddProductDto;
 import ctoutweb.lalamiam.model.schema.AddProductSchema;
 import ctoutweb.lalamiam.model.schema.UpdateProductSchema;
 import ctoutweb.lalamiam.repository.ProductRepository;
@@ -13,18 +15,22 @@ import java.math.BigInteger;
 
 @Service
 public class ProductServiceImpl implements ProductService {
-
   private final ProductRepository productRepository;
   private final StoreRepository storeRepository;
+  private final AddProductMapper addProductMapper;
 
-
-  public ProductServiceImpl(ProductRepository productRepository, StoreRepository storeRepository) {
+  public ProductServiceImpl(
+          ProductRepository productRepository,
+          StoreRepository storeRepository,
+          AddProductMapper addProductMapper
+  ) {
     this.productRepository = productRepository;
     this.storeRepository = storeRepository;
+    this.addProductMapper = addProductMapper;
   }
 
   @Override
-  public ProductEntity addProduct(AddProductSchema addProductSchema) {
+  public AddProductDto addProduct(AddProductSchema addProductSchema) {
     if(CommonFunction.isNullOrEmpty(addProductSchema.description())
             ||CommonFunction.isNullOrEmpty(addProductSchema.name())
             ||CommonFunction.isNullOrEmpty(addProductSchema.photo())
@@ -38,7 +44,7 @@ public class ProductServiceImpl implements ProductService {
 
     //Ajourt du produit
     ProductEntity product = productRepository.save(new ProductEntity(addProductSchema));
-    return product;
+    return addProductMapper.apply(product);
   }
 
   @Override

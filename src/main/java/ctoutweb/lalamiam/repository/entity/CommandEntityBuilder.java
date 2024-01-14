@@ -10,6 +10,7 @@ public final class CommandEntityBuilder {
   private Integer preparationTime;
   private Double orderPrice;
   private LocalDateTime slotTime;
+  private String commandCode;
   private Set<CookEntity> cooks;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
@@ -46,6 +47,11 @@ public final class CommandEntityBuilder {
     return this;
   }
 
+  public CommandEntityBuilder withCommandCode(String commandCode) {
+    this.commandCode = commandCode;
+    return this;
+  }
+
   public CommandEntityBuilder withCooks(Set<CookEntity> cooks) {
     this.cooks = cooks;
     return this;
@@ -68,6 +74,7 @@ public final class CommandEntityBuilder {
     commandEntity.setPreparationTime(preparationTime);
     commandEntity.setOrderPrice(orderPrice);
     commandEntity.setSlotTime(slotTime);
+    commandEntity.setCommandCode(commandCode);
     commandEntity.setCooks(cooks);
     commandEntity.setCreatedAt(createdAt);
     commandEntity.setUpdatedAt(updatedAt);

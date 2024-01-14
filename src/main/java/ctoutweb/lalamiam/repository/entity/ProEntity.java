@@ -1,5 +1,6 @@
 package ctoutweb.lalamiam.repository.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import ctoutweb.lalamiam.model.schema.AddProfessionalSchema;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
@@ -7,6 +8,7 @@ import org.hibernate.annotations.*;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -110,11 +112,38 @@ public class ProEntity {
     this.password = password;
   }
 
+  @JsonManagedReference
   public Set<StoreEntity> getStores() {
     return stores;
   }
 
   public void setStores(Set<StoreEntity> stores) {
     this.stores = stores;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    ProEntity proEntity = (ProEntity) o;
+    return Objects.equals(id, proEntity.id) && Objects.equals(email, proEntity.email) && Objects.equals(phone, proEntity.phone) && Objects.equals(password, proEntity.password) && Objects.equals(createdAt, proEntity.createdAt) && Objects.equals(updatedAt, proEntity.updatedAt) && Objects.equals(stores, proEntity.stores);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, email, phone, password, createdAt, updatedAt, stores);
+  }
+
+  @Override
+  public String toString() {
+    return "ProEntity{" +
+            "id=" + id +
+            ", email='" + email + '\'' +
+            ", phone='" + phone + '\'' +
+            ", password='" + password + '\'' +
+            ", createdAt=" + createdAt +
+            ", updatedAt=" + updatedAt +
+            //", stores=" + stores +
+            '}';
   }
 }

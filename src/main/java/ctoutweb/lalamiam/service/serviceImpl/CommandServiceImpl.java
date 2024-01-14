@@ -1,9 +1,11 @@
 package ctoutweb.lalamiam.service.serviceImpl;
 
 import ctoutweb.lalamiam.helper.CommandServiceHelper;
+import ctoutweb.lalamiam.model.dto.AddCommandDto;
+import ctoutweb.lalamiam.model.dto.UpdateProductQuantityInCommandDto;
 import ctoutweb.lalamiam.model.schema.AddCommandSchema;
 import ctoutweb.lalamiam.model.schema.ProductInCommand;
-import ctoutweb.lalamiam.model.schema.UpdateProductCommandSchema;
+import ctoutweb.lalamiam.model.schema.UpdateProductQuantityInCommandSchema;
 import ctoutweb.lalamiam.repository.CommandRepository;
 import ctoutweb.lalamiam.repository.CookRepository;
 import ctoutweb.lalamiam.repository.StoreRepository;
@@ -12,20 +14,18 @@ import ctoutweb.lalamiam.repository.entity.CookEntity;
 import ctoutweb.lalamiam.repository.entity.StoreEntity;
 import ctoutweb.lalamiam.service.CommandService;
 import ctoutweb.lalamiam.util.CommonFunction;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-
 @Service
 public class CommandServiceImpl implements CommandService {
-
   private final CommandServiceHelper commandServiceHelper;
   private final StoreRepository storeRepository;
   private final CommandRepository commandRepository;
-
   private final CookRepository cookRepository;
 
   public CommandServiceImpl(
@@ -40,7 +40,7 @@ public class CommandServiceImpl implements CommandService {
   }
 
   @Override
-  public CommandEntity addCommand(AddCommandSchema addCommandSchema) {
+  public AddCommandDto addCommand(AddCommandSchema addCommandSchema) {
 
     LocalDateTime now = LocalDateTime.now();
     List<BigInteger> produtcIdList = addCommandSchema
@@ -67,20 +67,25 @@ public class CommandServiceImpl implements CommandService {
   }
 
   @Override
-  public ProductInCommand updateProductCommand(UpdateProductCommandSchema updateProductCommand) {
+  @Transactional
+  public UpdateProductQuantityInCommandDto updateProductQuantityInCommand(
+          UpdateProductQuantityInCommandSchema updateProductCommand
+  ) throws RuntimeException {
+
+    // Correction quantité
+    if(updateProductCommand.getProductQuantity() <= 0) updateProductCommand .setProductQuantity(1);
+
     CookEntity productCook = cookRepository.findOneByStoreIdCommandIdProductId(
-            updateProductCommand.storeId(),
-            updateProductCommand.commandId(),
-            updateProductCommand.productId()
-    )
+            updateProductCommand.getStoreId(),
+            updateProductCommand.getCommandId(),
+            updateProductCommand.getProductId())
             .orElseThrow(()->new RuntimeException("Le produit n'est pas trouvé"));
 
-    // Mise a jour de la quantité
-    productCook.setProductQuantity(updateProductCommand.productQuantity());
+    // Récuperation des données de la commande mise a jour
+    CommandEntity updatedCommand = commandRepository
+            .findById(updateProductCommand.getCommandId())
+            .orElseThrow(()->new RuntimeException("La commande n'est pas trouvée"));
 
-    // Mise a jour des données
-    CookEntity updateCookProduct = cookRepository.save(productCook);
-
-    return new ProductInCommand(updateCookProduct.getProduct().getId(), updateProductCommand.productQuantity());
+    return commandServiceHelper.updateProductQuantityInCommand(productCook, updateProductCommand, updatedCommand);
   }
 }

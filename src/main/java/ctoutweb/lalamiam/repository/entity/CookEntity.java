@@ -1,13 +1,16 @@
 package ctoutweb.lalamiam.repository.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import ctoutweb.lalamiam.model.schema.AddCookSchema;
-import ctoutweb.lalamiam.model.schema.UpdateProductCommandSchema;
+import ctoutweb.lalamiam.model.schema.UpdateProductQuantityInCommandSchema;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "cook")
@@ -20,6 +23,7 @@ public class CookEntity {
   @Column(name = "product_quantity")
   private Integer productQuantity;
 
+  @JsonIgnore
   @ManyToOne
   @JoinColumn(name = "command_id")
   CommandEntity command;
@@ -53,10 +57,10 @@ public class CookEntity {
     this.productQuantity = addCookSchema.productQuantity();
   }
 
-  public CookEntity(UpdateProductCommandSchema updateProductCommand) {
-    this.command = new CommandEntity(updateProductCommand.commandId());
-    this.store = new StoreEntity(updateProductCommand.storeId());
-    this.product = new ProductEntity(updateProductCommand.productId());
+  public CookEntity(UpdateProductQuantityInCommandSchema updateProductCommand) {
+    this.command = new CommandEntity(updateProductCommand.getCommandId());
+    this.store = new StoreEntity(updateProductCommand.getStoreId());
+    this.product = new ProductEntity(updateProductCommand.getProductId());
   }
 
 
@@ -76,6 +80,7 @@ public class CookEntity {
     this.command = command;
   }
 
+  @JsonBackReference
   public StoreEntity getStore() {
     return store;
   }
@@ -84,6 +89,7 @@ public class CookEntity {
     this.store = store;
   }
 
+  @JsonBackReference
   public ProductEntity getProduct() {
     return product;
   }
@@ -114,5 +120,29 @@ public class CookEntity {
 
   public void setProductQuantity(Integer productQuantity) {
     this.productQuantity = productQuantity;
+  }
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    CookEntity that = (CookEntity) o;
+    return Objects.equals(id, that.id) && Objects.equals(productQuantity, that.productQuantity) && Objects.equals(command, that.command) && Objects.equals(store, that.store) && Objects.equals(product, that.product) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
+  }
+//  @Override
+//  public int hashCode() {
+//    return Objects.hash(id, productQuantity, command, store, product, createdAt, updatedAt);
+//  }
+
+  @Override
+  public String toString() {
+    return "CookEntity{" +
+            "id=" + id +
+            ", productQuantity=" + productQuantity +
+            //", command=" + command +
+            ", store=" + store +
+            ", product=" + product +
+            ", createdAt=" + createdAt +
+            ", updatedAt=" + updatedAt +
+            '}';
   }
 }

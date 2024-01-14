@@ -1,6 +1,9 @@
 package ctoutweb.lalamiam.test;
 
+import ctoutweb.lalamiam.model.dto.AddCommandDto;
+import ctoutweb.lalamiam.model.dto.AddProductDto;
 import ctoutweb.lalamiam.model.dto.ProInformationDto;
+import ctoutweb.lalamiam.model.dto.UpdateProductQuantityInCommandDto;
 import ctoutweb.lalamiam.model.schema.*;
 import ctoutweb.lalamiam.repository.CommandRepository;
 import ctoutweb.lalamiam.repository.CookRepository;
@@ -66,27 +69,27 @@ public class CommandServiceTest {
   @Test
   void should_create_command() {
     // Creation Commande
-    CommandEntity createCommand = commandService.addCommand(addCommandSchema());
+    AddCommandDto addCommand = commandService.addCommand(addCommandSchema());
 
     // Controle de la commande
     Assertions.assertEquals(1, commandRepository.countAll());
-    Assertions.assertEquals(createCommand.getClientPhone(), createCommand.getClientPhone());
-    Assertions.assertEquals(createCommand.getPreparationTime(), createCommand.getPreparationTime());
+    //Assertions.assertEquals(addCommand.phoneClient(), addCommand.getClientPhone());
+    //Assertions.assertEquals(addCommand.getPreparationTime(), addCommand.getPreparationTime());
 
     // Controle relation produits - store - commande
     Assertions.assertEquals(3, cookRepository.countAll());
     List<CookEntity> cooks = cookRepository.findAll();
 
     Assertions.assertEquals(productsInCommand.get(0).productId(), cooks.get(0).getProduct().getId());
-    Assertions.assertEquals(createCommand.getId(), cooks.get(0).getCommand().getId());
+    Assertions.assertEquals(addCommand.commandId(), cooks.get(0).getCommand().getId());
     Assertions.assertEquals(store.getId(), cooks.get(0).getStore().getId());
 
     Assertions.assertEquals(productsInCommand.get(1).productId(), cooks.get(1).getProduct().getId());
-    Assertions.assertEquals(createCommand.getId(), cooks.get(1).getCommand().getId());
+    Assertions.assertEquals(addCommand.commandId(), cooks.get(1).getCommand().getId());
     Assertions.assertEquals(store.getId(), cooks.get(1).getStore().getId());
 
     Assertions.assertEquals(productsInCommand.get(2).productId(), cooks.get(2).getProduct().getId());
-    Assertions.assertEquals(createCommand.getId(), cooks.get(2).getCommand().getId());
+    Assertions.assertEquals(addCommand.commandId(), cooks.get(2).getCommand().getId());
     Assertions.assertEquals(store.getId(), cooks.get(2).getStore().getId());
   }
 
@@ -142,12 +145,21 @@ public class CommandServiceTest {
 
   @Test
   void should_update_product_quantity_in_command(){
-    CommandEntity createCommand = commandService.addCommand(addCommandSchema());
+    // Creation Commande
+    AddCommandDto addCommand = commandService.addCommand(addCommandSchema());
+
+    // Récuperation d'un produit de la commande
     BigInteger productChangeId = productsInCommand.get(0).productId();
-    UpdateProductCommandSchema updateCommandSchema = new UpdateProductCommandSchema(productChangeId, createCommand.getId(), store.getId(), 25);
-    ProductInCommand productUpdated = commandService.updateProductCommand(updateCommandSchema);
-    Assertions.assertEquals(25, productUpdated.productQuantity());
-    Assertions.assertEquals(productChangeId, productUpdated.productId());
+
+    // Modification du produit dans la commande
+    UpdateProductQuantityInCommandSchema updateCommandSchema = new UpdateProductQuantityInCommandSchema(
+            productChangeId, addCommand.commandId(), store.getId(), 25);
+    UpdateProductQuantityInCommandDto productUpdated = commandService.updateProductQuantityInCommand(updateCommandSchema);
+
+    Assertions.assertEquals(25, productUpdated.productInCommand().productQuantity());
+    Assertions.assertEquals(productChangeId, productUpdated.productInCommand().productId());
+
+
 
   }
 
@@ -178,7 +190,7 @@ public class CommandServiceTest {
             StoreEntityBuilder.aStoreEntity().withId(BigInteger.valueOf(0)).build();
 
     // Création produits
-    List<ProductEntity> createProductList = createProduct(createdStore.getId());
+    List<AddProductDto> createProductList = createProduct(createdStore.getId());
 
     // Creation commande
     createProductsInCommand(createProductList);
@@ -187,8 +199,8 @@ public class CommandServiceTest {
     if(!isProdutcBelongToStore) {
       createdPro2 = createPro();
       createdStore2 = createStore(createdPro2);
-      List<ProductEntity> createProductList2 = createProduct(createdStore2.getId());
-      ProductInCommand productStore2 = new ProductInCommand(createProductList2.get(0).getId(), 1);
+      List<AddProductDto> createProductList2 = createProduct(createdStore2.getId());
+      ProductInCommand productStore2 = new ProductInCommand(createProductList2.get(0).id(), 1);
       productsInCommand.add(productStore2);
     }
 
@@ -220,10 +232,10 @@ public class CommandServiceTest {
    * @param productList
    * @return
    */
-  public void createProductsInCommand(List<ProductEntity> productList) {
+  public void createProductsInCommand(List<AddProductDto> productList) {
     productsInCommand = productList
             .stream()
-            .map(product -> new ProductInCommand(product.getId(), 2))
+            .map(product -> new ProductInCommand(product.id(), 2))
             .collect(Collectors.toList());
   }
 
@@ -247,16 +259,16 @@ public class CommandServiceTest {
     StoreEntity createdStore = storeService.createStore(addStoreSchema);
     return createdStore;
   }
-  public List<ProductEntity> createProduct(BigInteger storeId) {
+  public List<AddProductDto> createProduct(BigInteger storeId) {
     AddProductSchema addProductSchema1 = new AddProductSchema("lait", 10D, "initial description", 5, "s", storeId);
     AddProductSchema addProductSchema2 = new AddProductSchema("coco", 20D, "initial description", 5, "s", storeId);
     AddProductSchema addProductSchema3 = new AddProductSchema("orange", 10D, "initial description", 5, "s", storeId);
 
-    ProductEntity addProduct1 =  productService.addProduct(addProductSchema1);
-    ProductEntity addProduct2 =  productService.addProduct(addProductSchema2);
-    ProductEntity addProduct3 =  productService.addProduct(addProductSchema3);
+    AddProductDto addProduct1 =  productService.addProduct(addProductSchema1);
+    AddProductDto addProduct2 =  productService.addProduct(addProductSchema2);
+    AddProductDto addProduct3 =  productService.addProduct(addProductSchema3);
 
-    List<ProductEntity> createdProductList = new ArrayList<>();
+    List<AddProductDto> createdProductList = new ArrayList<>();
     createdProductList.add(addProduct1);
     createdProductList.add(addProduct2);
     createdProductList.add(addProduct3);

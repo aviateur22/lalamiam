@@ -1,5 +1,7 @@
 package ctoutweb.lalamiam.repository.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import ctoutweb.lalamiam.model.schema.AddStoreSchema;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -7,6 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -47,10 +50,10 @@ public class StoreEntity {
   @JoinColumn(name="pro_id", nullable=false)
   private ProEntity pro;
 
-  @OneToMany(mappedBy = "store")
+  @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
   Set<ProductEntity> products;
 
-  @OneToMany(mappedBy = "store")
+  @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
   Set<CookEntity> cooks;
 
   /**
@@ -61,7 +64,7 @@ public class StoreEntity {
 
   public StoreEntity(AddStoreSchema addStoreSchema) {
     this.pro = new ProEntity(addStoreSchema.proId());
-    this.adress = addStoreSchema.Adress();
+    this.adress = addStoreSchema.adress();
     this.city = addStoreSchema.city();
     this.name = addStoreSchema.name();
     this.cp = addStoreSchema.cp();
@@ -151,6 +154,7 @@ public class StoreEntity {
     this.updatedAt = updatedAt;
   }
 
+  @JsonBackReference
   public ProEntity getPro() {
     return pro;
   }
@@ -159,6 +163,7 @@ public class StoreEntity {
     this.pro = pro;
   }
 
+  @JsonManagedReference
   public Set<ProductEntity> getProducts() {
     return products;
   }
@@ -167,11 +172,44 @@ public class StoreEntity {
     this.products = products;
   }
 
+  @JsonManagedReference
   public Set<CookEntity> getCooks() {
     return cooks;
   }
 
   public void setCooks(Set<CookEntity> cooks) {
     this.cooks = cooks;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    StoreEntity store = (StoreEntity) o;
+    return Objects.equals(id, store.id) && Objects.equals(name, store.name) && Objects.equals(presentation, store.presentation) && Objects.equals(adress, store.adress) && Objects.equals(city, store.city) && Objects.equals(cp, store.cp) && Objects.equals(phone, store.phone) && Objects.equals(photo, store.photo) && Objects.equals(createdAt, store.createdAt) && Objects.equals(updatedAt, store.updatedAt) && Objects.equals(pro, store.pro) && Objects.equals(products, store.products) && Objects.equals(cooks, store.cooks);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, name, presentation, adress, city, cp, phone, photo, createdAt, updatedAt, pro, products, cooks);
+  }
+
+  @Override
+  public String toString() {
+    return "StoreEntity{" +
+            "id=" + id +
+            ", name='" + name + '\'' +
+            ", presentation='" + presentation + '\'' +
+            ", adress='" + adress + '\'' +
+            ", city='" + city + '\'' +
+            ", cp='" + cp + '\'' +
+            ", phone='" + phone + '\'' +
+            ", photo='" + photo + '\'' +
+            ", createdAt=" + createdAt +
+            ", updatedAt=" + updatedAt +
+            ", pro=" + pro +
+            //", products=" + products +
+            //", cooks=" + cooks +
+            '}';
   }
 }
