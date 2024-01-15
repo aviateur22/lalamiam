@@ -1,10 +1,11 @@
 package ctoutweb.lalamiam.service.serviceImpl;
 
 import ctoutweb.lalamiam.helper.CommandServiceHelper;
-import ctoutweb.lalamiam.model.dto.AddCommandDto;
+import ctoutweb.lalamiam.model.dto.CommandDetailDto;
 import ctoutweb.lalamiam.model.dto.UpdateProductQuantityInCommandDto;
 import ctoutweb.lalamiam.model.schema.AddCommandSchema;
-import ctoutweb.lalamiam.model.schema.ProductInCommand;
+import ctoutweb.lalamiam.model.schema.DeleteProductInCommandSchema;
+import ctoutweb.lalamiam.model.schema.ProductWithQuantity;
 import ctoutweb.lalamiam.model.schema.UpdateProductQuantityInCommandSchema;
 import ctoutweb.lalamiam.repository.CommandRepository;
 import ctoutweb.lalamiam.repository.CookRepository;
@@ -40,13 +41,13 @@ public class CommandServiceImpl implements CommandService {
   }
 
   @Override
-  public AddCommandDto addCommand(AddCommandSchema addCommandSchema) {
+  public CommandDetailDto addCommand(AddCommandSchema addCommandSchema) {
 
     LocalDateTime now = LocalDateTime.now();
     List<BigInteger> produtcIdList = addCommandSchema
             .productsInCommand()
             .stream()
-            .map(ProductInCommand::productId)
+            .map(ProductWithQuantity::productId)
             .collect(Collectors.toList());
 
     String phoneClient = addCommandSchema.clientPhone();
@@ -79,7 +80,7 @@ public class CommandServiceImpl implements CommandService {
             updateProductCommand.getStoreId(),
             updateProductCommand.getCommandId(),
             updateProductCommand.getProductId())
-            .orElseThrow(()->new RuntimeException("Le produit n'est pas trouvé"));
+            .orElseThrow(()->new RuntimeException("Le produit n'est pas rattaché au commerce"));
 
     // Récuperation des données de la commande mise a jour
     CommandEntity updatedCommand = commandRepository
@@ -87,5 +88,10 @@ public class CommandServiceImpl implements CommandService {
             .orElseThrow(()->new RuntimeException("La commande n'est pas trouvée"));
 
     return commandServiceHelper.updateProductQuantityInCommand(productCook, updateProductCommand, updatedCommand);
+  }
+
+  @Override
+  public CommandDetailDto deleteProductInCommand(DeleteProductInCommandSchema deleteProductInCommand) {
+    return commandServiceHelper.deleteProductInCommand(deleteProductInCommand);
   }
 }

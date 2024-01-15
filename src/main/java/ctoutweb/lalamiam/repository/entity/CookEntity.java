@@ -3,6 +3,7 @@ package ctoutweb.lalamiam.repository.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import ctoutweb.lalamiam.model.schema.AddCookSchema;
+import ctoutweb.lalamiam.model.schema.DeleteProductInCommandSchema;
 import ctoutweb.lalamiam.model.schema.UpdateProductQuantityInCommandSchema;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -55,6 +56,12 @@ public class CookEntity {
     this.store = new StoreEntity(addCookSchema.storeId());
     this.product = new ProductEntity(addCookSchema.productId());
     this.productQuantity = addCookSchema.productQuantity();
+  }
+
+  public CookEntity(DeleteProductInCommandSchema deleteProductInCommand) {
+    this.command = new CommandEntity(deleteProductInCommand.commandId());
+    this.store = new StoreEntity(deleteProductInCommand.storeId());
+    this.product = new ProductEntity(deleteProductInCommand.productId());
   }
 
   public CookEntity(UpdateProductQuantityInCommandSchema updateProductCommand) {

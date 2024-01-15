@@ -1,11 +1,8 @@
 package ctoutweb.lalamiam.helper;
 
-import ctoutweb.lalamiam.model.dto.AddCommandDto;
+import ctoutweb.lalamiam.model.dto.CommandDetailDto;
 import ctoutweb.lalamiam.model.dto.UpdateProductQuantityInCommandDto;
-import ctoutweb.lalamiam.model.schema.AddCommandSchema;
-import ctoutweb.lalamiam.model.schema.AddCookSchema;
-import ctoutweb.lalamiam.model.schema.ProductInCommand;
-import ctoutweb.lalamiam.model.schema.UpdateProductQuantityInCommandSchema;
+import ctoutweb.lalamiam.model.schema.*;
 import ctoutweb.lalamiam.repository.CommandRepository;
 import ctoutweb.lalamiam.repository.CookRepository;
 import ctoutweb.lalamiam.repository.ProductRepository;
@@ -39,7 +36,7 @@ public class CommandServiceHelper {
    * @return
    * @throws RuntimeException
    */
-  public AddCommandDto addCommand(AddCommandSchema addCommandSchema) throws RuntimeException {
+  public CommandDetailDto addCommand(AddCommandSchema addCommandSchema) throws RuntimeException {
 
     // Vérification si les produits appartiennent au Store
     if(!isProductListBelongToStore(addCommandSchema.productsInCommand(), addCommandSchema.storeId()))
@@ -78,13 +75,13 @@ public class CommandServiceHelper {
     });
 
     // Récuperatation des produits de la commande
-    List<ProductInCommand> productInCommandList = findAllProductInCommand(addCommandSchema.storeId(), addCommand.getId());
+    List<ProductWithQuantity> productInCommandList = findAllProductInCommand(addCommandSchema.storeId(), addCommand.getId());
 
     // Calcul quantité produit
     Integer numberOfProductInCommande = calculatedNumberOfProductInCommand(productInCommandList);
 
 
-    return new AddCommandDto(
+    return new CommandDetailDto(
             addCommand.getId(),
             productInCommandList,
             commandPrepartionTime,
@@ -110,7 +107,7 @@ public class CommandServiceHelper {
   ) throws RuntimeException {
 
     // Recherche de la liste des produits en commande
-    List<ProductInCommand> productInCommandList = findAllProductInCommand(
+    List<ProductWithQuantity> productInCommandList = findAllProductInCommand(
             updateProductQuantityInCommand.getStoreId(),
             updateProductQuantityInCommand.getCommandId());
 
@@ -134,7 +131,7 @@ public class CommandServiceHelper {
 
     return new UpdateProductQuantityInCommandDto(
             updatedCommand.getId(),
-            new ProductInCommand(productUpdate.getProduct().getId(), productUpdate.getProductQuantity()),
+            new ProductWithQuantity(productUpdate.getProduct().getId(), productUpdate.getProductQuantity()),
             commandPrepartionTime,
             totalProductInCommand,
             commandPrice);
@@ -142,11 +139,57 @@ public class CommandServiceHelper {
   }
 
   /**
+   * Suppression produit dans 1 commande
+   * @param deleteProductInCommand - Produit a supprimmé
+   * @return CommandDetailDto
+   */
+  public CommandDetailDto deleteProductInCommand(DeleteProductInCommandSchema deleteProductInCommand) {
+
+    // Récuperation des données de la commande
+    CommandEntity command = commandRepository
+            .findById(deleteProductInCommand.commandId())
+            .orElseThrow(()->new RuntimeException("La commande n'est pas trouvée"));
+
+    // Suppression du produit
+    cookRepository.deleteProductInCommandByCommandIdStoreIdProductId(
+            deleteProductInCommand.commandId(),
+            deleteProductInCommand.productId(),
+            deleteProductInCommand.storeId()
+    );
+
+    // Recherche de la liste des produits en commande
+    List<ProductWithQuantity> productInCommandList = findAllProductInCommand(
+            deleteProductInCommand.storeId(),
+            deleteProductInCommand.commandId());
+
+    // Calcul du nouveau prix de la commande
+    Double commandPrice = calculateCommandPrice(productInCommandList);
+
+    // Calcul du nouveau du temps de preparation de la commande
+    Integer commandPrepartionTime = calculateCommandPreparationTime(productInCommandList);
+
+    // Calcul du nouveau du nombre de produits dans la commande
+    Integer totalProductInCommand = calculatedNumberOfProductInCommand(productInCommandList);
+
+    // Calcul quantité produit
+    Integer numberOfProductInCommande = calculatedNumberOfProductInCommand(productInCommandList);
+
+    return new CommandDetailDto(
+            deleteProductInCommand.commandId(),
+            productInCommandList,
+            commandPrepartionTime,
+            numberOfProductInCommande,
+            commandPrice,
+            command.getClientPhone(),
+            command.getCommandCode(),
+            command.getSlotTime());
+  }
+  /**
    * Calcul le prix d'une commande
    * @param productInCommandList
    * @return
    */
-  public Double calculateCommandPrice(List<ProductInCommand> productInCommandList) throws RuntimeException {
+  public Double calculateCommandPrice(List<ProductWithQuantity> productInCommandList) throws RuntimeException {
     // Calcul du prix de la commande
     return productInCommandList
             .stream()
@@ -165,7 +208,7 @@ public class CommandServiceHelper {
    * @param productInCommandList
    * @return
    */
-  public Integer calculateCommandPreparationTime(List<ProductInCommand> productInCommandList) {
+  public Integer calculateCommandPreparationTime(List<ProductWithQuantity> productInCommandList) {
     return productInCommandList
             .stream()
             .map(productInCommand -> {
@@ -183,10 +226,10 @@ public class CommandServiceHelper {
    * @param productInCommandList
    * @return
    */
-  public Integer calculatedNumberOfProductInCommand(List<ProductInCommand> productInCommandList) {
+  public Integer calculatedNumberOfProductInCommand(List<ProductWithQuantity> productInCommandList) {
     return productInCommandList
             .stream()
-            .map(ProductInCommand::productQuantity)
+            .map(ProductWithQuantity::productQuantity)
             .collect(Collectors.summingInt(Integer::intValue));
   }
 
@@ -197,14 +240,14 @@ public class CommandServiceHelper {
    * @return List<ProductInCommand>
    * @throws RuntimeException
    */
-  public List<ProductInCommand> findAllProductInCommand(BigInteger storeId, BigInteger commandId) throws RuntimeException {
+  public List<ProductWithQuantity> findAllProductInCommand(BigInteger storeId, BigInteger commandId) throws RuntimeException {
 
     return cookRepository.findByCommandIdAndStoreId(storeId, commandId).stream().map(cookItem-> {
       Integer productQuantity = cookItem.getProductQuantity();
       ProductEntity product = productRepository
               .findById(cookItem.getProduct().getId())
               .orElseThrow(()->new RuntimeException("Le produit n'existe pas"));
-      return new ProductInCommand(product.getId(), productQuantity);
+      return new ProductWithQuantity(product.getId(), productQuantity);
     }).collect(Collectors.toList());
   }
 
@@ -227,7 +270,7 @@ public class CommandServiceHelper {
    * @param storeId
    * @return
    */
-  public boolean isProductListBelongToStore(List<ProductInCommand> productInCommandList, BigInteger storeId) {
+  public boolean isProductListBelongToStore(List<ProductWithQuantity> productInCommandList, BigInteger storeId) {
     return productInCommandList
             .stream()
             .map(productInCommand-> {

@@ -6,9 +6,8 @@ import ctoutweb.lalamiam.model.dto.ProInformationDto;
 import ctoutweb.lalamiam.model.schema.AddProductSchema;
 import ctoutweb.lalamiam.model.schema.AddProfessionalSchema;
 import ctoutweb.lalamiam.model.schema.AddStoreSchema;
-import ctoutweb.lalamiam.model.schema.ProductInCommand;
+import ctoutweb.lalamiam.model.schema.ProductWithQuantity;
 import ctoutweb.lalamiam.repository.ProRepository;
-import ctoutweb.lalamiam.repository.entity.ProductEntity;
 import ctoutweb.lalamiam.repository.entity.StoreEntity;
 import ctoutweb.lalamiam.service.ProService;
 import ctoutweb.lalamiam.service.ProductService;
@@ -166,10 +165,10 @@ public class CommandServiceHelperTest {
     AddProductDto addProduct2 =  productService.addProduct(addProductSchema2);
     AddProductDto addProduct3 =  productService.addProduct(addProductSchema3);
 
-    List<ProductInCommand> products = new ArrayList<>();
-    products.add(new ProductInCommand(addProduct1.id(), 1));
-    products.add(new ProductInCommand(addProduct2.id(), 1));
-    products.add(new ProductInCommand(addProduct3.id(), 1));
+    List<ProductWithQuantity> products = new ArrayList<>();
+    products.add(new ProductWithQuantity(addProduct1.id(), 1));
+    products.add(new ProductWithQuantity(addProduct2.id(), 1));
+    products.add(new ProductWithQuantity(addProduct3.id(), 1));
 
     Assertions.assertEquals(13.85, storeServiceHelper.calculateCommandPrice(products));
   }
@@ -207,10 +206,10 @@ public class CommandServiceHelperTest {
     AddProductDto addProduct2 =  productService.addProduct(addProductSchema2);
     AddProductDto addProduct3 =  productService.addProduct(addProductSchema3);
 
-    List<ProductInCommand> products = new ArrayList<>();
-    products.add(new ProductInCommand(addProduct1.id(), 1));
-    products.add(new ProductInCommand(addProduct2.id(), 1));
-    products.add(new ProductInCommand(addProduct3.id(), 2));
+    List<ProductWithQuantity> products = new ArrayList<>();
+    products.add(new ProductWithQuantity(addProduct1.id(), 1));
+    products.add(new ProductWithQuantity(addProduct2.id(), 1));
+    products.add(new ProductWithQuantity(addProduct3.id(), 2));
 
     Assertions.assertEquals(27, commandServiceHelper.calculateCommandPreparationTime(products));
 

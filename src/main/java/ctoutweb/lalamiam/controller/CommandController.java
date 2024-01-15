@@ -1,6 +1,6 @@
 package ctoutweb.lalamiam.controller;
 
-import ctoutweb.lalamiam.model.dto.AddCommandDto;
+import ctoutweb.lalamiam.model.dto.CommandDetailDto;
 import ctoutweb.lalamiam.model.dto.UpdateProductQuantityInCommandDto;
 import ctoutweb.lalamiam.model.schema.AddCommandSchema;
 import ctoutweb.lalamiam.model.schema.UpdateProductQuantityInCommandSchema;
@@ -20,8 +20,8 @@ public class CommandController {
   }
 
   @PostMapping("/")
-  ResponseEntity<AddCommandDto> AddCommand(@RequestBody AddCommandSchema addCommandSchema) {
-    AddCommandDto addCommand = commandService.addCommand(addCommandSchema);
+  ResponseEntity<CommandDetailDto> AddCommand(@RequestBody AddCommandSchema addCommandSchema) {
+    CommandDetailDto addCommand = commandService.addCommand(addCommandSchema);
     return new ResponseEntity<>(addCommand, HttpStatus.OK);
   }
   @PatchMapping("/update-product-quantity-in-command")

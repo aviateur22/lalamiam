@@ -1,6 +1,6 @@
 package ctoutweb.lalamiam.test;
 
-import ctoutweb.lalamiam.model.dto.AddCommandDto;
+import ctoutweb.lalamiam.model.dto.CommandDetailDto;
 import ctoutweb.lalamiam.model.dto.AddProductDto;
 import ctoutweb.lalamiam.model.dto.ProInformationDto;
 import ctoutweb.lalamiam.model.dto.UpdateProductQuantityInCommandDto;
@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+//TODO vérifier qu'une commande ne puisse pas etre supprimé ou modifié par un store exterieur
 @SpringBootTest
 public class CommandServiceTest {
 
@@ -51,7 +52,7 @@ public class CommandServiceTest {
   HashMap<String, Boolean> testParameters = new HashMap<>();
 
   //Liste pour commande Pro1
-  List<ProductInCommand> productsInCommand = new ArrayList<>();
+  List<ProductWithQuantity> productsInCommand = new ArrayList<>();
   StoreEntity store;
 
   @BeforeEach
@@ -69,7 +70,7 @@ public class CommandServiceTest {
   @Test
   void should_create_command() {
     // Creation Commande
-    AddCommandDto addCommand = commandService.addCommand(addCommandSchema());
+    CommandDetailDto addCommand = commandService.addCommand(addCommandSchema());
 
     // Controle de la commande
     Assertions.assertEquals(1, commandRepository.countAll());
@@ -146,7 +147,7 @@ public class CommandServiceTest {
   @Test
   void should_update_product_quantity_in_command(){
     // Creation Commande
-    AddCommandDto addCommand = commandService.addCommand(addCommandSchema());
+    CommandDetailDto addCommand = commandService.addCommand(addCommandSchema());
 
     // Récuperation d'un produit de la commande
     BigInteger productChangeId = productsInCommand.get(0).productId();
@@ -158,11 +159,72 @@ public class CommandServiceTest {
 
     Assertions.assertEquals(25, productUpdated.productInCommand().productQuantity());
     Assertions.assertEquals(productChangeId, productUpdated.productInCommand().productId());
+  }
 
+  @Test
+  void should_not_update_product_quantity_if_product_not_belong_to_command() {
+    // Creation Commande store1
+    CommandDetailDto addCommand = commandService.addCommand(addCommandSchema());
+
+    // Creation produit pour store2
+    ProInformationDto pro2 = createPro();
+    StoreEntity store2 = createStore(pro2);
+    List<AddProductDto> productStore2 = createProduct(store2.getId());
+
+    // Récuperation d'un produit du store2
+    BigInteger productStore2Id = productStore2.get(0).id();
+
+    // Modification quantité commande store1 avec un produit du store2
+    UpdateProductQuantityInCommandSchema updateCommandSchema = new UpdateProductQuantityInCommandSchema(
+            productStore2Id, addCommand.commandId(), store.getId(), 12);
+
+    Exception exception = Assertions.assertThrows(
+            RuntimeException.class,
+            ()->commandService.updateProductQuantityInCommand(updateCommandSchema)
+    );
+    Assertions.assertEquals("Le produit n'est pas rattaché au commerce", exception.getMessage());
 
 
   }
 
+  @Test
+  void should_force_update_product_quantity_to_1_if_quantity_inferior_at_1() {
+    // Creation Commande
+    CommandDetailDto addCommand = commandService.addCommand(addCommandSchema());
+
+    // Récuperation d'un produit de la commande
+    BigInteger productChangeId = productsInCommand.get(0).productId();
+
+    // Modification du produit dans la commande
+    UpdateProductQuantityInCommandSchema updateCommandSchema = new UpdateProductQuantityInCommandSchema(
+            productChangeId, addCommand.commandId(), store.getId(), 0);
+    UpdateProductQuantityInCommandDto productUpdated = commandService.updateProductQuantityInCommand(updateCommandSchema);
+
+    Assertions.assertEquals(1, productUpdated.productInCommand().productQuantity());
+    Assertions.assertEquals(productChangeId, productUpdated.productInCommand().productId());
+  }
+  @Test
+  void should_delete_one_product_in_command() {
+    // Creation Commande
+    CommandDetailDto addCommand = commandService.addCommand(addCommandSchema());
+
+    // Recuperation du produit a supprimer
+    BigInteger productId = addCommand.productInCommandList().get(0).productId();
+
+    BigInteger commandId = addCommand.commandId();
+    // Suppression du produit
+    DeleteProductInCommandSchema deleteProductInCommand = new DeleteProductInCommandSchema(commandId, productId, store.getId());
+    CommandDetailDto updateCommandDetail = commandService.deleteProductInCommand(deleteProductInCommand);
+
+    Assertions.assertEquals(2, updateCommandDetail.productInCommandList().size());
+    Assertions.assertEquals(0,
+            updateCommandDetail.productInCommandList()
+                    .stream()
+                    .filter(product -> product.productId() == productId)
+                    .collect(Collectors.toList())
+                    .size());
+
+  }
   /**
    * Création schema pour une commande
    * @return AddCommandSchema
@@ -200,7 +262,7 @@ public class CommandServiceTest {
       createdPro2 = createPro();
       createdStore2 = createStore(createdPro2);
       List<AddProductDto> createProductList2 = createProduct(createdStore2.getId());
-      ProductInCommand productStore2 = new ProductInCommand(createProductList2.get(0).id(), 1);
+      ProductWithQuantity productStore2 = new ProductWithQuantity(createProductList2.get(0).id(), 1);
       productsInCommand.add(productStore2);
     }
 
@@ -215,7 +277,7 @@ public class CommandServiceTest {
 
     if(!isCommandWithProduct) productsInCommand.clear();
 
-    if(!isProductInStore) productsInCommand.add(new ProductInCommand(BigInteger.valueOf(0), 1));
+    if(!isProductInStore) productsInCommand.add(new ProductWithQuantity(BigInteger.valueOf(0), 1));
 
     AddCommandSchema addCommandSchema = new AddCommandSchema(
             phoneCient,
@@ -235,7 +297,7 @@ public class CommandServiceTest {
   public void createProductsInCommand(List<AddProductDto> productList) {
     productsInCommand = productList
             .stream()
-            .map(product -> new ProductInCommand(product.id(), 2))
+            .map(product -> new ProductWithQuantity(product.id(), 2))
             .collect(Collectors.toList());
   }
 

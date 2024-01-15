@@ -2,8 +2,9 @@ package ctoutweb.lalamiam.model.schema;
 
 import java.math.BigInteger;
 
-public record ProductInCommand(
+public record DeleteProductInCommandSchema(
+        BigInteger commandId,
         BigInteger productId,
-        Integer productQuantity
+        BigInteger storeId
 ) {
 }

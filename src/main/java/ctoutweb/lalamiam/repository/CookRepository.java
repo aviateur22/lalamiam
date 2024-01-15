@@ -1,7 +1,9 @@
 package ctoutweb.lalamiam.repository;
 
 import ctoutweb.lalamiam.repository.entity.CookEntity;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -31,5 +33,8 @@ public interface CookRepository extends JpaRepository<CookEntity, BigInteger> {
         nativeQuery = true)
   public List<CookEntity> findByCommandIdAndStoreId(BigInteger storeId, BigInteger commandId);
 
-
+  @Modifying
+  @Transactional
+  @Query(value = "delete from sc_lalamiam.cook where command_id = ?1 and product_id = ?2 and store_id = ?3", nativeQuery = true)
+  public int deleteProductInCommandByCommandIdStoreIdProductId(BigInteger commandId, BigInteger productId, BigInteger storeId);
 }

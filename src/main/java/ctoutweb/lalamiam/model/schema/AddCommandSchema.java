@@ -11,4 +11,4 @@ public record AddCommandSchema(
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
         LocalDateTime slotTime,
         BigInteger storeId,
-        List<ProductInCommand> productsInCommand) {}
+        List<ProductWithQuantity> productsInCommand) {}
