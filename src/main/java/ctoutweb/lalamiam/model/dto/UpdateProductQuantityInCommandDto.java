@@ -7,6 +7,6 @@ public record UpdateProductQuantityInCommandDto(
         BigInteger commandId,
         ProductWithQuantity productInCommand,
         Integer commandPreparationTime,
-        Integer numberOProductInCommand,
+        Integer ProductQuantity,
         Double commandPrice) {
 }

@@ -31,6 +31,7 @@ create table IF NOT EXISTS sc_lalamiam.command(
     "client_phone" TEXT NOT NULL,
     "preparation_time" INTEGER NOT NULL,
     "order_price" NUMERIC NOT NULL,
+    "product_quantity" INTEGER NOT NULL,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
     "updated_at" TIMESTAMPTZ
 );

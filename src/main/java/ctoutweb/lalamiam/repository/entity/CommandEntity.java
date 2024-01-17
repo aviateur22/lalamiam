@@ -36,6 +36,9 @@ public class CommandEntity {
   @Column(name = "command_code")
   private String commandCode;
 
+  @Column(name = "product_quantity")
+  private Integer productQuantity;
+
   @JsonIgnore
   @OneToMany(mappedBy = "command", fetch = FetchType.LAZY)
   Set<CookEntity> cooks;
@@ -134,6 +137,14 @@ public class CommandEntity {
 
   public void setCommandCode(String commandCode) {
     this.commandCode = commandCode;
+  }
+
+  public Integer getProductQuantity() {
+    return productQuantity;
+  }
+
+  public void setProductQuantity(Integer productQuantity) {
+    this.productQuantity = productQuantity;
   }
 
   @Override

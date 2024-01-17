@@ -3,16 +3,11 @@ package ctoutweb.lalamiam.service.serviceImpl;
 import ctoutweb.lalamiam.helper.CommandServiceHelper;
 import ctoutweb.lalamiam.model.dto.CommandDetailDto;
 import ctoutweb.lalamiam.model.dto.UpdateProductQuantityInCommandDto;
-import ctoutweb.lalamiam.model.schema.AddCommandSchema;
-import ctoutweb.lalamiam.model.schema.DeleteProductInCommandSchema;
-import ctoutweb.lalamiam.model.schema.ProductWithQuantity;
-import ctoutweb.lalamiam.model.schema.UpdateProductQuantityInCommandSchema;
+import ctoutweb.lalamiam.model.schema.*;
 import ctoutweb.lalamiam.repository.CommandRepository;
 import ctoutweb.lalamiam.repository.CookRepository;
 import ctoutweb.lalamiam.repository.StoreRepository;
-import ctoutweb.lalamiam.repository.entity.CommandEntity;
-import ctoutweb.lalamiam.repository.entity.CookEntity;
-import ctoutweb.lalamiam.repository.entity.StoreEntity;
+import ctoutweb.lalamiam.repository.entity.*;
 import ctoutweb.lalamiam.service.CommandService;
 import ctoutweb.lalamiam.util.CommonFunction;
 import jakarta.transaction.Transactional;
@@ -93,5 +88,15 @@ public class CommandServiceImpl implements CommandService {
   @Override
   public CommandDetailDto deleteProductInCommand(DeleteProductInCommandSchema deleteProductInCommand) {
     return commandServiceHelper.deleteProductInCommand(deleteProductInCommand);
+  }
+
+  @Override
+  public CommandDetailDto addProductsInCommand(AddProductsInCommandSchema addProductsInCommand) {
+
+    CommandEntity findCommand = commandRepository
+            .findById(addProductsInCommand.commandId())
+            .orElseThrow(()->new RuntimeException(""));
+
+   return commandServiceHelper.addProductsInCommand(addProductsInCommand);
   }
 }

@@ -70,7 +70,7 @@ public class UpdateProductQuantityInCommandSchema  {
   @Override
   public String toString() {
     return "UpdateProductQuantityInCommandSchema{" +
-            "productId=" + productId +
+            "productIdList=" + productId +
             ", commandId=" + commandId +
             ", storeId=" + storeId +
             ", productQuantity=" + productQuantity +

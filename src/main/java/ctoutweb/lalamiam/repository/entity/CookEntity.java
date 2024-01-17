@@ -3,6 +3,7 @@ package ctoutweb.lalamiam.repository.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import ctoutweb.lalamiam.model.schema.AddCookSchema;
+import ctoutweb.lalamiam.model.schema.AddProductsInCommandSchema;
 import ctoutweb.lalamiam.model.schema.DeleteProductInCommandSchema;
 import ctoutweb.lalamiam.model.schema.UpdateProductQuantityInCommandSchema;
 import jakarta.persistence.*;
@@ -69,8 +70,6 @@ public class CookEntity {
     this.store = new StoreEntity(updateProductCommand.getStoreId());
     this.product = new ProductEntity(updateProductCommand.getProductId());
   }
-
-
   public BigInteger getId() {
     return id;
   }

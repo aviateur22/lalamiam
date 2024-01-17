@@ -48,6 +48,8 @@ public class CommandServiceHelper {
     // Temps de preparation
     Integer commandPrepartionTime = calculateCommandPreparationTime(addCommandSchema.productsInCommand());
 
+    Integer productQuantity = calculatedNumberOfProductInCommand(addCommandSchema.productsInCommand());
+
     // Génération CodeCommande
     String commandCode = generateCode(6);
 
@@ -59,6 +61,7 @@ public class CommandServiceHelper {
                     .withOrderPrice(commandPrice)
                     .withSlotTime(addCommandSchema.slotTime())
                     .withPreparationTime(commandPrepartionTime)
+                    .withProductQuantity(productQuantity)
                     .withCommandCode(commandCode)
                     .build());
 
@@ -127,6 +130,7 @@ public class CommandServiceHelper {
     // Enregistrement des nouvelles donnes de la commandes
     updatedCommand.setOrderPrice(commandPrice);
     updatedCommand.setPreparationTime(commandPrepartionTime);
+    updatedCommand.setProductQuantity(totalProductInCommand);
     commandRepository.save(updatedCommand);
 
     return new UpdateProductQuantityInCommandDto(
@@ -168,14 +172,65 @@ public class CommandServiceHelper {
     // Calcul du nouveau du temps de preparation de la commande
     Integer commandPrepartionTime = calculateCommandPreparationTime(productInCommandList);
 
-    // Calcul du nouveau du nombre de produits dans la commande
-    Integer totalProductInCommand = calculatedNumberOfProductInCommand(productInCommandList);
+    // Calcul quantité produit
+    Integer numberOfProductInCommande = calculatedNumberOfProductInCommand(productInCommandList);
+
+    // Mise a jour en base de données des données de la commande
+    command.setPreparationTime(commandPrepartionTime);
+    command.setOrderPrice(commandPrice);
+    command.setProductQuantity(numberOfProductInCommande);
+    commandRepository.save(command);
+
+    return new CommandDetailDto(
+            deleteProductInCommand.commandId(),
+            productInCommandList,
+            commandPrepartionTime,
+            numberOfProductInCommande,
+            commandPrice,
+            command.getClientPhone(),
+            command.getCommandCode(),
+            command.getSlotTime());
+  }
+
+  /**
+   * Ajout d'un ou plusieurs produits dans la commande
+   * @param addProductsInCommand
+   * @return CommandDetailDto
+   */
+  public CommandDetailDto addProductsInCommand(AddProductsInCommandSchema addProductsInCommand) {
+    addProductsInCommand.productIdList().stream().forEach(productId->{
+      CookEntity addProduct = CookEntityBuilder.aCookEntity()
+              .withCommand(new CommandEntity(addProductsInCommand.commandId()))
+              .withProductQuantity(1)
+              .withStore(new StoreEntity(addProductsInCommand.storeId()))
+              .withProduct(new ProductEntity(productId))
+              .build();
+      addProduct = cookRepository.save(addProduct);
+    });
+
+    // Recherche de la liste des produits en commande
+    List<ProductWithQuantity> productInCommandList = findAllProductInCommand(
+            addProductsInCommand.storeId(),
+            addProductsInCommand.commandId());
+
+    // Calcul du nouveau prix de la commande
+    Double commandPrice = calculateCommandPrice(productInCommandList);
+
+    // Calcul du nouveau du temps de preparation de la commande
+    Integer commandPrepartionTime = calculateCommandPreparationTime(productInCommandList);
 
     // Calcul quantité produit
     Integer numberOfProductInCommande = calculatedNumberOfProductInCommand(productInCommandList);
 
+    // Mise a jour en base de données des données de la commande
+    CommandEntity command = commandRepository.findById(addProductsInCommand.commandId()).orElseThrow();
+    command.setPreparationTime(commandPrepartionTime);
+    command.setOrderPrice(commandPrice);
+    command.setProductQuantity(numberOfProductInCommande);
+    commandRepository.save(command);
+
     return new CommandDetailDto(
-            deleteProductInCommand.commandId(),
+            command.getId(),
             productInCommandList,
             commandPrepartionTime,
             numberOfProductInCommande,
