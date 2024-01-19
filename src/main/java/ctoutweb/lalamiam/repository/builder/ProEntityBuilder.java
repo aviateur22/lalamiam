@@ -1,4 +1,6 @@
-package ctoutweb.lalamiam.repository.entity;
+package ctoutweb.lalamiam.repository.builder;
+
+import ctoutweb.lalamiam.repository.entity.ProEntity;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;

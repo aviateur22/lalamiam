@@ -1,7 +1,5 @@
 package ctoutweb.lalamiam.repository.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import ctoutweb.lalamiam.model.schema.AddStoreSchema;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -54,12 +52,16 @@ public class StoreEntity {
   Set<ProductEntity> products;
 
   @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
-  Set<CookEntity> cooks;
+  Set<CommandEntity> commands;
 
   /**
    *
    */
   public StoreEntity() {
+  }
+
+  public StoreEntity(BigInteger storeId) {
+    this.id = storeId;
   }
 
   public StoreEntity(AddStoreSchema addStoreSchema) {
@@ -68,10 +70,6 @@ public class StoreEntity {
     this.city = addStoreSchema.city();
     this.name = addStoreSchema.name();
     this.cp = addStoreSchema.cp();
-  }
-
-  public StoreEntity(BigInteger storeId) {
-    this.id = storeId;
   }
 
   public BigInteger getId() {
@@ -154,7 +152,6 @@ public class StoreEntity {
     this.updatedAt = updatedAt;
   }
 
-  @JsonBackReference
   public ProEntity getPro() {
     return pro;
   }
@@ -163,7 +160,6 @@ public class StoreEntity {
     this.pro = pro;
   }
 
-  @JsonManagedReference
   public Set<ProductEntity> getProducts() {
     return products;
   }
@@ -172,13 +168,12 @@ public class StoreEntity {
     this.products = products;
   }
 
-  @JsonManagedReference
-  public Set<CookEntity> getCooks() {
-    return cooks;
+  public Set<CommandEntity> getCommands() {
+    return commands;
   }
 
-  public void setCooks(Set<CookEntity> cooks) {
-    this.cooks = cooks;
+  public void setCommands(Set<CommandEntity> commands) {
+    this.commands = commands;
   }
 
   @Override
@@ -186,12 +181,12 @@ public class StoreEntity {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     StoreEntity store = (StoreEntity) o;
-    return Objects.equals(id, store.id) && Objects.equals(name, store.name) && Objects.equals(presentation, store.presentation) && Objects.equals(adress, store.adress) && Objects.equals(city, store.city) && Objects.equals(cp, store.cp) && Objects.equals(phone, store.phone) && Objects.equals(photo, store.photo) && Objects.equals(createdAt, store.createdAt) && Objects.equals(updatedAt, store.updatedAt) && Objects.equals(pro, store.pro) && Objects.equals(products, store.products) && Objects.equals(cooks, store.cooks);
+    return Objects.equals(id, store.id) && Objects.equals(name, store.name) && Objects.equals(presentation, store.presentation) && Objects.equals(adress, store.adress) && Objects.equals(city, store.city) && Objects.equals(cp, store.cp) && Objects.equals(phone, store.phone) && Objects.equals(photo, store.photo) && Objects.equals(createdAt, store.createdAt) && Objects.equals(updatedAt, store.updatedAt) && Objects.equals(pro, store.pro) && Objects.equals(products, store.products) && Objects.equals(commands, store.commands);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, presentation, adress, city, cp, phone, photo, createdAt, updatedAt, pro, products, cooks);
+    return Objects.hash(id, name, presentation, adress, city, cp, phone, photo, createdAt, updatedAt, pro, products, commands);
   }
 
   @Override
@@ -208,8 +203,8 @@ public class StoreEntity {
             ", createdAt=" + createdAt +
             ", updatedAt=" + updatedAt +
             ", pro=" + pro +
-            //", products=" + products +
-            //", cooks=" + cooks +
+            ", products=" + products +
+            ", commands=" + commands +
             '}';
   }
 }

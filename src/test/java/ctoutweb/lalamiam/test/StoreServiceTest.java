@@ -1,24 +1,14 @@
 package ctoutweb.lalamiam.test;
 
-import ctoutweb.lalamiam.model.dto.ProInformationDto;
-import ctoutweb.lalamiam.model.schema.*;
 import ctoutweb.lalamiam.repository.CommandRepository;
-import ctoutweb.lalamiam.repository.CookRepository;
+import ctoutweb.lalamiam.repository.CommandProductRepository;
 import ctoutweb.lalamiam.repository.ProRepository;
 import ctoutweb.lalamiam.repository.ProductRepository;
-import ctoutweb.lalamiam.repository.entity.*;
 import ctoutweb.lalamiam.service.ProService;
 import ctoutweb.lalamiam.service.StoreService;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.math.BigInteger;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @SpringBootTest
 public class StoreServiceTest {
@@ -39,7 +29,7 @@ public class StoreServiceTest {
   CommandRepository commandRepository;
 
   @Autowired
-  CookRepository cookRepository;
+  CommandProductRepository cookRepository;
 
   @BeforeEach
   void init() {

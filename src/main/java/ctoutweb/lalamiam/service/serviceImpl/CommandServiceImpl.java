@@ -5,7 +5,7 @@ import ctoutweb.lalamiam.model.dto.CommandDetailDto;
 import ctoutweb.lalamiam.model.dto.UpdateProductQuantityInCommandDto;
 import ctoutweb.lalamiam.model.schema.*;
 import ctoutweb.lalamiam.repository.CommandRepository;
-import ctoutweb.lalamiam.repository.CookRepository;
+import ctoutweb.lalamiam.repository.CommandProductRepository;
 import ctoutweb.lalamiam.repository.StoreRepository;
 import ctoutweb.lalamiam.repository.entity.*;
 import ctoutweb.lalamiam.service.CommandService;
@@ -22,13 +22,13 @@ public class CommandServiceImpl implements CommandService {
   private final CommandServiceHelper commandServiceHelper;
   private final StoreRepository storeRepository;
   private final CommandRepository commandRepository;
-  private final CookRepository cookRepository;
+  private final CommandProductRepository cookRepository;
 
   public CommandServiceImpl(
           CommandServiceHelper commandServiceHelper,
           StoreRepository storeRepository,
           CommandRepository commandRepository,
-          CookRepository cookRepository) {
+          CommandProductRepository cookRepository) {
     this.commandServiceHelper = commandServiceHelper;
     this.storeRepository = storeRepository;
     this.commandRepository = commandRepository;
@@ -42,7 +42,7 @@ public class CommandServiceImpl implements CommandService {
     List<BigInteger> produtcIdList = addCommandSchema
             .productsInCommand()
             .stream()
-            .map(ProductWithQuantity::productId)
+            .map(ProductWithQuantity::getProductId)
             .collect(Collectors.toList());
 
     String phoneClient = addCommandSchema.clientPhone();
@@ -71,8 +71,7 @@ public class CommandServiceImpl implements CommandService {
     // Correction quantité
     if(updateProductCommand.getProductQuantity() <= 0) updateProductCommand .setProductQuantity(1);
 
-    CookEntity productCook = cookRepository.findOneByStoreIdCommandIdProductId(
-            updateProductCommand.getStoreId(),
+    CommandProductEntity productCook = cookRepository.findOneProductByCommandIdProductId(
             updateProductCommand.getCommandId(),
             updateProductCommand.getProductId())
             .orElseThrow(()->new RuntimeException("Le produit n'est pas rattaché au commerce"));

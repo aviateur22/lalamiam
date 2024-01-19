@@ -6,8 +6,9 @@ import ctoutweb.lalamiam.model.dto.ProInformationDto;
 import ctoutweb.lalamiam.model.dto.UpdateProductQuantityInCommandDto;
 import ctoutweb.lalamiam.model.schema.*;
 import ctoutweb.lalamiam.repository.CommandRepository;
-import ctoutweb.lalamiam.repository.CookRepository;
+import ctoutweb.lalamiam.repository.CommandProductRepository;
 import ctoutweb.lalamiam.repository.ProRepository;
+import ctoutweb.lalamiam.repository.builder.StoreEntityBuilder;
 import ctoutweb.lalamiam.repository.entity.*;
 import ctoutweb.lalamiam.service.CommandService;
 import ctoutweb.lalamiam.service.ProService;
@@ -42,7 +43,7 @@ public class CommandServiceTest {
   ProService proService;
 
   @Autowired
-  CookRepository cookRepository;
+  CommandProductRepository cookRepository;
 
   @Autowired
   ProductService productService;
@@ -79,19 +80,19 @@ public class CommandServiceTest {
 
     // Controle relation produits - store - commande
     Assertions.assertEquals(3, cookRepository.countAll());
-    List<CookEntity> cooks = cookRepository.findAll();
+    List<CommandProductEntity> commandProducts = cookRepository.findAll();
 
-    Assertions.assertEquals(productsInCommand.get(0).productId(), cooks.get(0).getProduct().getId());
-    Assertions.assertEquals(addCommand.commandId(), cooks.get(0).getCommand().getId());
-    Assertions.assertEquals(store.getId(), cooks.get(0).getStore().getId());
+    Assertions.assertEquals(productsInCommand.get(0).getProductId(), commandProducts.get(0).getProduct().getId());
+    Assertions.assertEquals(addCommand.commandId(), commandProducts.get(0).getCommand().getId());
+    //Assertions.assertEquals(addCommand  store.getId(), commandProducts.get(0).getStore().getId());
 
-    Assertions.assertEquals(productsInCommand.get(1).productId(), cooks.get(1).getProduct().getId());
-    Assertions.assertEquals(addCommand.commandId(), cooks.get(1).getCommand().getId());
-    Assertions.assertEquals(store.getId(), cooks.get(1).getStore().getId());
+    Assertions.assertEquals(productsInCommand.get(1).getProductId(), commandProducts.get(1).getProduct().getId());
+    Assertions.assertEquals(addCommand.commandId(), commandProducts.get(1).getCommand().getId());
+    //Assertions.assertEquals(store.getId(), commandProducts.get(1).getStore().getId());
 
-    Assertions.assertEquals(productsInCommand.get(2).productId(), cooks.get(2).getProduct().getId());
-    Assertions.assertEquals(addCommand.commandId(), cooks.get(2).getCommand().getId());
-    Assertions.assertEquals(store.getId(), cooks.get(2).getStore().getId());
+    Assertions.assertEquals(productsInCommand.get(2).getProductId(), commandProducts.get(2).getProduct().getId());
+    Assertions.assertEquals(addCommand.commandId(), commandProducts.get(2).getCommand().getId());
+    //Assertions.assertEquals(store.getId(), commandProducts.get(2).getStore().getId());
   }
 
   @Test
@@ -150,17 +151,17 @@ public class CommandServiceTest {
     CommandDetailDto addCommand = commandService.addCommand(addCommandSchema());
 
     // Récuperation d'un produit de la commande
-    BigInteger productChangeId = productsInCommand.get(0).productId();
+    BigInteger productChangeId = productsInCommand.get(0).getProductId();
 
     // Modification du produit dans la commande
     UpdateProductQuantityInCommandSchema updateCommandSchema = new UpdateProductQuantityInCommandSchema(
             productChangeId, addCommand.commandId(), store.getId(), 4);
     UpdateProductQuantityInCommandDto productUpdated = commandService.updateProductQuantityInCommand(updateCommandSchema);
 
-    Assertions.assertEquals(4, productUpdated.productInCommand().productQuantity());
+    Assertions.assertEquals(4, productUpdated.productInCommand().getProductQuantity());
 
     // Vérification id
-    Assertions.assertEquals(productChangeId, productUpdated.productInCommand().productId());
+    Assertions.assertEquals(productChangeId, productUpdated.productInCommand().getProductId());
 
     // Vérification du nouveau prix
     Assertions.assertEquals(120, productUpdated.commandPrice());
@@ -201,24 +202,25 @@ public class CommandServiceTest {
     CommandDetailDto addCommand = commandService.addCommand(addCommandSchema());
 
     // Récuperation d'un produit de la commande
-    BigInteger productChangeId = productsInCommand.get(0).productId();
+    BigInteger productChangeId = productsInCommand.get(0).getProductId();
 
     // Modification du produit dans la commande
     UpdateProductQuantityInCommandSchema updateCommandSchema = new UpdateProductQuantityInCommandSchema(
             productChangeId, addCommand.commandId(), store.getId(), 0);
     UpdateProductQuantityInCommandDto productUpdated = commandService.updateProductQuantityInCommand(updateCommandSchema);
 
-    Assertions.assertEquals(1, productUpdated.productInCommand().productQuantity());
-    Assertions.assertEquals(productChangeId, productUpdated.productInCommand().productId());
+    Assertions.assertEquals(1, productUpdated.productInCommand().getProductQuantity());
+    Assertions.assertEquals(productChangeId, productUpdated.productInCommand().getProductId());
   }
 
   @Test
   void should_delete_one_product_in_command() {
+    // TODO Vérifier la logique de la méthode update
     // Creation Commande
     CommandDetailDto addCommand = commandService.addCommand(addCommandSchema());
 
     // Recuperation du produit a supprimer - Prix 10€ - temps prepaparation 5 min
-    BigInteger productId = addCommand.productInCommandList().get(0).productId();
+    BigInteger productId = addCommand.productInCommandList().get(0).getProductId();
 
     // Produits restants
     // Quantite 2 - AddProductSchema addProductSchema2 = new AddProductSchema("coco", 20D, "initial description", 10, "s", storeId);
@@ -236,7 +238,7 @@ public class CommandServiceTest {
     Assertions.assertEquals(0,
             updateCommandDetail.productInCommandList()
                     .stream()
-                    .filter(product -> product.productId() == productId)
+                    .filter(product -> product.getProductId() == productId)
                     .collect(Collectors.toList())
                     .size());
 
@@ -250,13 +252,12 @@ public class CommandServiceTest {
   @Test
   void should_add_one_or_multiple_products_to_command() {
     // TODO 1 commande ne oeut pas etre modifié si pas existante
-    // TODO vérifier que le produit ajouté pas déja present, si oui alors incremeter la quantité par 1
     // Creation Commande
     CommandDetailDto addCommand = commandService.addCommand(addCommandSchema());
 
     // Récuperation produitId a ajouter
     List<BigInteger> productIdList = new ArrayList<>();
-    BigInteger productId = productsInCommand.get(0).productId();
+    BigInteger productId = productsInCommand.get(0).getProductId();
     productIdList.add(productId);
     AddProductsInCommandSchema addProductsInCommandSchema = new AddProductsInCommandSchema(productIdList, store.getId(), addCommand.commandId());
     CommandDetailDto commandDetail = commandService.addProductsInCommand(addProductsInCommandSchema);
@@ -270,6 +271,28 @@ public class CommandServiceTest {
     // Verification du nouveau temps de prepapration de la commande
     Assertions.assertEquals(75, commandDetail.commandPreparationTime());
 
+  }
+
+  @Test
+  void should_add_one_product_already_in_command() {
+    // Creation Commande
+    CommandDetailDto addCommand = commandService.addCommand(addCommandSchema());
+
+    // Récuperation produitId a ajouter
+    List<BigInteger> productIdList = new ArrayList<>();
+    BigInteger productId = productsInCommand.get(0).getProductId();
+
+    productIdList.add(productId);
+    AddProductsInCommandSchema addProductsInCommandSchema = new AddProductsInCommandSchema(productIdList, store.getId(), addCommand.commandId());
+    CommandDetailDto commandDetail = commandService.addProductsInCommand(addProductsInCommandSchema);
+
+    // Vérification que le produit ajouté n'est pas en doublons
+    List<ProductWithQuantity> findProductIdInProductList = commandDetail
+            .productInCommandList()
+            .stream()
+            .filter(product-> product.getProductId().equals(productId)).collect(Collectors.toList());
+    Assertions.assertEquals(1, findProductIdInProductList.size());
+    Assertions.assertEquals(3, findProductIdInProductList.stream().filter(product->product.getProductId().equals(productId)).findFirst().get().getProductQuantity());
   }
 
   /**

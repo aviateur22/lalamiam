@@ -4,28 +4,31 @@ import ctoutweb.lalamiam.model.dto.CommandDetailDto;
 import ctoutweb.lalamiam.model.dto.UpdateProductQuantityInCommandDto;
 import ctoutweb.lalamiam.model.schema.*;
 import ctoutweb.lalamiam.repository.CommandRepository;
-import ctoutweb.lalamiam.repository.CookRepository;
+import ctoutweb.lalamiam.repository.CommandProductRepository;
 import ctoutweb.lalamiam.repository.ProductRepository;
+import ctoutweb.lalamiam.repository.builder.CommandEntityBuilder;
+import ctoutweb.lalamiam.repository.builder.CommandProductEntityBuilder;
 import ctoutweb.lalamiam.repository.entity.*;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
 @Component
 public class CommandServiceHelper {
 
-  private final CookRepository cookRepository;
+  private final CommandProductRepository commandProductRepository;
   private final CommandRepository commandRepository;
   private final ProductRepository productRepository;
 
   public CommandServiceHelper(
-          CookRepository cookRepository,
+          CommandProductRepository cookRepository,
           CommandRepository commandRepository,
           ProductRepository productRepository) {
-    this.cookRepository = cookRepository;
+    this.commandProductRepository = cookRepository;
     this.commandRepository = commandRepository;
     this.productRepository = productRepository;
   }
@@ -63,6 +66,7 @@ public class CommandServiceHelper {
                     .withPreparationTime(commandPrepartionTime)
                     .withProductQuantity(productQuantity)
                     .withCommandCode(commandCode)
+                    .withStore(new StoreEntity(addCommandSchema.storeId()))
                     .build());
 
     // Enregistrement des produits
@@ -70,11 +74,11 @@ public class CommandServiceHelper {
             .stream()
             .forEach(productInCommand->{
               AddCookSchema addCookSchema = new AddCookSchema(
-                      productInCommand.productId(),
+                      productInCommand.getProductId(),
                       addCommand.getId(),
                       addCommandSchema.storeId(),
-                      productInCommand.productQuantity());
-              CookEntity addCook = cookRepository.save(new CookEntity(addCookSchema));
+                      productInCommand.getProductQuantity());
+              CommandProductEntity addCook = commandProductRepository.save(new CommandProductEntity(addCookSchema));
     });
 
     // Récuperatation des produits de la commande
@@ -104,7 +108,7 @@ public class CommandServiceHelper {
    * @throws RuntimeException
    */
   public UpdateProductQuantityInCommandDto updateProductQuantityInCommand (
-          CookEntity productCook,
+          CommandProductEntity productCook,
           UpdateProductQuantityInCommandSchema updateProductQuantityInCommand,
           CommandEntity updatedCommand
   ) throws RuntimeException {
@@ -125,7 +129,7 @@ public class CommandServiceHelper {
 
     // Enregistrement de la quantité du produit
     productCook.setProductQuantity(updateProductQuantityInCommand.getProductQuantity());
-    CookEntity productUpdate = cookRepository.save(productCook);
+    CommandProductEntity productUpdate = commandProductRepository.save(productCook);
 
     // Enregistrement des nouvelles donnes de la commandes
     updatedCommand.setOrderPrice(commandPrice);
@@ -155,10 +159,9 @@ public class CommandServiceHelper {
             .orElseThrow(()->new RuntimeException("La commande n'est pas trouvée"));
 
     // Suppression du produit
-    cookRepository.deleteProductInCommandByCommandIdStoreIdProductId(
+    commandProductRepository.deleteProductByCommandIdAndProductId(
             deleteProductInCommand.commandId(),
-            deleteProductInCommand.productId(),
-            deleteProductInCommand.storeId()
+            deleteProductInCommand.productId()
     );
 
     // Recherche de la liste des produits en commande
@@ -198,14 +201,31 @@ public class CommandServiceHelper {
    * @return CommandDetailDto
    */
   public CommandDetailDto addProductsInCommand(AddProductsInCommandSchema addProductsInCommand) {
+
+    var listWrapper = new Object() {
+      List<ProductWithQuantity> productInCommandList = findAllProductInCommand(
+              addProductsInCommand.storeId(),
+              addProductsInCommand.commandId());
+    };
+
     addProductsInCommand.productIdList().stream().forEach(productId->{
-      CookEntity addProduct = CookEntityBuilder.aCookEntity()
-              .withCommand(new CommandEntity(addProductsInCommand.commandId()))
-              .withProductQuantity(1)
-              .withStore(new StoreEntity(addProductsInCommand.storeId()))
-              .withProduct(new ProductEntity(productId))
-              .build();
-      addProduct = cookRepository.save(addProduct);
+    findProductIdInCommandList(productId, listWrapper.productInCommandList)
+            .ifPresentOrElse((value)->{
+              //value.setProductQuantity(value.getProductQuantity() + 1);
+              CommandProductEntity updateProduct = commandProductRepository.findOneProductByCommandIdProductId(
+                      addProductsInCommand.commandId(),
+                      productId).orElseThrow(()->new RuntimeException("Le produit n'existe pas"));
+              updateProduct.setProductQuantity(updateProduct.getProductQuantity() + 1);
+              commandProductRepository.save(updateProduct);
+            },
+            ()->{
+              CommandProductEntity addProduct = CommandProductEntityBuilder.aCommandProductEntity()
+                      .withCommand(new CommandEntity(addProductsInCommand.commandId()))
+                      .withProductQuantity(1)
+                      .withProduct(new ProductEntity(productId))
+                      .build();
+              addProduct = commandProductRepository.save(addProduct);
+            });
     });
 
     // Recherche de la liste des produits en commande
@@ -250,10 +270,10 @@ public class CommandServiceHelper {
             .stream()
             .map(productInCommand -> {
               double productPrice = productRepository
-                      .findById(productInCommand.productId())
+                      .findById(productInCommand.getProductId())
                       .orElseThrow(()-> new RuntimeException("Le produit n'existe pas"))
                       .getPrice();
-              return productInCommand.productQuantity() * productPrice;
+              return productInCommand.getProductQuantity() * productPrice;
             })
             .collect(Collectors.summingDouble(Double::doubleValue));
   }
@@ -268,10 +288,10 @@ public class CommandServiceHelper {
             .stream()
             .map(productInCommand -> {
               Integer productPreparationTime = productRepository
-                      .findById(productInCommand.productId())
+                      .findById(productInCommand.getProductId())
                       .orElseThrow()
                       .getPreparationTime();
-              return productPreparationTime * productInCommand.productQuantity();
+              return productPreparationTime * productInCommand.getProductQuantity();
             })
             .collect(Collectors.summingInt(Integer::intValue));
   }
@@ -284,7 +304,7 @@ public class CommandServiceHelper {
   public Integer calculatedNumberOfProductInCommand(List<ProductWithQuantity> productInCommandList) {
     return productInCommandList
             .stream()
-            .map(ProductWithQuantity::productQuantity)
+            .map(ProductWithQuantity::getProductQuantity)
             .collect(Collectors.summingInt(Integer::intValue));
   }
 
@@ -297,7 +317,7 @@ public class CommandServiceHelper {
    */
   public List<ProductWithQuantity> findAllProductInCommand(BigInteger storeId, BigInteger commandId) throws RuntimeException {
 
-    return cookRepository.findByCommandIdAndStoreId(storeId, commandId).stream().map(cookItem-> {
+    return commandProductRepository.findProductsByCommandId(commandId).stream().map(cookItem-> {
       Integer productQuantity = cookItem.getProductQuantity();
       ProductEntity product = productRepository
               .findById(cookItem.getProduct().getId())
@@ -330,7 +350,7 @@ public class CommandServiceHelper {
             .stream()
             .map(productInCommand-> {
               ProductEntity product = productRepository
-                      .findById(productInCommand.productId())
+                      .findById(productInCommand.getProductId())
                       .orElseThrow(()->new RuntimeException("Le produit n'existe pas"));
               return product.getStore().getId().equals(storeId);
 
@@ -346,4 +366,17 @@ public class CommandServiceHelper {
             .toString();
     return str.toLowerCase();
   }
+
+  /**
+   * Vérifie si produit deja présent dansd la liste
+   * @param productId
+   * @param productInCommandList
+   * @return
+   */
+  public Optional<ProductWithQuantity> findProductIdInCommandList(
+          BigInteger productId,
+          List<ProductWithQuantity> productInCommandList) {
+    return productInCommandList.stream().filter(product->product.getProductId().equals(productId)).findFirst();
+  }
+
 }

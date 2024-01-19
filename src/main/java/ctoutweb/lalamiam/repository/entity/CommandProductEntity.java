@@ -3,7 +3,6 @@ package ctoutweb.lalamiam.repository.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import ctoutweb.lalamiam.model.schema.AddCookSchema;
-import ctoutweb.lalamiam.model.schema.AddProductsInCommandSchema;
 import ctoutweb.lalamiam.model.schema.DeleteProductInCommandSchema;
 import ctoutweb.lalamiam.model.schema.UpdateProductQuantityInCommandSchema;
 import jakarta.persistence.*;
@@ -15,11 +14,11 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
-@Table(name = "cook")
-public class CookEntity {
+@Table(name = "command_product")
+public class CommandProductEntity {
   @Id
-  @SequenceGenerator(name="cookPkSeq", sequenceName="COOK_PK_SEQ", allocationSize=1, initialValue = 1)
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cookPkSeq")
+  @SequenceGenerator(name="command_product_pk_seq", sequenceName="command_product_pk_seq", allocationSize=1, initialValue = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "command_product_pk_seq")
   private BigInteger id;
 
   @Column(name = "product_quantity")
@@ -30,10 +29,8 @@ public class CookEntity {
   @JoinColumn(name = "command_id")
   CommandEntity command;
 
-  @ManyToOne
-  @JoinColumn(name = "store_id")
-  StoreEntity store;
 
+  @JsonIgnore
   @ManyToOne
   @JoinColumn(name = "product_id")
   ProductEntity product;
@@ -49,25 +46,22 @@ public class CookEntity {
   /**
    *
    */
-  public CookEntity() {
+  public CommandProductEntity() {
   }
 
-  public CookEntity(AddCookSchema addCookSchema) {
+  public CommandProductEntity(AddCookSchema addCookSchema) {
     this.command = new CommandEntity(addCookSchema.commandId());
-    this.store = new StoreEntity(addCookSchema.storeId());
     this.product = new ProductEntity(addCookSchema.productId());
     this.productQuantity = addCookSchema.productQuantity();
   }
 
-  public CookEntity(DeleteProductInCommandSchema deleteProductInCommand) {
+  public CommandProductEntity(DeleteProductInCommandSchema deleteProductInCommand) {
     this.command = new CommandEntity(deleteProductInCommand.commandId());
-    this.store = new StoreEntity(deleteProductInCommand.storeId());
     this.product = new ProductEntity(deleteProductInCommand.productId());
   }
 
-  public CookEntity(UpdateProductQuantityInCommandSchema updateProductCommand) {
+  public CommandProductEntity(UpdateProductQuantityInCommandSchema updateProductCommand) {
     this.command = new CommandEntity(updateProductCommand.getCommandId());
-    this.store = new StoreEntity(updateProductCommand.getStoreId());
     this.product = new ProductEntity(updateProductCommand.getProductId());
   }
   public BigInteger getId() {
@@ -85,16 +79,6 @@ public class CookEntity {
   public void setCommand(CommandEntity command) {
     this.command = command;
   }
-
-  @JsonBackReference
-  public StoreEntity getStore() {
-    return store;
-  }
-
-  public void setStore(StoreEntity store) {
-    this.store = store;
-  }
-
   @JsonBackReference
   public ProductEntity getProduct() {
     return product;
@@ -131,8 +115,8 @@ public class CookEntity {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    CookEntity that = (CookEntity) o;
-    return Objects.equals(id, that.id) && Objects.equals(productQuantity, that.productQuantity) && Objects.equals(command, that.command) && Objects.equals(store, that.store) && Objects.equals(product, that.product) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
+    CommandProductEntity that = (CommandProductEntity) o;
+    return Objects.equals(id, that.id) && Objects.equals(productQuantity, that.productQuantity) && Objects.equals(command, that.command) && Objects.equals(product, that.product) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
   }
 //  @Override
 //  public int hashCode() {
@@ -145,7 +129,6 @@ public class CookEntity {
             "id=" + id +
             ", productQuantity=" + productQuantity +
             //", command=" + command +
-            ", store=" + store +
             ", product=" + product +
             ", createdAt=" + createdAt +
             ", updatedAt=" + updatedAt +

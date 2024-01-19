@@ -1,4 +1,9 @@
-package ctoutweb.lalamiam.repository.entity;
+package ctoutweb.lalamiam.repository.builder;
+
+import ctoutweb.lalamiam.repository.entity.CommandEntity;
+import ctoutweb.lalamiam.repository.entity.ProEntity;
+import ctoutweb.lalamiam.repository.entity.ProductEntity;
+import ctoutweb.lalamiam.repository.entity.StoreEntity;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -17,7 +22,7 @@ public final class StoreEntityBuilder {
   private LocalDateTime updatedAt;
   private ProEntity pro;
   private Set<ProductEntity> products;
-  private Set<CookEntity> cooks;
+  private Set<CommandEntity> commands;
 
   private StoreEntityBuilder() {
   }
@@ -86,8 +91,8 @@ public final class StoreEntityBuilder {
     return this;
   }
 
-  public StoreEntityBuilder withCooks(Set<CookEntity> cooks) {
-    this.cooks = cooks;
+  public StoreEntityBuilder withCommands(Set<CommandEntity> commands) {
+    this.commands = commands;
     return this;
   }
 
@@ -105,7 +110,7 @@ public final class StoreEntityBuilder {
     storeEntity.setUpdatedAt(updatedAt);
     storeEntity.setPro(pro);
     storeEntity.setProducts(products);
-    storeEntity.setCooks(cooks);
+    storeEntity.setCommands(commands);
     return storeEntity;
   }
 }

@@ -1,8 +1,6 @@
 package ctoutweb.lalamiam.repository.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import ctoutweb.lalamiam.model.schema.AddCommandSchema;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -41,7 +39,11 @@ public class CommandEntity {
 
   @JsonIgnore
   @OneToMany(mappedBy = "command", fetch = FetchType.LAZY)
-  Set<CookEntity> cooks;
+  private Set<CommandProductEntity> commandProducts;
+
+  @ManyToOne
+  @JoinColumn(name="store_id", nullable=false)
+  private StoreEntity store;
 
   @CreationTimestamp
   @Column(name = "created_at")
@@ -67,6 +69,7 @@ public class CommandEntity {
     this.slotTime = addCommandSchema.slotTime();
     this.clientPhone = addCommandSchema.clientPhone();
   }
+
   public BigInteger getId() {
     return id;
   }
@@ -107,12 +110,36 @@ public class CommandEntity {
     this.slotTime = slotTime;
   }
 
-  public Set<CookEntity> getCooks() {
-    return cooks;
+  public String getCommandCode() {
+    return commandCode;
   }
 
-  public void setCooks(Set<CookEntity> cooks) {
-    this.cooks = cooks;
+  public void setCommandCode(String commandCode) {
+    this.commandCode = commandCode;
+  }
+
+  public Integer getProductQuantity() {
+    return productQuantity;
+  }
+
+  public void setProductQuantity(Integer productQuantity) {
+    this.productQuantity = productQuantity;
+  }
+
+  public Set<CommandProductEntity> getCommandProducts() {
+    return commandProducts;
+  }
+
+  public void setCommandProducts(Set<CommandProductEntity> commandProducts) {
+    this.commandProducts = commandProducts;
+  }
+
+  public StoreEntity getStore() {
+    return store;
+  }
+
+  public void setStore(StoreEntity store) {
+    this.store = store;
   }
 
   public LocalDateTime getCreatedAt() {
@@ -131,35 +158,18 @@ public class CommandEntity {
     this.updatedAt = updatedAt;
   }
 
-  public String getCommandCode() {
-    return commandCode;
-  }
-
-  public void setCommandCode(String commandCode) {
-    this.commandCode = commandCode;
-  }
-
-  public Integer getProductQuantity() {
-    return productQuantity;
-  }
-
-  public void setProductQuantity(Integer productQuantity) {
-    this.productQuantity = productQuantity;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    CommandEntity that = (CommandEntity) o;
-    return Objects.equals(id, that.id) && Objects.equals(clientPhone, that.clientPhone) && Objects.equals(preparationTime, that.preparationTime) && Objects.equals(orderPrice, that.orderPrice) && Objects.equals(slotTime, that.slotTime) && Objects.equals(cooks, that.cooks) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
+    CommandEntity command = (CommandEntity) o;
+    return Objects.equals(id, command.id) && Objects.equals(clientPhone, command.clientPhone) && Objects.equals(preparationTime, command.preparationTime) && Objects.equals(orderPrice, command.orderPrice) && Objects.equals(slotTime, command.slotTime) && Objects.equals(commandCode, command.commandCode) && Objects.equals(productQuantity, command.productQuantity) && Objects.equals(commandProducts, command.commandProducts) && Objects.equals(store, command.store) && Objects.equals(createdAt, command.createdAt) && Objects.equals(updatedAt, command.updatedAt);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, clientPhone, preparationTime, orderPrice, slotTime, cooks, createdAt, updatedAt);
+    return Objects.hash(id, clientPhone, preparationTime, orderPrice, slotTime, commandCode, productQuantity, commandProducts, store, createdAt, updatedAt);
   }
-
   @Override
   public String toString() {
     return "CommandEntity{" +
@@ -168,7 +178,10 @@ public class CommandEntity {
             ", preparationTime=" + preparationTime +
             ", orderPrice=" + orderPrice +
             ", slotTime=" + slotTime +
-            ", cooks=" + cooks +
+            ", commandCode='" + commandCode + '\'' +
+            ", productQuantity=" + productQuantity +
+            ", commandProducts=" + commandProducts +
+            ", store=" + store +
             ", createdAt=" + createdAt +
             ", updatedAt=" + updatedAt +
             '}';

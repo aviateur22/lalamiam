@@ -44,11 +44,11 @@ public class ProductEntity {
   private LocalDateTime updatedAt;
 
   @ManyToOne
-  @JoinColumn(name = "store_id", nullable = false)
+  @JoinColumn(name = "store_id")
   private StoreEntity store;
 
   @OneToMany(mappedBy = "product")
-  Set<CookEntity> cooks;
+  Set<CommandProductEntity> commandProducts;
 
   /**
    *
@@ -63,11 +63,11 @@ public class ProductEntity {
 
   public ProductEntity(AddProductSchema addProductSchema) {
     this.name = addProductSchema.name();
-    this.store = new StoreEntity(addProductSchema.storeId());
     this.photo = addProductSchema.photo();
     this.preparationTime = addProductSchema.preparationTime();
     this.description = addProductSchema.description();
     this.price = addProductSchema.price();
+    this.store = new StoreEntity(addProductSchema.storeId());
   }
 
   public BigInteger getId() {
@@ -144,12 +144,12 @@ public class ProductEntity {
   }
 
   @JsonManagedReference
-  public Set<CookEntity> getCooks() {
-    return cooks;
+  public Set<CommandProductEntity> getCommandProducts() {
+    return commandProducts;
   }
 
-  public void setCooks(Set<CookEntity> cooks) {
-    this.cooks = cooks;
+  public void setCommandProducts(Set<CommandProductEntity> commandProducts) {
+    this.commandProducts = commandProducts;
   }
 
   @Override
@@ -157,12 +157,12 @@ public class ProductEntity {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     ProductEntity product = (ProductEntity) o;
-    return Objects.equals(id, product.id) && Objects.equals(name, product.name) && Objects.equals(price, product.price) && Objects.equals(description, product.description) && Objects.equals(preparationTime, product.preparationTime) && Objects.equals(photo, product.photo) && Objects.equals(createdAt, product.createdAt) && Objects.equals(updatedAt, product.updatedAt) && Objects.equals(store, product.store) && Objects.equals(cooks, product.cooks);
+    return Objects.equals(id, product.id) && Objects.equals(name, product.name) && Objects.equals(price, product.price) && Objects.equals(description, product.description) && Objects.equals(preparationTime, product.preparationTime) && Objects.equals(photo, product.photo) && Objects.equals(createdAt, product.createdAt) && Objects.equals(updatedAt, product.updatedAt) && Objects.equals(store, product.store) && Objects.equals(commandProducts, product.commandProducts);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, price, description, preparationTime, photo, createdAt, updatedAt, store, cooks);
+    return Objects.hash(id, name, price, description, preparationTime, photo, createdAt, updatedAt, store, commandProducts);
   }
 
   @Override
