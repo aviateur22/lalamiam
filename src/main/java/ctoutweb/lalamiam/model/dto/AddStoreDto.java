@@ -1,6 +1,6 @@
-package ctoutweb.lalamiam.model.schema;
+package ctoutweb.lalamiam.model.dto;
 
 import java.math.BigInteger;
 
-public record AddStoreSchema(BigInteger proId, String name, String adress, String city, String cp) {
+public record AddStoreDto(BigInteger proId, String name, String adress, String city, String cp) {
 }

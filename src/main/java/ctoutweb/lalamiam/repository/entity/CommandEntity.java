@@ -1,11 +1,13 @@
 package ctoutweb.lalamiam.repository.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import ctoutweb.lalamiam.model.schema.AddCommandSchema;
+import ctoutweb.lalamiam.factory.Factory;
+import ctoutweb.lalamiam.model.CalculateCommandDetail;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -13,7 +15,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "command")
-public class CommandEntity {
+public class CommandEntity implements Serializable {
   @Id
   @SequenceGenerator(name="commandPkSeq", sequenceName="COMMAND_PK_SEQ", allocationSize=1, initialValue = 1)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "commandPkSeq")
@@ -26,7 +28,7 @@ public class CommandEntity {
   private Integer preparationTime;
 
   @Column(name = "order_price")
-  private Double orderPrice;
+  private Double commandPrice;
 
   @Column(name = "slot_time")
   private LocalDateTime slotTime;
@@ -54,9 +56,10 @@ public class CommandEntity {
   private LocalDateTime updatedAt;
 
 
-  /**
-   *
-   */
+
+
+
+  /////////////////////////////////////////////////////////////////////////////////////////
 
   public CommandEntity() {
   }
@@ -65,9 +68,20 @@ public class CommandEntity {
     this.id = commandId;
   }
 
-  public CommandEntity(AddCommandSchema addCommandSchema) {
-    this.slotTime = addCommandSchema.slotTime();
-    this.clientPhone = addCommandSchema.clientPhone();
+  public CommandEntity(
+          CalculateCommandDetail calculateCommandDetail,
+          String commandCode,
+          LocalDateTime slotTime,
+          BigInteger storeId,
+          String clientPhone
+  ) {
+    this.preparationTime = calculateCommandDetail.commandPreparationTime();
+    this.productQuantity = calculateCommandDetail.numberOProductInCommand();
+    this.commandPrice = calculateCommandDetail.commandPrice();
+    this.commandCode = commandCode;
+    this.slotTime = slotTime;
+    this.store = Factory.getStore(storeId);
+    this.clientPhone = clientPhone;
   }
 
   public BigInteger getId() {
@@ -94,12 +108,12 @@ public class CommandEntity {
     this.preparationTime = preparationTime;
   }
 
-  public Double getOrderPrice() {
-    return orderPrice;
+  public Double getCommandPrice() {
+    return commandPrice;
   }
 
-  public void setOrderPrice(Double orderPrice) {
-    this.orderPrice = orderPrice;
+  public void setCommandPrice(Double commandPrice) {
+    this.commandPrice = commandPrice;
   }
 
   public LocalDateTime getSlotTime() {
@@ -163,12 +177,12 @@ public class CommandEntity {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     CommandEntity command = (CommandEntity) o;
-    return Objects.equals(id, command.id) && Objects.equals(clientPhone, command.clientPhone) && Objects.equals(preparationTime, command.preparationTime) && Objects.equals(orderPrice, command.orderPrice) && Objects.equals(slotTime, command.slotTime) && Objects.equals(commandCode, command.commandCode) && Objects.equals(productQuantity, command.productQuantity) && Objects.equals(commandProducts, command.commandProducts) && Objects.equals(store, command.store) && Objects.equals(createdAt, command.createdAt) && Objects.equals(updatedAt, command.updatedAt);
+    return Objects.equals(id, command.id) && Objects.equals(clientPhone, command.clientPhone) && Objects.equals(preparationTime, command.preparationTime) && Objects.equals(commandPrice, command.commandPrice) && Objects.equals(slotTime, command.slotTime) && Objects.equals(commandCode, command.commandCode) && Objects.equals(productQuantity, command.productQuantity) && Objects.equals(commandProducts, command.commandProducts) && Objects.equals(store, command.store) && Objects.equals(createdAt, command.createdAt) && Objects.equals(updatedAt, command.updatedAt);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, clientPhone, preparationTime, orderPrice, slotTime, commandCode, productQuantity, commandProducts, store, createdAt, updatedAt);
+    return Objects.hash(id, clientPhone, preparationTime, commandPrice, slotTime, commandCode, productQuantity, commandProducts, store, createdAt, updatedAt);
   }
   @Override
   public String toString() {
@@ -176,7 +190,7 @@ public class CommandEntity {
             "id=" + id +
             ", clientPhone='" + clientPhone + '\'' +
             ", preparationTime=" + preparationTime +
-            ", orderPrice=" + orderPrice +
+            ", orderPrice=" + commandPrice +
             ", slotTime=" + slotTime +
             ", commandCode='" + commandCode + '\'' +
             ", productQuantity=" + productQuantity +

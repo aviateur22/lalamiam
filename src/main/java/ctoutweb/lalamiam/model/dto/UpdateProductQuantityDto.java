@@ -1,9 +1,9 @@
-package ctoutweb.lalamiam.model.schema;
+package ctoutweb.lalamiam.model.dto;
 
 import java.math.BigInteger;
 import java.util.Objects;
 
-public class UpdateProductQuantityInCommandSchema  {
+public class UpdateProductQuantityDto {
   private BigInteger productId;
   private BigInteger commandId;
   private Integer productQuantity;
@@ -11,10 +11,10 @@ public class UpdateProductQuantityInCommandSchema  {
   /**
    *
    */
-  public UpdateProductQuantityInCommandSchema() {
+  public UpdateProductQuantityDto() {
   }
 
-  public UpdateProductQuantityInCommandSchema(BigInteger productId, BigInteger commandId, Integer productQuantity) {
+  public UpdateProductQuantityDto(BigInteger productId, BigInteger commandId, Integer productQuantity) {
     this.productId = productId;
     this.commandId = commandId;
     this.productQuantity = productQuantity;
@@ -48,7 +48,7 @@ public class UpdateProductQuantityInCommandSchema  {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    UpdateProductQuantityInCommandSchema that = (UpdateProductQuantityInCommandSchema) o;
+    UpdateProductQuantityDto that = (UpdateProductQuantityDto) o;
     return Objects.equals(productId, that.productId) && Objects.equals(commandId, that.commandId) && Objects.equals(productQuantity, that.productQuantity);
   }
 

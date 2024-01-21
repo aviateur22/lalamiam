@@ -2,9 +2,8 @@ package ctoutweb.lalamiam.repository.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import ctoutweb.lalamiam.model.schema.AddCookSchema;
-import ctoutweb.lalamiam.model.schema.DeleteProductInCommandSchema;
-import ctoutweb.lalamiam.model.schema.UpdateProductQuantityInCommandSchema;
+import ctoutweb.lalamiam.model.dto.DeleteProductInCommandDto;
+import ctoutweb.lalamiam.model.dto.UpdateProductQuantityDto;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -43,27 +42,13 @@ public class CommandProductEntity {
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
 
-  /**
-   *
-   */
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
   public CommandProductEntity() {
   }
 
-  public CommandProductEntity(AddCookSchema addCookSchema) {
-    this.command = new CommandEntity(addCookSchema.commandId());
-    this.product = new ProductEntity(addCookSchema.productId());
-    this.productQuantity = addCookSchema.productQuantity();
-  }
-
-  public CommandProductEntity(DeleteProductInCommandSchema deleteProductInCommand) {
-    this.command = new CommandEntity(deleteProductInCommand.commandId());
-    this.product = new ProductEntity(deleteProductInCommand.productId());
-  }
-
-  public CommandProductEntity(UpdateProductQuantityInCommandSchema updateProductCommand) {
-    this.command = new CommandEntity(updateProductCommand.getCommandId());
-    this.product = new ProductEntity(updateProductCommand.getProductId());
-  }
   public BigInteger getId() {
     return id;
   }
@@ -118,6 +103,7 @@ public class CommandProductEntity {
     CommandProductEntity that = (CommandProductEntity) o;
     return Objects.equals(id, that.id) && Objects.equals(productQuantity, that.productQuantity) && Objects.equals(command, that.command) && Objects.equals(product, that.product) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
   }
+
 //  @Override
 //  public int hashCode() {
 //    return Objects.hash(id, productQuantity, command, store, product, createdAt, updatedAt);
@@ -129,7 +115,7 @@ public class CommandProductEntity {
             "id=" + id +
             ", productQuantity=" + productQuantity +
             //", command=" + command +
-            ", product=" + product +
+            //", product=" + product +
             ", createdAt=" + createdAt +
             ", updatedAt=" + updatedAt +
             '}';

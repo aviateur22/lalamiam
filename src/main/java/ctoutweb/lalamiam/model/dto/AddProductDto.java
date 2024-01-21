@@ -1,10 +1,8 @@
-package ctoutweb.lalamiam.model.schema;
-
-import ctoutweb.lalamiam.repository.entity.StoreEntity;
+package ctoutweb.lalamiam.model.dto;
 
 import java.math.BigInteger;
 
-public record AddProductSchema(
+public record AddProductDto(
         String name,
         Double price,
         String description,

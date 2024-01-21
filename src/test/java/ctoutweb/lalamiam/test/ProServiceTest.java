@@ -1,8 +1,8 @@
 package ctoutweb.lalamiam.test;
 
 import ctoutweb.lalamiam.model.dto.ProInformationDto;
-import ctoutweb.lalamiam.model.schema.AddProfessionalSchema;
-import ctoutweb.lalamiam.model.schema.AddStoreSchema;
+import ctoutweb.lalamiam.model.dto.AddProfessionalDto;
+import ctoutweb.lalamiam.model.dto.AddStoreDto;
 import ctoutweb.lalamiam.repository.ProRepository;
 import ctoutweb.lalamiam.repository.StoreRepository;
 import ctoutweb.lalamiam.repository.entity.ProEntity;
@@ -43,10 +43,10 @@ public class ProServiceTest {
 
   @Test
   void should_not_register_pro() {
-    AddProfessionalSchema addProfessionalInformation2 = new AddProfessionalSchema("aaaa", "", "aaa");
+    AddProfessionalDto addProfessionalInformation2 = new AddProfessionalDto("aaaa", "", "aaa");
     Assertions.assertThrows(RuntimeException.class, ()->proService.addProfessional(addProfessionalInformation2));
 
-    AddProfessionalSchema addProfessionalInformation3 = new AddProfessionalSchema("aaaa", "psps", "");
+    AddProfessionalDto addProfessionalInformation3 = new AddProfessionalDto("aaaa", "psps", "");
     Assertions.assertThrows(RuntimeException.class, ()->proService.addProfessional(addProfessionalInformation3));
 
     int proCount = proRepository.countProInDatabase();
@@ -56,7 +56,7 @@ public class ProServiceTest {
 
   @Test
   void should_register_pro_without_phone() {
-    AddProfessionalSchema addProfessionalInformation = new AddProfessionalSchema("", "password", "aaa");
+    AddProfessionalDto addProfessionalInformation = new AddProfessionalDto("", "password", "aaa");
     proService.addProfessional(addProfessionalInformation);
     List<ProEntity> professionalList = proRepository.findAll();
     int proCountInDatabase = proRepository.countProInDatabase();
@@ -68,7 +68,7 @@ public class ProServiceTest {
 
   @Test
   void should_register_pro_with_complete_information() {
-    AddProfessionalSchema addProfessionalInformation1 = new AddProfessionalSchema("aaa", "aaa", "aaa");
+    AddProfessionalDto addProfessionalInformation1 = new AddProfessionalDto("aaa", "aaa", "aaa");
     ProInformationDto proInformationDto = proService.addProfessional(addProfessionalInformation1);
 
     List<ProEntity> pro = proRepository.findAll();
@@ -79,10 +79,10 @@ public class ProServiceTest {
   @Test
   void should_create_store() throws IntrospectionException {
     // Creation Pro
-    AddProfessionalSchema addProfessionalInformation = new AddProfessionalSchema("", "password", "aaa");
+    AddProfessionalDto addProfessionalInformation = new AddProfessionalDto("", "password", "aaa");
     ProInformationDto createdPro = proService.addProfessional(addProfessionalInformation);
 
-    AddStoreSchema addStoreSchema = new AddStoreSchema(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
     StoreEntity createdStore =  storeService.createStore(addStoreSchema);
 
     long storeCountInDatabase = storeRepository.countAll();
@@ -94,10 +94,10 @@ public class ProServiceTest {
   @Test
   void should_not_create_store_with_incomplete_info() {
     // Creation Pro
-    AddProfessionalSchema addProfessionalInformation = new AddProfessionalSchema("", "password", "aaa");
+    AddProfessionalDto addProfessionalInformation = new AddProfessionalDto("", "password", "aaa");
     ProInformationDto createdPro = proService.addProfessional(addProfessionalInformation);
 
-    AddStoreSchema addStoreSchema = new AddStoreSchema(createdPro.id(), "", "rue des carriere", "auterive", "31190");
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "", "rue des carriere", "auterive", "31190");
 
     Assertions.assertThrows(RuntimeException.class, ()-> storeService.createStore(addStoreSchema));
 
@@ -107,7 +107,7 @@ public class ProServiceTest {
 
   @Test
   void should_not_create_store_with_pro_not_existing() {
-    AddStoreSchema addStoreSchema = new AddStoreSchema(BigInteger.valueOf(0), "d", "rue des carriere", "auterive", "31190");
+    AddStoreDto addStoreSchema = new AddStoreDto(BigInteger.valueOf(0), "d", "rue des carriere", "auterive", "31190");
     Assertions.assertThrows(RuntimeException.class, ()-> storeService.createStore(addStoreSchema));
 
     long storeCountInDatabase = storeRepository.countAll();

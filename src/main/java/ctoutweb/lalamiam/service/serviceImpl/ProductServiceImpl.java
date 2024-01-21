@@ -1,9 +1,9 @@
 package ctoutweb.lalamiam.service.serviceImpl;
 
 import ctoutweb.lalamiam.mapper.AddProductMapper;
+import ctoutweb.lalamiam.model.dto.AddProductResponseDto;
 import ctoutweb.lalamiam.model.dto.AddProductDto;
-import ctoutweb.lalamiam.model.schema.AddProductSchema;
-import ctoutweb.lalamiam.model.schema.UpdateProductSchema;
+import ctoutweb.lalamiam.model.dto.UpdateProductDto;
 import ctoutweb.lalamiam.repository.ProductRepository;
 import ctoutweb.lalamiam.repository.StoreRepository;
 import ctoutweb.lalamiam.repository.entity.ProductEntity;
@@ -30,7 +30,7 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public AddProductDto addProduct(AddProductSchema addProductSchema) {
+  public AddProductResponseDto addProduct(AddProductDto addProductSchema) {
     if(CommonFunction.isNullOrEmpty(addProductSchema.description())
             ||CommonFunction.isNullOrEmpty(addProductSchema.name())
             ||CommonFunction.isNullOrEmpty(addProductSchema.photo())
@@ -48,7 +48,7 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public ProductEntity updateProduct(UpdateProductSchema updateProductSchema) {
+  public ProductEntity updateProduct(UpdateProductDto updateProductSchema) {
 
     ProductEntity product = productRepository.findById(updateProductSchema.productId()).orElseThrow(()->new RuntimeException("le produit n'existe pas"));
 

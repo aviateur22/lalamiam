@@ -1,6 +1,6 @@
 package ctoutweb.lalamiam.service.serviceImpl;
 
-import ctoutweb.lalamiam.model.schema.AddStoreSchema;
+import ctoutweb.lalamiam.model.dto.AddStoreDto;
 import ctoutweb.lalamiam.repository.ProRepository;
 import ctoutweb.lalamiam.repository.StoreRepository;
 import ctoutweb.lalamiam.repository.entity.StoreEntity;
@@ -23,7 +23,7 @@ public class StoreServiceImp implements StoreService {
   }
 
   @Override
-  public StoreEntity createStore(AddStoreSchema addStoreSchema) {
+  public StoreEntity createStore(AddStoreDto addStoreSchema) {
     String name = addStoreSchema.name();
     String adress = addStoreSchema.adress();
     String city = addStoreSchema.city();

@@ -1,9 +1,9 @@
 package ctoutweb.lalamiam.model.dto;
 
-import ctoutweb.lalamiam.model.schema.ProductWithQuantity;
+import ctoutweb.lalamiam.model.ProductWithQuantity;
 
 import java.math.BigInteger;
-public record UpdateProductInCommandDtoResponse(
+public record UpdateProductQuantityResponseDto(
         BigInteger commandId,
         ProductWithQuantity productInCommand,
         Integer commandPreparationTime,

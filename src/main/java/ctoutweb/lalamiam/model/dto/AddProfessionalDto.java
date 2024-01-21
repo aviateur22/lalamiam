@@ -1,4 +1,4 @@
-package ctoutweb.lalamiam.model.schema;
+package ctoutweb.lalamiam.model.dto;
 
-public record AddProfessionalSchema(String phone, String password, String email) {
+public record AddProfessionalDto(String phone, String password, String email) {
 }

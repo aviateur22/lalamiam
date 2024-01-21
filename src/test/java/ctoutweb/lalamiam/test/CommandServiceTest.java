@@ -1,10 +1,8 @@
 package ctoutweb.lalamiam.test;
 
-import ctoutweb.lalamiam.model.dto.CommandDetailDto;
+import ctoutweb.lalamiam.model.ProductWithQuantity;
+import ctoutweb.lalamiam.model.dto.*;
 import ctoutweb.lalamiam.model.dto.AddProductDto;
-import ctoutweb.lalamiam.model.dto.ProInformationDto;
-import ctoutweb.lalamiam.model.dto.UpdateProductQuantityInCommandDto;
-import ctoutweb.lalamiam.model.schema.*;
 import ctoutweb.lalamiam.repository.CommandRepository;
 import ctoutweb.lalamiam.repository.CommandProductRepository;
 import ctoutweb.lalamiam.repository.ProRepository;
@@ -71,7 +69,7 @@ public class CommandServiceTest {
   @Test
   void should_create_command() {
     // Creation Commande
-    CommandDetailDto addCommand = commandService.addCommand(addCommandSchema());
+    CompleteCommandDetailResponseDto addCommand = commandService.addCommand(addCommandSchema());
 
     // Controle de la commande
     Assertions.assertEquals(1, commandRepository.countAll());
@@ -148,15 +146,15 @@ public class CommandServiceTest {
   @Test
   void should_update_product_quantity_in_command(){
     // Creation Commande
-    CommandDetailDto addCommand = commandService.addCommand(addCommandSchema());
+    CompleteCommandDetailResponseDto addCommand = commandService.addCommand(addCommandSchema());
 
     // Récuperation d'un produit de la commande
     BigInteger productChangeId = productsInCommand.get(0).getProductId();
 
     // Modification du produit dans la commande
-    UpdateProductQuantityInCommandSchema updateCommandSchema = new UpdateProductQuantityInCommandSchema(
-            productChangeId, addCommand.commandId(), store.getId(), 4);
-    UpdateProductQuantityInCommandDto productUpdated = commandService.updateProductQuantityInCommand(updateCommandSchema);
+    UpdateProductQuantityDto updateCommandSchema = new UpdateProductQuantityDto(
+            productChangeId, addCommand.commandId(), 4);
+    UpdateProductQuantityResponseDto productUpdated = commandService.updateProductQuantityInCommand(updateCommandSchema);
 
     Assertions.assertEquals(4, productUpdated.productInCommand().getProductQuantity());
 
@@ -164,28 +162,28 @@ public class CommandServiceTest {
     Assertions.assertEquals(productChangeId, productUpdated.productInCommand().getProductId());
 
     // Vérification du nouveau prix
-    Assertions.assertEquals(120, productUpdated.commandPrice());
+    Assertions.assertEquals(140, productUpdated.commandPrice());
 
     // Verification du nouveau temps de prepapration de la commande
-    Assertions.assertEquals(70, productUpdated.commandPreparationTime());
+    Assertions.assertEquals(80, productUpdated.commandPreparationTime());
   }
 
   @Test
   void should_not_update_product_quantity_if_product_not_belong_to_command() {
     // Creation Commande store1
-    CommandDetailDto addCommand = commandService.addCommand(addCommandSchema());
+    CompleteCommandDetailResponseDto addCommand = commandService.addCommand(addCommandSchema());
 
     // Creation produit pour store2
     ProInformationDto pro2 = createPro();
     StoreEntity store2 = createStore(pro2);
-    List<AddProductDto> productStore2 = createProduct(store2.getId());
+    List<AddProductResponseDto> productStore2 = createProduct(store2.getId());
 
     // Récuperation d'un produit du store2
     BigInteger productStore2Id = productStore2.get(0).id();
 
     // Modification quantité commande store1 avec un produit du store2
-    UpdateProductQuantityInCommandSchema updateCommandSchema = new UpdateProductQuantityInCommandSchema(
-            productStore2Id, addCommand.commandId(), store.getId(), 12);
+    UpdateProductQuantityDto updateCommandSchema = new UpdateProductQuantityDto(
+            productStore2Id, addCommand.commandId(), 12);
 
     Exception exception = Assertions.assertThrows(
             RuntimeException.class,
@@ -199,15 +197,15 @@ public class CommandServiceTest {
   @Test
   void should_force_update_product_quantity_to_1_if_quantity_inferior_at_1() {
     // Creation Commande
-    CommandDetailDto addCommand = commandService.addCommand(addCommandSchema());
+    CompleteCommandDetailResponseDto addCommand = commandService.addCommand(addCommandSchema());
 
     // Récuperation d'un produit de la commande
     BigInteger productChangeId = productsInCommand.get(0).getProductId();
 
     // Modification du produit dans la commande
-    UpdateProductQuantityInCommandSchema updateCommandSchema = new UpdateProductQuantityInCommandSchema(
-            productChangeId, addCommand.commandId(), store.getId(), 0);
-    UpdateProductQuantityInCommandDto productUpdated = commandService.updateProductQuantityInCommand(updateCommandSchema);
+    UpdateProductQuantityDto updateCommandSchema = new UpdateProductQuantityDto(
+            productChangeId, addCommand.commandId(), 0);
+    UpdateProductQuantityResponseDto productUpdated = commandService.updateProductQuantityInCommand(updateCommandSchema);
 
     Assertions.assertEquals(1, productUpdated.productInCommand().getProductQuantity());
     Assertions.assertEquals(productChangeId, productUpdated.productInCommand().getProductId());
@@ -215,9 +213,8 @@ public class CommandServiceTest {
 
   @Test
   void should_delete_one_product_in_command() {
-    // TODO Vérifier la logique de la méthode update
     // Creation Commande
-    CommandDetailDto addCommand = commandService.addCommand(addCommandSchema());
+    CompleteCommandDetailResponseDto addCommand = commandService.addCommand(addCommandSchema());
 
     // Recuperation du produit a supprimer - Prix 10€ - temps prepaparation 5 min
     BigInteger productId = addCommand.productInCommandList().get(0).getProductId();
@@ -228,8 +225,8 @@ public class CommandServiceTest {
 
     BigInteger commandId = addCommand.commandId();
     // Suppression du produit
-    DeleteProductInCommandSchema deleteProductInCommand = new DeleteProductInCommandSchema(commandId, productId, store.getId());
-    CommandDetailDto updateCommandDetail = commandService.deleteProductInCommand(deleteProductInCommand);
+    DeleteProductInCommandDto deleteProductInCommand = new DeleteProductInCommandDto(commandId, productId);
+    SimplifyCommandDetailResponseDto updateCommandDetail = commandService.deleteProductInCommand(deleteProductInCommand);
 
     // Vérification nombre de produit
     Assertions.assertEquals(2, updateCommandDetail.productInCommandList().size());
@@ -243,24 +240,24 @@ public class CommandServiceTest {
                     .size());
 
     // Vérification du nouveau prix
-    Assertions.assertEquals(60, updateCommandDetail.commandPrice());
+    Assertions.assertEquals(100, updateCommandDetail.commandPrice());
 
     // Verification du nouveau temps de prepapration de la commande
-    Assertions.assertEquals(30, updateCommandDetail.commandPreparationTime());
+    Assertions.assertEquals(60, updateCommandDetail.commandPreparationTime());
   }
 
   @Test
   void should_add_one_or_multiple_products_to_command() {
     // TODO 1 commande ne oeut pas etre modifié si pas existante
     // Creation Commande
-    CommandDetailDto addCommand = commandService.addCommand(addCommandSchema());
+    CompleteCommandDetailResponseDto addCommand = commandService.addCommand(addCommandSchema());
 
     // Récuperation produitId a ajouter
     List<BigInteger> productIdList = new ArrayList<>();
     BigInteger productId = productsInCommand.get(0).getProductId();
     productIdList.add(productId);
-    AddProductsInCommandSchema addProductsInCommandSchema = new AddProductsInCommandSchema(productIdList, store.getId(), addCommand.commandId());
-    CommandDetailDto commandDetail = commandService.addProductsInCommand(addProductsInCommandSchema);
+    AddProductsInCommandDto addProductsInCommandSchema = new AddProductsInCommandDto(productIdList, addCommand.commandId());
+    SimplifyCommandDetailResponseDto commandDetail = commandService.addProductsInCommand(addProductsInCommandSchema);
 
     // Vérification nombre de produit
     Assertions.assertEquals(7, commandDetail.numberOProductInCommand());
@@ -276,15 +273,15 @@ public class CommandServiceTest {
   @Test
   void should_add_one_product_already_in_command() {
     // Creation Commande
-    CommandDetailDto addCommand = commandService.addCommand(addCommandSchema());
+    CompleteCommandDetailResponseDto addCommand = commandService.addCommand(addCommandSchema());
 
     // Récuperation produitId a ajouter
     List<BigInteger> productIdList = new ArrayList<>();
     BigInteger productId = productsInCommand.get(0).getProductId();
 
     productIdList.add(productId);
-    AddProductsInCommandSchema addProductsInCommandSchema = new AddProductsInCommandSchema(productIdList, store.getId(), addCommand.commandId());
-    CommandDetailDto commandDetail = commandService.addProductsInCommand(addProductsInCommandSchema);
+    AddProductsInCommandDto addProductsInCommandSchema = new AddProductsInCommandDto(productIdList, addCommand.commandId());
+    SimplifyCommandDetailResponseDto commandDetail = commandService.addProductsInCommand(addProductsInCommandSchema);
 
     // Vérification que le produit ajouté n'est pas en doublons
     List<ProductWithQuantity> findProductIdInProductList = commandDetail
@@ -299,7 +296,7 @@ public class CommandServiceTest {
    * Création schema pour une commande
    * @return AddCommandSchema
    */
-  private AddCommandSchema addCommandSchema() {
+  private AddCommandDto addCommandSchema() {
 
     // Parametrages des tests
     boolean isStoreExist = testParameters.get("isStoreExist");
@@ -322,7 +319,7 @@ public class CommandServiceTest {
             StoreEntityBuilder.aStoreEntity().withId(BigInteger.valueOf(0)).build();
 
     // Création produits
-    List<AddProductDto> createProductList = createProduct(createdStore.getId());
+    List<AddProductResponseDto> createProductList = createProduct(createdStore.getId());
 
     // Creation commande
     createProductsInCommand(createProductList);
@@ -331,7 +328,7 @@ public class CommandServiceTest {
     if(!isProdutcBelongToStore) {
       createdPro2 = createPro();
       createdStore2 = createStore(createdPro2);
-      List<AddProductDto> createProductList2 = createProduct(createdStore2.getId());
+      List<AddProductResponseDto> createProductList2 = createProduct(createdStore2.getId());
       ProductWithQuantity productStore2 = new ProductWithQuantity(createProductList2.get(0).id(), 1);
       productsInCommand.add(productStore2);
     }
@@ -349,7 +346,7 @@ public class CommandServiceTest {
 
     if(!isProductInStore) productsInCommand.add(new ProductWithQuantity(BigInteger.valueOf(0), 1));
 
-    AddCommandSchema addCommandSchema = new AddCommandSchema(
+    AddCommandDto addCommandSchema = new AddCommandDto(
             phoneCient,
             commandSlotTime,
             store.getId(),
@@ -364,7 +361,7 @@ public class CommandServiceTest {
    * @param productList
    * @return
    */
-  public void createProductsInCommand(List<AddProductDto> productList) {
+  public void createProductsInCommand(List<AddProductResponseDto> productList) {
     productsInCommand = productList
             .stream()
             .map(product -> new ProductWithQuantity(product.id(), 2))
@@ -377,7 +374,7 @@ public class CommandServiceTest {
    * @return ProInformationDto
    */
   public ProInformationDto createPro() {
-    ProInformationDto createdPro = proService.addProfessional(new AddProfessionalSchema("", "password", "aaa"));
+    ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
     return createdPro;
   }
 
@@ -387,20 +384,20 @@ public class CommandServiceTest {
    * @return StoreEntity
    */
   public StoreEntity createStore(ProInformationDto createdPro) {
-    AddStoreSchema addStoreSchema = new AddStoreSchema(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
     StoreEntity createdStore = storeService.createStore(addStoreSchema);
     return createdStore;
   }
-  public List<AddProductDto> createProduct(BigInteger storeId) {
-    AddProductSchema addProductSchema1 = new AddProductSchema("lait", 10D, "initial description", 5, "s", storeId);
-    AddProductSchema addProductSchema2 = new AddProductSchema("coco", 20D, "initial description", 10, "s", storeId);
-    AddProductSchema addProductSchema3 = new AddProductSchema("orange", 30D, "initial description", 20, "s", storeId);
+  public List<AddProductResponseDto> createProduct(BigInteger storeId) {
+    AddProductDto addProductSchema1 = new AddProductDto("lait", 10D, "initial description", 5, "s", storeId);
+    AddProductDto addProductSchema2 = new AddProductDto("coco", 20D, "initial description", 10, "s", storeId);
+    AddProductDto addProductSchema3 = new AddProductDto("orange", 30D, "initial description", 20, "s", storeId);
 
-    AddProductDto addProduct1 =  productService.addProduct(addProductSchema1);
-    AddProductDto addProduct2 =  productService.addProduct(addProductSchema2);
-    AddProductDto addProduct3 =  productService.addProduct(addProductSchema3);
+    AddProductResponseDto addProduct1 =  productService.addProduct(addProductSchema1);
+    AddProductResponseDto addProduct2 =  productService.addProduct(addProductSchema2);
+    AddProductResponseDto addProduct3 =  productService.addProduct(addProductSchema3);
 
-    List<AddProductDto> createdProductList = new ArrayList<>();
+    List<AddProductResponseDto> createdProductList = new ArrayList<>();
     createdProductList.add(addProduct1);
     createdProductList.add(addProduct2);
     createdProductList.add(addProduct3);

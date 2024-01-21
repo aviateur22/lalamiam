@@ -1,7 +1,7 @@
 package ctoutweb.lalamiam.controller;
 
 import ctoutweb.lalamiam.model.dto.ProInformationDto;
-import ctoutweb.lalamiam.model.schema.AddProfessionalSchema;
+import ctoutweb.lalamiam.model.dto.AddProfessionalDto;
 import ctoutweb.lalamiam.service.ProService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ public class ProController {
   }
 
   @PostMapping("/")
-  public ResponseEntity<ProInformationDto> createProfessional(@RequestBody AddProfessionalSchema addProfessionalSchema) {
+  public ResponseEntity<ProInformationDto> createProfessional(@RequestBody AddProfessionalDto addProfessionalSchema) {
     ProInformationDto addProfessional = proService.addProfessional(addProfessionalSchema);
     return new ResponseEntity<>(addProfessional, HttpStatus.OK);
   }

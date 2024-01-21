@@ -1,9 +1,8 @@
 package ctoutweb.lalamiam.service.serviceImpl;
 
 import ctoutweb.lalamiam.helper.CommandServiceHelper;
-import ctoutweb.lalamiam.model.dto.CommandDetailDto;
-import ctoutweb.lalamiam.model.dto.UpdateProductQuantityInCommandDto;
-import ctoutweb.lalamiam.model.schema.*;
+import ctoutweb.lalamiam.model.ProductWithQuantity;
+import ctoutweb.lalamiam.model.dto.*;
 import ctoutweb.lalamiam.repository.CommandRepository;
 import ctoutweb.lalamiam.repository.CommandProductRepository;
 import ctoutweb.lalamiam.repository.StoreRepository;
@@ -22,7 +21,7 @@ public class CommandServiceImpl implements CommandService {
   private final CommandServiceHelper commandServiceHelper;
   private final StoreRepository storeRepository;
   private final CommandRepository commandRepository;
-  private final CommandProductRepository cookRepository;
+  private final CommandProductRepository commandProductRepository;
 
   public CommandServiceImpl(
           CommandServiceHelper commandServiceHelper,
@@ -32,25 +31,25 @@ public class CommandServiceImpl implements CommandService {
     this.commandServiceHelper = commandServiceHelper;
     this.storeRepository = storeRepository;
     this.commandRepository = commandRepository;
-    this.cookRepository = cookRepository;
+    this.commandProductRepository = cookRepository;
   }
 
   @Override
-  public CommandDetailDto addCommand(AddCommandSchema addCommandSchema) {
+  public CompleteCommandDetailResponseDto addCommand(AddCommandDto addCommand) {
 
     LocalDateTime now = LocalDateTime.now();
-    List<BigInteger> produtcIdList = addCommandSchema
+    List<BigInteger> produtcIdList = addCommand
             .productsInCommand()
             .stream()
             .map(ProductWithQuantity::getProductId)
             .collect(Collectors.toList());
 
-    String phoneClient = addCommandSchema.clientPhone();
-    LocalDateTime slotTime = addCommandSchema.slotTime();
+    String phoneClient = addCommand.clientPhone();
+    LocalDateTime slotTime = addCommand.slotTime();
 
     // Vérification Store
     StoreEntity store = storeRepository
-            .findById(addCommandSchema.storeId())
+            .findById(addCommand.storeId())
             .orElseThrow(()->new RuntimeException("Le commerce n'existe pas"));
 
     if(CommonFunction.isNullOrEmpty(phoneClient)) throw new RuntimeException("Le téléphone client est obligatoire");
@@ -59,19 +58,19 @@ public class CommandServiceImpl implements CommandService {
     if(produtcIdList == null || produtcIdList.isEmpty()) throw new RuntimeException("La commande ne peut pas être vide");
 
     // Calcul temps de prezpartion
-    return commandServiceHelper.addCommand(addCommandSchema);
+    return commandServiceHelper.addCommand(store, addCommand);
   }
 
   @Override
   @Transactional
-  public UpdateProductQuantityInCommandDto updateProductQuantityInCommand(
-          UpdateProductQuantityInCommandSchema updateProductCommand
+  public UpdateProductQuantityResponseDto updateProductQuantityInCommand(
+          UpdateProductQuantityDto updateProductCommand
   ) throws RuntimeException {
 
     // Correction quantité
     if(updateProductCommand.getProductQuantity() <= 0) updateProductCommand .setProductQuantity(1);
 
-    CommandProductEntity productCook = cookRepository.findOneProductByCommandIdProductId(
+    CommandProductEntity productCook = commandProductRepository.findOneProductByCommandIdProductId(
             updateProductCommand.getCommandId(),
             updateProductCommand.getProductId())
             .orElseThrow(()->new RuntimeException("Le produit n'est pas rattaché au commerce"));
@@ -81,16 +80,16 @@ public class CommandServiceImpl implements CommandService {
             .findById(updateProductCommand.getCommandId())
             .orElseThrow(()->new RuntimeException("La commande n'est pas trouvée"));
 
-    return commandServiceHelper.updateProductQuantityInCommand(productCook, updateProductCommand, updatedCommand);
+    return commandServiceHelper.updateProductQuantityInCommand(updateProductCommand);
   }
 
   @Override
-  public CommandDetailDto deleteProductInCommand(DeleteProductInCommandSchema deleteProductInCommand) {
+  public SimplifyCommandDetailResponseDto deleteProductInCommand(DeleteProductInCommandDto deleteProductInCommand) {
     return commandServiceHelper.deleteProductInCommand(deleteProductInCommand);
   }
 
   @Override
-  public CommandDetailDto addProductsInCommand(AddProductsInCommandSchema addProductsInCommand) {
+  public SimplifyCommandDetailResponseDto addProductsInCommand(AddProductsInCommandDto addProductsInCommand) {
 
     CommandEntity findCommand = commandRepository
             .findById(addProductsInCommand.commandId())

@@ -1,17 +1,17 @@
 package ctoutweb.lalamiam.service;
 
+import ctoutweb.lalamiam.model.dto.AddProductResponseDto;
 import ctoutweb.lalamiam.model.dto.AddProductDto;
-import ctoutweb.lalamiam.model.schema.AddProductSchema;
-import ctoutweb.lalamiam.model.schema.UpdateProductSchema;
+import ctoutweb.lalamiam.model.dto.UpdateProductDto;
 import ctoutweb.lalamiam.repository.entity.ProductEntity;
 
 import java.math.BigInteger;
 
 public interface ProductService {
 
-  AddProductDto addProduct(AddProductSchema addProductSchema);
+  AddProductResponseDto addProduct(AddProductDto addProductSchema);
 
-  ProductEntity updateProduct(UpdateProductSchema updateProductSchema);
+  ProductEntity updateProduct(UpdateProductDto updateProductSchema);
 
   ProductEntity findProduct(BigInteger productId);
 

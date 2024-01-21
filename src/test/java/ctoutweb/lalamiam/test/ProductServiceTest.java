@@ -1,11 +1,11 @@
 package ctoutweb.lalamiam.test;
 
-import ctoutweb.lalamiam.model.dto.AddProductDto;
+import ctoutweb.lalamiam.model.dto.AddProductResponseDto;
 import ctoutweb.lalamiam.model.dto.ProInformationDto;
-import ctoutweb.lalamiam.model.schema.AddProductSchema;
-import ctoutweb.lalamiam.model.schema.AddProfessionalSchema;
-import ctoutweb.lalamiam.model.schema.AddStoreSchema;
-import ctoutweb.lalamiam.model.schema.UpdateProductSchema;
+import ctoutweb.lalamiam.model.dto.AddProductDto;
+import ctoutweb.lalamiam.model.dto.AddProfessionalDto;
+import ctoutweb.lalamiam.model.dto.AddStoreDto;
+import ctoutweb.lalamiam.model.dto.UpdateProductDto;
 import ctoutweb.lalamiam.repository.ProRepository;
 import ctoutweb.lalamiam.repository.ProductRepository;
 import ctoutweb.lalamiam.repository.entity.ProductEntity;
@@ -47,15 +47,15 @@ public class ProductServiceTest {
   @Test
   void should_add_product() {
     // Creation Pro
-    ProInformationDto createdPro = proService.addProfessional(new AddProfessionalSchema("", "password", "aaa"));
+    ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
     // Creation Store
-    AddStoreSchema addStoreSchema = new AddStoreSchema(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produit
-    AddProductSchema addProductSchema = new AddProductSchema("melon", 1.9, "jolie melon", 5, "ddd", store.getId());
-    AddProductDto addProduct =  productService.addProduct(addProductSchema);
+    AddProductDto addProductSchema = new AddProductDto("melon", 1.9, "jolie melon", 5, "ddd", store.getId());
+    AddProductResponseDto addProduct =  productService.addProduct(addProductSchema);
 
     /**
      * Then
@@ -69,7 +69,7 @@ public class ProductServiceTest {
   @Test
   void should_not_add_product_if_store_not_exist()   {
     // Ajout produit
-    AddProductSchema addProductSchema = new AddProductSchema("melon", 1.9, "jolie melon", 5, "ddd", BigInteger.valueOf(0));
+    AddProductDto addProductSchema = new AddProductDto("melon", 1.9, "jolie melon", 5, "ddd", BigInteger.valueOf(0));
 
     /**
      * Then
@@ -80,14 +80,14 @@ public class ProductServiceTest {
   @Test
   void should_not_add_product_with_decription_missing() {
     // Creation Pro
-    ProInformationDto createdPro = proService.addProfessional(new AddProfessionalSchema("", "password", "aaa"));
+    ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
     // Creation Store
-    AddStoreSchema addStoreSchema = new AddStoreSchema(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produit
-    AddProductSchema addProductSchema = new AddProductSchema("melon", 0D, "", 5, "", store.getId());
+    AddProductDto addProductSchema = new AddProductDto("melon", 0D, "", 5, "", store.getId());
 
     List<ProductEntity> product = productRepository.findAll();
     Assertions.assertThrows(RuntimeException.class, ()->productService.addProduct(addProductSchema));
@@ -97,14 +97,14 @@ public class ProductServiceTest {
   @Test
   void should_not_add_product_with_name_missing() {
     // Creation Pro
-    ProInformationDto createdPro = proService.addProfessional(new AddProfessionalSchema("", "password", "aaa"));
+    ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
     // Creation Store
-    AddStoreSchema addStoreSchema = new AddStoreSchema(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produit
-    AddProductSchema addProductSchema = new AddProductSchema("", 0D, "dd", 5, "d", store.getId());
+    AddProductDto addProductSchema = new AddProductDto("", 0D, "dd", 5, "d", store.getId());
 
     List<ProductEntity> product = productRepository.findAll();
     Assertions.assertThrows(RuntimeException.class, ()->productService.addProduct(addProductSchema));
@@ -114,14 +114,14 @@ public class ProductServiceTest {
   @Test
   void should_not_add_product_with_photo_missing() {
     // Creation Pro
-    ProInformationDto createdPro = proService.addProfessional(new AddProfessionalSchema("", "password", "aaa"));
+    ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
     // Creation Store
-    AddStoreSchema addStoreSchema = new AddStoreSchema(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produit
-    AddProductSchema addProductSchema = new AddProductSchema("dd", 0D, "dd", 5, "", store.getId());
+    AddProductDto addProductSchema = new AddProductDto("dd", 0D, "dd", 5, "", store.getId());
 
     List<ProductEntity> product = productRepository.findAll();
     Assertions.assertThrows(RuntimeException.class, ()->productService.addProduct(addProductSchema));
@@ -131,10 +131,10 @@ public class ProductServiceTest {
   @Test
   void should_update_product() {
     // Creation Pro
-    ProInformationDto createdPro = proService.addProfessional(new AddProfessionalSchema("", "password", "aaa"));
+    ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
     // Creation Store
-    AddStoreSchema addStoreSchema = new AddStoreSchema(
+    AddStoreDto addStoreSchema = new AddStoreDto(
             createdPro.id(),
             "magasin",
             "rue des carriere",
@@ -143,16 +143,16 @@ public class ProductServiceTest {
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produit
-    AddProductSchema addProductSchema = new AddProductSchema(
+    AddProductDto addProductSchema = new AddProductDto(
             "initial name",
             0D, "initial description",
             5,
             "s"
             , store.getId());
-    AddProductDto addProduct =  productService.addProduct(addProductSchema);
+    AddProductResponseDto addProduct =  productService.addProduct(addProductSchema);
 
     // Update du produit
-    UpdateProductSchema updateProductSchema = new UpdateProductSchema(
+    UpdateProductDto updateProductSchema = new UpdateProductDto(
             addProduct.id(),
             "mise a jour",
             10D,
@@ -173,27 +173,27 @@ public class ProductServiceTest {
   @Test
   void should_not_update_product_wich_not_exist() {
     // Creation Pro
-    ProInformationDto createdPro = proService.addProfessional(new AddProfessionalSchema("", "password", "aaa"));
+    ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
     // Creation Store
-    AddStoreSchema addStoreSchema = new AddStoreSchema(createdPro.id(),
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(),
             "magasin",
             "rue des carriere",
             "auterive", "31190");
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produit
-    AddProductSchema addProductSchema = new AddProductSchema(
+    AddProductDto addProductSchema = new AddProductDto(
             "initial name",
             0D,
             "initial description",
             5,
             "s",
             store.getId());
-    AddProductDto addProduct =  productService.addProduct(addProductSchema);
+    AddProductResponseDto addProduct =  productService.addProduct(addProductSchema);
 
     // Update du produit
-    UpdateProductSchema updateProductSchema = new UpdateProductSchema(
+    UpdateProductDto updateProductSchema = new UpdateProductDto(
             BigInteger.valueOf(2),
             "mise a jour",
             10D,
@@ -206,18 +206,18 @@ public class ProductServiceTest {
   @Test
   void should_not_update_product_without_description() {
     // Creation Pro
-    ProInformationDto createdPro = proService.addProfessional(new AddProfessionalSchema("", "password", "aaa"));
+    ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
     // Creation Store
-    AddStoreSchema addStoreSchema = new AddStoreSchema(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produit
-    AddProductSchema addProductSchema = new AddProductSchema("initial name", 0D, "initial description", 5, "s", store.getId());
-    AddProductDto addProduct =  productService.addProduct(addProductSchema);
+    AddProductDto addProductSchema = new AddProductDto("initial name", 0D, "initial description", 5, "s", store.getId());
+    AddProductResponseDto addProduct =  productService.addProduct(addProductSchema);
 
     // Update du produit
-    UpdateProductSchema updateProductSchema = new UpdateProductSchema(addProduct.id(), "mise a jour", 10D, "", 15, "x", store.getId());
+    UpdateProductDto updateProductSchema = new UpdateProductDto(addProduct.id(), "mise a jour", 10D, "", 15, "x", store.getId());
     Assertions.assertThrows(RuntimeException.class, ()->productService.updateProduct(updateProductSchema));
 
     // Vérification des données du produit
@@ -233,18 +233,18 @@ public class ProductServiceTest {
   @Test
   void should_not_update_product_without_name() {
     // Creation Pro
-    ProInformationDto createdPro = proService.addProfessional(new AddProfessionalSchema("", "password", "aaa"));
+    ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
     // Creation Store
-    AddStoreSchema addStoreSchema = new AddStoreSchema(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produit
-    AddProductSchema addProductSchema = new AddProductSchema("initial name", 0D, "initial description", 5, "s", store.getId());
-    AddProductDto addProduct =  productService.addProduct(addProductSchema);
+    AddProductDto addProductSchema = new AddProductDto("initial name", 0D, "initial description", 5, "s", store.getId());
+    AddProductResponseDto addProduct =  productService.addProduct(addProductSchema);
 
     // Update du produit
-    UpdateProductSchema updateProductSchema = new UpdateProductSchema(addProduct.id(), "", 10D, "desription", 15, "x", store.getId());
+    UpdateProductDto updateProductSchema = new UpdateProductDto(addProduct.id(), "", 10D, "desription", 15, "x", store.getId());
     Assertions.assertThrows(RuntimeException.class, ()->productService.updateProduct(updateProductSchema));
 
     // Vérification des données du produit
@@ -260,18 +260,18 @@ public class ProductServiceTest {
   @Test
   void should_not_update_product_without_photo() {
     // Creation Pro
-    ProInformationDto createdPro = proService.addProfessional(new AddProfessionalSchema("", "password", "aaa"));
+    ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
     // Creation Store
-    AddStoreSchema addStoreSchema = new AddStoreSchema(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produit
-    AddProductSchema addProductSchema = new AddProductSchema("initial name", 0D, "initial description", 5, "s", store.getId());
-    AddProductDto addProduct =  productService.addProduct(addProductSchema);
+    AddProductDto addProductSchema = new AddProductDto("initial name", 0D, "initial description", 5, "s", store.getId());
+    AddProductResponseDto addProduct =  productService.addProduct(addProductSchema);
 
     // Update du produit
-    UpdateProductSchema updateProductSchema = new UpdateProductSchema(addProduct.id(), "mise a jour", 10D, "description", 15, "", store.getId());
+    UpdateProductDto updateProductSchema = new UpdateProductDto(addProduct.id(), "mise a jour", 10D, "description", 15, "", store.getId());
     Assertions.assertThrows(RuntimeException.class, ()->productService.updateProduct(updateProductSchema));
 
     // Vérification des données du produit
@@ -287,15 +287,15 @@ public class ProductServiceTest {
   @Test
   void should_delete_product() {
     // Creation Pro
-    ProInformationDto createdPro = proService.addProfessional(new AddProfessionalSchema("", "password", "aaa"));
+    ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
     // Creation Store
-    AddStoreSchema addStoreSchema = new AddStoreSchema(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produit
-    AddProductSchema addProductSchema = new AddProductSchema("initial name", 0D, "initial description", 5, "s", store.getId());
-    AddProductDto addProduct =  productService.addProduct(addProductSchema);
+    AddProductDto addProductSchema = new AddProductDto("initial name", 0D, "initial description", 5, "s", store.getId());
+    AddProductResponseDto addProduct =  productService.addProduct(addProductSchema);
 
     // Suppression
     productService.deleteProduct(addProduct.id());
@@ -307,10 +307,10 @@ public class ProductServiceTest {
   @Test
   void should_not_delete_if_product_not_exist() {
     // Creation Pro
-    ProInformationDto createdPro = proService.addProfessional(new AddProfessionalSchema("", "password", "aaa"));
+    ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
     // Creation Store
-    AddStoreSchema addStoreSchema = new AddStoreSchema(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Suppression produit inexistant

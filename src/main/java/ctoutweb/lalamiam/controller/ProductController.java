@@ -1,8 +1,7 @@
 package ctoutweb.lalamiam.controller;
 
+import ctoutweb.lalamiam.model.dto.AddProductResponseDto;
 import ctoutweb.lalamiam.model.dto.AddProductDto;
-import ctoutweb.lalamiam.model.schema.AddProductSchema;
-import ctoutweb.lalamiam.repository.entity.ProductEntity;
 import ctoutweb.lalamiam.service.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +21,8 @@ public class ProductController {
   }
 
   @PostMapping("/")
-  ResponseEntity<AddProductDto> addProduct(@RequestBody AddProductSchema addProductSchema) {
-    AddProductDto addProduct = productService.addProduct(addProductSchema);
-    return new ResponseEntity<AddProductDto>(addProduct,HttpStatus.OK);
+  ResponseEntity<AddProductResponseDto> addProduct(@RequestBody AddProductDto addProductSchema) {
+    AddProductResponseDto addProduct = productService.addProduct(addProductSchema);
+    return new ResponseEntity<AddProductResponseDto>(addProduct,HttpStatus.OK);
   }
 }

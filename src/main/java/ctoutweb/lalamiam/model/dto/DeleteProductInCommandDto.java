@@ -1,10 +1,9 @@
-package ctoutweb.lalamiam.model.schema;
+package ctoutweb.lalamiam.model.dto;
 
 import java.math.BigInteger;
 
-public record DeleteProductInCommandSchema(
+public record DeleteProductInCommandDto(
         BigInteger commandId,
-        BigInteger productId,
-        BigInteger storeId
+        BigInteger productId
 ) {
 }

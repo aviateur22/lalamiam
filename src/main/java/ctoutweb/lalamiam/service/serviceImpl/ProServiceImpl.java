@@ -1,20 +1,14 @@
 package ctoutweb.lalamiam.service.serviceImpl;
 
 import ctoutweb.lalamiam.mapper.ProInformationMapper;
-import ctoutweb.lalamiam.model.schema.AddProfessionalSchema;
+import ctoutweb.lalamiam.model.dto.AddProfessionalDto;
 import ctoutweb.lalamiam.model.dto.ProInformationDto;
-import ctoutweb.lalamiam.model.schema.AddStoreSchema;
 import ctoutweb.lalamiam.repository.ProRepository;
 import ctoutweb.lalamiam.repository.StoreRepository;
 import ctoutweb.lalamiam.repository.entity.ProEntity;
-import ctoutweb.lalamiam.repository.entity.StoreEntity;
 import ctoutweb.lalamiam.service.ProService;
-import ctoutweb.lalamiam.util.CommonFunction;
 import org.springframework.stereotype.Service;
 
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
 import java.math.BigInteger;
 
 @Service
@@ -32,7 +26,7 @@ public class ProServiceImpl implements ProService {
   }
 
   @Override
-  public ProInformationDto addProfessional(AddProfessionalSchema addProfessionalInfo) {
+  public ProInformationDto addProfessional(AddProfessionalDto addProfessionalInfo) {
 
     String password = addProfessionalInfo.password();
     String email = addProfessionalInfo.email();

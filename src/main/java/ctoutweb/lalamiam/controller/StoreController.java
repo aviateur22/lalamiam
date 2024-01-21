@@ -1,6 +1,6 @@
 package ctoutweb.lalamiam.controller;
 
-import ctoutweb.lalamiam.model.schema.AddStoreSchema;
+import ctoutweb.lalamiam.model.dto.AddStoreDto;
 import ctoutweb.lalamiam.repository.entity.StoreEntity;
 import ctoutweb.lalamiam.service.StoreService;
 import org.springframework.http.HttpStatus;
@@ -21,7 +21,7 @@ public class StoreController {
   }
 
   @PostMapping("/")
-  ResponseEntity<StoreEntity> addStore(@RequestBody AddStoreSchema addStoreSchema) {
+  ResponseEntity<StoreEntity> addStore(@RequestBody AddStoreDto addStoreSchema) {
     StoreEntity addStore = storeService.createStore(addStoreSchema);
     return new ResponseEntity<>(addStore, HttpStatus.OK);
   }

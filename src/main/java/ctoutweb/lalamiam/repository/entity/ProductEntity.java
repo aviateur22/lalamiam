@@ -2,7 +2,8 @@ package ctoutweb.lalamiam.repository.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import ctoutweb.lalamiam.model.schema.AddProductSchema;
+import ctoutweb.lalamiam.model.dto.AddProductDto;
+import ctoutweb.lalamiam.repository.ProductRepository;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -51,8 +52,29 @@ public class ProductEntity {
   Set<CommandProductEntity> commandProducts;
 
   /**
-   *
+   * Recherche un produit
+   * @param productRepository
+   * @return
+   * @throws RuntimeException
    */
+  public ProductEntity findProductById(ProductRepository productRepository) throws RuntimeException {
+    return productRepository
+            .findById(id)
+            .orElseThrow(()->new RuntimeException("Le produit n'existe pas"));
+  }
+
+  /**
+   * Trouve le prix d'un produit
+   * @param productRepository
+   * @return
+   * @throws RuntimeException
+   */
+  public Double findProductPrice(ProductRepository productRepository) throws RuntimeException {
+    return findProductById(productRepository).getPrice();
+  }
+
+
+ //////////////////////////////////////////////////////////////////////////
 
   public ProductEntity() {
   }
@@ -61,7 +83,7 @@ public class ProductEntity {
     this.id = productId;
   }
 
-  public ProductEntity(AddProductSchema addProductSchema) {
+  public ProductEntity(AddProductDto addProductSchema) {
     this.name = addProductSchema.name();
     this.photo = addProductSchema.photo();
     this.preparationTime = addProductSchema.preparationTime();

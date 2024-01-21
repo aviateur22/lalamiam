@@ -1,4 +1,4 @@
-package ctoutweb.lalamiam.model.schema;
+package ctoutweb.lalamiam.model;
 
 import java.math.BigInteger;
 

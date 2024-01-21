@@ -1,7 +1,7 @@
 package ctoutweb.lalamiam.repository.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import ctoutweb.lalamiam.model.schema.AddProfessionalSchema;
+import ctoutweb.lalamiam.model.dto.AddProfessionalDto;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
 import org.hibernate.annotations.*;
@@ -54,7 +54,7 @@ public class ProEntity {
     this.updatedAt = updatedAt;
   }
 
-  public ProEntity(AddProfessionalSchema addProfessionalSchema) {
+  public ProEntity(AddProfessionalDto addProfessionalSchema) {
     this.email = addProfessionalSchema.email();
     this.phone = addProfessionalSchema.phone();
     this.password = addProfessionalSchema.password();

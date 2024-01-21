@@ -88,7 +88,7 @@ public final class CommandEntityBuilder {
     commandEntity.setId(id);
     commandEntity.setClientPhone(clientPhone);
     commandEntity.setPreparationTime(preparationTime);
-    commandEntity.setOrderPrice(orderPrice);
+    commandEntity.setCommandPrice(orderPrice);
     commandEntity.setSlotTime(slotTime);
     commandEntity.setCommandCode(commandCode);
     commandEntity.setProductQuantity(productQuantity);
