@@ -3,7 +3,7 @@ package ctoutweb.lalamiam.model.dto;
 import ctoutweb.lalamiam.model.schema.ProductWithQuantity;
 
 import java.math.BigInteger;
-public record UpdateProductQuantityInCommandDto(
+public record UpdateProductInCommandDtoResponse(
         BigInteger commandId,
         ProductWithQuantity productInCommand,
         Integer commandPreparationTime,

@@ -1,15 +1,14 @@
-package ctoutweb.lalamiam.model.dto;
+package ctoutweb.lalamiam.model.schema;
+
+import ctoutweb.lalamiam.repository.entity.StoreEntity;
 
 import java.math.BigInteger;
-import java.time.LocalDateTime;
 
-public record AddProductDto(
-        BigInteger id,
+public record AddProductSchema(
         String name,
         Double price,
         String description,
         Integer preparationTime,
         String photo,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt
-) {}
+        BigInteger storeId) {
+}
