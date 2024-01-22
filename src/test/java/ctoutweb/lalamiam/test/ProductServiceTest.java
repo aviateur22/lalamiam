@@ -50,7 +50,7 @@ public class ProductServiceTest {
     ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
     // Creation Store
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190", 10);
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produit
@@ -83,7 +83,7 @@ public class ProductServiceTest {
     ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
     // Creation Store
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190", 10);
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produit
@@ -100,7 +100,7 @@ public class ProductServiceTest {
     ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
     // Creation Store
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190", 10);
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produit
@@ -117,7 +117,7 @@ public class ProductServiceTest {
     ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
     // Creation Store
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190", 10);
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produit
@@ -139,7 +139,8 @@ public class ProductServiceTest {
             "magasin",
             "rue des carriere",
             "auterive",
-            "31190");
+            "31190",
+            10);
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produit
@@ -179,7 +180,8 @@ public class ProductServiceTest {
     AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(),
             "magasin",
             "rue des carriere",
-            "auterive", "31190");
+            "auterive", "31190",
+            10);
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produit
@@ -209,7 +211,7 @@ public class ProductServiceTest {
     ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
     // Creation Store
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190", 10);
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produit
@@ -236,7 +238,7 @@ public class ProductServiceTest {
     ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
     // Creation Store
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190", 10);
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produit
@@ -263,7 +265,7 @@ public class ProductServiceTest {
     ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
     // Creation Store
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190", 10);
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produit
@@ -290,7 +292,7 @@ public class ProductServiceTest {
     ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
     // Creation Store
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190", 10);
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produit
@@ -310,7 +312,7 @@ public class ProductServiceTest {
     ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
     // Creation Store
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190", 10);
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Suppression produit inexistant

@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,8 +57,9 @@ public class CommandServiceTest {
 
   @BeforeEach
   void beforeEach() {
-    proRepository.truncateAll();
     commandRepository.deleteAll();
+    proRepository.truncateAll();
+
     testParameters.clear();
     testParameters.put("isStoreExist", true);
     testParameters.put("isPhoneClientExist", true);
@@ -114,7 +116,7 @@ public class CommandServiceTest {
     testParameters.put("isSlotTimeValid", false);
     Assertions.assertThrows(RuntimeException.class, ()-> commandService.addCommand(addCommandSchema()));
     Exception exception = Assertions.assertThrows(RuntimeException.class, ()->commandService.addCommand(addCommandSchema()));
-    Assertions.assertEquals("Horaire de commande invalide", exception.getMessage());
+    Assertions.assertEquals("La commande ne peut pas être dans le passée", exception.getMessage());
   }
 
   @Test
@@ -140,7 +142,7 @@ public class CommandServiceTest {
     testParameters.put("isProdutcBelongToStore", false);
     Assertions.assertThrows(RuntimeException.class, ()-> commandService.addCommand(addCommandSchema()));
     Exception exception = Assertions.assertThrows(RuntimeException.class, ()->commandService.addCommand(addCommandSchema()));
-    Assertions.assertEquals("Le produit n'est pas rattaché au store", exception.getMessage());
+    Assertions.assertEquals("Certains produits à ajouter ne sont pas rattachés au commerce", exception.getMessage());
   }
 
   @Test
@@ -153,7 +155,7 @@ public class CommandServiceTest {
 
     // Modification du produit dans la commande
     UpdateProductQuantityDto updateCommandSchema = new UpdateProductQuantityDto(
-            productChangeId, addCommand.commandId(), 4);
+            productChangeId, addCommand.commandId(), store.getId(), 4);
     UpdateProductQuantityResponseDto productUpdated = commandService.updateProductQuantityInCommand(updateCommandSchema);
 
     Assertions.assertEquals(4, productUpdated.productInCommand().getProductQuantity());
@@ -183,13 +185,13 @@ public class CommandServiceTest {
 
     // Modification quantité commande store1 avec un produit du store2
     UpdateProductQuantityDto updateCommandSchema = new UpdateProductQuantityDto(
-            productStore2Id, addCommand.commandId(), 12);
+            productStore2Id, addCommand.commandId(), store.getId(), 12);
 
     Exception exception = Assertions.assertThrows(
             RuntimeException.class,
             ()->commandService.updateProductQuantityInCommand(updateCommandSchema)
     );
-    Assertions.assertEquals("Le produit n'est pas rattaché au commerce", exception.getMessage());
+    Assertions.assertEquals("Certains produits à modifier ne sont pas rattachés au commerce", exception.getMessage());
 
 
   }
@@ -204,7 +206,7 @@ public class CommandServiceTest {
 
     // Modification du produit dans la commande
     UpdateProductQuantityDto updateCommandSchema = new UpdateProductQuantityDto(
-            productChangeId, addCommand.commandId(), 0);
+            productChangeId, addCommand.commandId(), store.getId(), 0);
     UpdateProductQuantityResponseDto productUpdated = commandService.updateProductQuantityInCommand(updateCommandSchema);
 
     Assertions.assertEquals(1, productUpdated.productInCommand().getProductQuantity());
@@ -225,7 +227,7 @@ public class CommandServiceTest {
 
     BigInteger commandId = addCommand.commandId();
     // Suppression du produit
-    DeleteProductInCommandDto deleteProductInCommand = new DeleteProductInCommandDto(commandId, productId);
+    DeleteProductInCommandDto deleteProductInCommand = new DeleteProductInCommandDto(commandId, productId, store.getId());
     SimplifyCommandDetailResponseDto updateCommandDetail = commandService.deleteProductInCommand(deleteProductInCommand);
 
     // Vérification nombre de produit
@@ -256,7 +258,7 @@ public class CommandServiceTest {
     List<BigInteger> productIdList = new ArrayList<>();
     BigInteger productId = productsInCommand.get(0).getProductId();
     productIdList.add(productId);
-    AddProductsInCommandDto addProductsInCommandSchema = new AddProductsInCommandDto(productIdList, addCommand.commandId());
+    AddProductsInCommandDto addProductsInCommandSchema = new AddProductsInCommandDto(store.getId(), productIdList, addCommand.commandId());
     SimplifyCommandDetailResponseDto commandDetail = commandService.addProductsInCommand(addProductsInCommandSchema);
 
     // Vérification nombre de produit
@@ -280,7 +282,7 @@ public class CommandServiceTest {
     BigInteger productId = productsInCommand.get(0).getProductId();
 
     productIdList.add(productId);
-    AddProductsInCommandDto addProductsInCommandSchema = new AddProductsInCommandDto(productIdList, addCommand.commandId());
+    AddProductsInCommandDto addProductsInCommandSchema = new AddProductsInCommandDto(store.getId(), productIdList, addCommand.commandId());
     SimplifyCommandDetailResponseDto commandDetail = commandService.addProductsInCommand(addProductsInCommandSchema);
 
     // Vérification que le produit ajouté n'est pas en doublons
@@ -290,6 +292,42 @@ public class CommandServiceTest {
             .filter(product-> product.getProductId().equals(productId)).collect(Collectors.toList());
     Assertions.assertEquals(1, findProductIdInProductList.size());
     Assertions.assertEquals(3, findProductIdInProductList.stream().filter(product->product.getProductId().equals(productId)).findFirst().get().getProductQuantity());
+  }
+
+  @Test
+  void should_find_first_slot_available_for_command() {
+    // Creation store - produit - commande
+    ProInformationDto pro = createPro();
+    StoreEntity store = createStore(pro);
+    List<AddProductResponseDto> createProductList = createProduct(store.getId());
+    List<ProductWithQuantity> products = createProductsInCommand(createProductList);
+
+    LocalDateTime now = LocalDateTime.now().plusDays(1);
+
+    // Creation Commande
+    LocalDateTime time1 = LocalDateTime.of(now.getYear(), now.getMonth() ,now.getDayOfMonth(),20,55,00);
+    LocalDateTime time2 = LocalDateTime.of(now.getYear(), now.getMonth() ,now.getDayOfMonth(),19,00,00);
+    LocalDateTime time3 =  LocalDateTime.of(now.getYear(), now.getMonth() ,now.getDayOfMonth(),20,30,00);
+    LocalDateTime time4 =  LocalDateTime.of(now.getYear(), now.getMonth() ,now.getDayOfMonth(),18,30,00);
+    LocalDateTime time5 =  LocalDateTime.of(now.getYear(), now.getMonth() ,now.getDayOfMonth(),19,30,00);
+
+    commandService.addCommand(customCommandSchema(store.getId(), time1));
+    commandService.addCommand(customCommandSchema(store.getId(), time2));
+    commandService.addCommand(customCommandSchema(store.getId(), time3));
+    commandService.addCommand(customCommandSchema(store.getId(), time4));
+    commandService.addCommand(customCommandSchema(store.getId(), time5));
+
+    ////////////////////////
+
+    Integer commandPreparationTime = 5;
+    List<LocalDateTime> findAllSlotAvailable = commandService.findAllSlotAvailable(
+            new FindSlotTimeDto(
+                    LocalDate.of(now.getYear(), now.getMonth() ,now.getDayOfMonth()),
+                    store.getId(),
+                    30)
+    );
+    Assertions.assertEquals(10, findAllSlotAvailable.size());
+
   }
 
   /**
@@ -356,16 +394,25 @@ public class CommandServiceTest {
     return addCommandSchema;
   }
 
+  private AddCommandDto customCommandSchema(BigInteger storeId, LocalDateTime slotTime) {
+    return new AddCommandDto(
+            "phoneCient",
+            slotTime,
+            storeId,
+            productsInCommand);
+  }
   /**
    * Liste des produits pour une commande
    * @param productList
    * @return
    */
-  public void createProductsInCommand(List<AddProductResponseDto> productList) {
+  public List<ProductWithQuantity> createProductsInCommand(List<AddProductResponseDto> productList) {
     productsInCommand = productList
             .stream()
             .map(product -> new ProductWithQuantity(product.id(), 2))
             .collect(Collectors.toList());
+
+    return productsInCommand;
   }
 
 
@@ -384,7 +431,7 @@ public class CommandServiceTest {
    * @return StoreEntity
    */
   public StoreEntity createStore(ProInformationDto createdPro) {
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190", 10);
     StoreEntity createdStore = storeService.createStore(addStoreSchema);
     return createdStore;
   }
@@ -404,5 +451,7 @@ public class CommandServiceTest {
 
     return createdProductList;
   }
+
+
 
 }

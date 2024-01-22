@@ -22,8 +22,6 @@ public class Factory {
   public  static ProductEntity getProduct(BigInteger productId) {
     return new ProductEntity(productId);
   }
-
-  public static CommandEntity getCommand() { return new CommandEntity();}
   public static CommandEntity getCommand(BigInteger commandId) { return new CommandEntity(commandId);}
 
   public static CommandEntity getCommand(
@@ -112,6 +110,11 @@ public class Factory {
   public static ProductWithQuantity getProductWithQuantity(CommandProductEntity commandProduct) {
     return new ProductWithQuantity(commandProduct.getProduct().getId(), commandProduct.getProductQuantity());
   }
+
+  public static ProductWithQuantity getProductWithQuantity(BigInteger productId, Integer quantity) {
+    return new ProductWithQuantity(productId, quantity);
+  }
+
 
   /**
    *

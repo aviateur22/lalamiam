@@ -57,7 +57,7 @@ public class CommandServiceHelperTest {
     ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
     // Creation Store
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190", 10);
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produits
@@ -97,7 +97,7 @@ public class CommandServiceHelperTest {
     ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
     // Creation Store
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190", 10);
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produits
@@ -138,7 +138,7 @@ public class CommandServiceHelperTest {
     ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
     // Creation Store
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190", 10);
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produits

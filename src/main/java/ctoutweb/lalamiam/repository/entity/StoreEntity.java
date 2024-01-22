@@ -1,16 +1,12 @@
 package ctoutweb.lalamiam.repository.entity;
 
-import ctoutweb.lalamiam.factory.Factory;
 import ctoutweb.lalamiam.model.dto.AddStoreDto;
-import ctoutweb.lalamiam.model.ProductWithQuantity;
-import ctoutweb.lalamiam.repository.ProductRepository;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -40,6 +36,10 @@ public class StoreEntity {
 
   @Column(name = "photo")
   private String photo;
+
+  @Column(name = "frequence_slot_time")
+  private Integer frequenceSlotTime;
+
   @CreationTimestamp
   @Column(name = "created_at")
   private LocalDateTime createdAt;
@@ -59,34 +59,6 @@ public class StoreEntity {
   Set<CommandEntity> commands;
 
 
-  /**
-   *
-   * @param productsId
-   * @param productRepository
-   * @return
-   */
-  public boolean areProductsBelongToStore(
-          List<ProductWithQuantity> productsInCommand,
-          ProductRepository productRepository
-  ) throws RuntimeException {
-    return productsInCommand
-            .stream()
-            .map(product-> {
-              return Factory.getProduct(product.getProductId())
-                      .findProductById(productRepository)
-                      .getStore()
-                      .getId().equals(id);
-            }).allMatch(Boolean::booleanValue);
-  }
-
-  public CommandEntity findCommandInList(BigInteger commandId) throws RuntimeException {
-    return commands
-            .stream()
-            .filter(command->command.getId().equals(commandId))
-            .findFirst()
-            .orElseThrow(()-> new RuntimeException("La commande n'existe pas"));
-  }
-
   //////////////////////////////////////////////////////////////////////////////////////////
 
   public StoreEntity() {
@@ -96,12 +68,14 @@ public class StoreEntity {
     this.id = storeId;
   }
 
-  public StoreEntity(AddStoreDto addStoreSchema) {
-    this.pro = new ProEntity(addStoreSchema.proId());
-    this.adress = addStoreSchema.adress();
-    this.city = addStoreSchema.city();
-    this.name = addStoreSchema.name();
-    this.cp = addStoreSchema.cp();
+  public StoreEntity(AddStoreDto addStoreDto) {
+    this.pro = new ProEntity(addStoreDto.proId());
+    this.adress = addStoreDto.adress();
+    this.city = addStoreDto.city();
+    this.name = addStoreDto.name();
+    this.cp = addStoreDto.cp();
+    this.frequenceSlotTime = addStoreDto.frequenceSlotTime();
+
   }
 
   public BigInteger getId() {
@@ -208,6 +182,14 @@ public class StoreEntity {
     this.commands = commands;
   }
 
+  public Integer getFrequenceSlotTime() {
+    return frequenceSlotTime;
+  }
+
+  public void setFrequenceSlotTime(Integer frequenceSlotTime) {
+    this.frequenceSlotTime = frequenceSlotTime;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -235,8 +217,8 @@ public class StoreEntity {
             ", createdAt=" + createdAt +
             ", updatedAt=" + updatedAt +
             ", pro=" + pro +
-            ", products=" + products +
-            ", commands=" + commands +
+            //", products=" + products +
+            //", commands=" + commands +
             '}';
   }
 }

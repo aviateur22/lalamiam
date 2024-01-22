@@ -1,4 +1,4 @@
-package ctoutweb.lalamiam.helper;
+package ctoutweb.lalamiam.repository.transaction;
 
 import ctoutweb.lalamiam.factory.Factory;
 import ctoutweb.lalamiam.model.ProductWithQuantity;
@@ -9,6 +9,7 @@ import ctoutweb.lalamiam.repository.entity.ProductEntity;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class RepositoryCommonMethod {
@@ -27,10 +28,21 @@ public class RepositoryCommonMethod {
    * @param productId
    * @return CommandProductEntity || Throw
    */
-  public CommandProductEntity findProductByIdInCommand(BigInteger commandId, BigInteger productId) throws RuntimeException {
-    return commandProductRepository
-            .findOneProductByCommandIdProductId(commandId, productId)
-            .orElseThrow(() -> new RuntimeException("Le produit n'est pas dans la commande"));
+  public Optional<CommandProductEntity> findProductByIdInCommand(BigInteger commandId, BigInteger productId) {
+    return commandProductRepository.findOneProductByCommandIdProductId(commandId, productId);
+  }
+
+  /**
+   * Vérification que tous les produits d'une liste sont présent dans une commande
+   * @param commandId
+   * @param productsId
+   * @return CommandProductEntity || Throw
+   */
+  public boolean areProductsInCommand(BigInteger commandId, List<BigInteger> productsId) {
+    return productsId
+            .stream()
+            .map(productId->findProductByIdInCommand(commandId, productId))
+            .allMatch(Optional::isPresent);
   }
 
   /**

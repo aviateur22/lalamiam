@@ -1,6 +1,7 @@
-package ctoutweb.lalamiam.helper;
+package ctoutweb.lalamiam.repository.transaction;
 
 import ctoutweb.lalamiam.factory.Factory;
+import ctoutweb.lalamiam.helper.CalculateDetailCommandHelper;
 import ctoutweb.lalamiam.model.CalculateCommandDetail;
 import ctoutweb.lalamiam.model.CommandWithCalculateDetail;
 import ctoutweb.lalamiam.model.CommandIdWithCalculateDetail;
@@ -21,13 +22,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class CommandRepositoryHelper extends RepositoryCommonMethod {
+public class CommandTransaction extends RepositoryCommonMethod {
 
   private final CommandProductRepository commandProductRepository;
   private final CommandRepository commandRepository;
   private final CalculateDetailCommandHelper calculateDetailCommandHelper;
 
-  public CommandRepositoryHelper(
+  public CommandTransaction(
           CommandProductRepository commandProductRepository,
           CommandRepository commandRepository,
           ProductRepository productRepository,
@@ -120,8 +121,7 @@ public class CommandRepositoryHelper extends RepositoryCommonMethod {
   }
 
   @Transactional
-  public CommandIdWithCalculateDetail addProductInExistingCommand(
-          AddProductsInCommandDto addProductsInCommand) {
+  public CommandIdWithCalculateDetail addProductInExistingCommand(AddProductsInCommandDto addProductsInCommand) {
 
     final Integer ADD_PRODUCT_QUANTITY = 1;
 
@@ -136,7 +136,7 @@ public class CommandRepositoryHelper extends RepositoryCommonMethod {
                 CommandProductEntity updateProduct = findProductByIdInCommand(
                         addProductsInCommand.commandId(),
                         productId
-                );
+                ).orElseThrow(()->new RuntimeException(""));
                 updateProduct.setProductQuantity(updateProduct.getProductQuantity() + ADD_PRODUCT_QUANTITY);
                 updateProductQuantityCommand(updateProduct);
               },

@@ -82,7 +82,7 @@ public class ProServiceTest {
     AddProfessionalDto addProfessionalInformation = new AddProfessionalDto("", "password", "aaa");
     ProInformationDto createdPro = proService.addProfessional(addProfessionalInformation);
 
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190");
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190", 10);
     StoreEntity createdStore =  storeService.createStore(addStoreSchema);
 
     long storeCountInDatabase = storeRepository.countAll();
@@ -97,7 +97,7 @@ public class ProServiceTest {
     AddProfessionalDto addProfessionalInformation = new AddProfessionalDto("", "password", "aaa");
     ProInformationDto createdPro = proService.addProfessional(addProfessionalInformation);
 
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "", "rue des carriere", "auterive", "31190");
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "", "rue des carriere", "auterive", "31190", 10);
 
     Assertions.assertThrows(RuntimeException.class, ()-> storeService.createStore(addStoreSchema));
 
@@ -107,7 +107,7 @@ public class ProServiceTest {
 
   @Test
   void should_not_create_store_with_pro_not_existing() {
-    AddStoreDto addStoreSchema = new AddStoreDto(BigInteger.valueOf(0), "d", "rue des carriere", "auterive", "31190");
+    AddStoreDto addStoreSchema = new AddStoreDto(BigInteger.valueOf(0), "d", "rue des carriere", "auterive", "31190", 10);
     Assertions.assertThrows(RuntimeException.class, ()-> storeService.createStore(addStoreSchema));
 
     long storeCountInDatabase = storeRepository.countAll();

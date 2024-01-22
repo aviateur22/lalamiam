@@ -6,17 +6,19 @@ import java.util.Objects;
 public class UpdateProductQuantityDto {
   private BigInteger productId;
   private BigInteger commandId;
+  private BigInteger storeId;
   private Integer productQuantity;
 
-  /**
-   *
-   */
+  /////////////////////////////////////////////////////////////////////////////////////////////
+
   public UpdateProductQuantityDto() {
   }
 
-  public UpdateProductQuantityDto(BigInteger productId, BigInteger commandId, Integer productQuantity) {
+
+  public UpdateProductQuantityDto(BigInteger productId, BigInteger commandId, BigInteger storeId, Integer productQuantity) {
     this.productId = productId;
     this.commandId = commandId;
+    this.storeId = storeId;
     this.productQuantity = productQuantity;
   }
 
@@ -36,6 +38,14 @@ public class UpdateProductQuantityDto {
     this.commandId = commandId;
   }
 
+  public BigInteger getStoreId() {
+    return storeId;
+  }
+
+  public void setStoreId(BigInteger storeId) {
+    this.storeId = storeId;
+  }
+
   public Integer getProductQuantity() {
     return productQuantity;
   }
@@ -49,19 +59,20 @@ public class UpdateProductQuantityDto {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     UpdateProductQuantityDto that = (UpdateProductQuantityDto) o;
-    return Objects.equals(productId, that.productId) && Objects.equals(commandId, that.commandId) && Objects.equals(productQuantity, that.productQuantity);
+    return Objects.equals(productId, that.productId) && Objects.equals(commandId, that.commandId) && Objects.equals(storeId, that.storeId) && Objects.equals(productQuantity, that.productQuantity);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(productId, commandId, productQuantity);
+    return Objects.hash(productId, commandId, storeId, productQuantity);
   }
 
   @Override
   public String toString() {
-    return "UpdateProductQuantityInCommandSchema{" +
-            "productIdList=" + productId +
+    return "UpdateProductQuantityDto{" +
+            "productId=" + productId +
             ", commandId=" + commandId +
+            ", storeId=" + storeId +
             ", productQuantity=" + productQuantity +
             '}';
   }

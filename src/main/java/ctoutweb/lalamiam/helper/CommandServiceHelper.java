@@ -7,9 +7,16 @@ import ctoutweb.lalamiam.repository.CommandRepository;
 import ctoutweb.lalamiam.repository.CommandProductRepository;
 import ctoutweb.lalamiam.repository.ProductRepository;
 import ctoutweb.lalamiam.repository.entity.*;
+import ctoutweb.lalamiam.repository.transaction.CommandTransaction;
+import ctoutweb.lalamiam.repository.transaction.RepositoryCommonMethod;
+import ctoutweb.lalamiam.util.CommonFunction;
 import org.springframework.stereotype.Component;
 
+import java.math.BigInteger;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Component
 public class CommandServiceHelper extends RepositoryCommonMethod {
@@ -17,18 +24,19 @@ public class CommandServiceHelper extends RepositoryCommonMethod {
   int CODE_COMMAND_LENGTH = 6;
   private final CommandRepository commandRepository;
   private final ProductRepository productRepository;
-
-  private final CommandRepositoryHelper commandRepositoryHelper;
+  private final CommandProductRepository commandProductRepository;
+  private final CommandTransaction commandTransaction;
 
   public CommandServiceHelper(
           CommandProductRepository commandProductRepository,
           CommandRepository commandRepository,
           ProductRepository productRepository,
-          CommandRepositoryHelper commandRepositoryHelper) {
+          CommandTransaction commandRepositoryHelper) {
     super(commandProductRepository, productRepository);
     this.commandRepository = commandRepository;
     this.productRepository = productRepository;
-    this.commandRepositoryHelper = commandRepositoryHelper;
+    this.commandProductRepository = commandProductRepository;
+    this.commandTransaction = commandRepositoryHelper;
   }
 
   /**
@@ -38,12 +46,8 @@ public class CommandServiceHelper extends RepositoryCommonMethod {
    * @throws RuntimeException
    */
   public CompleteCommandDetailResponseDto addCommand(StoreEntity store, AddCommandDto addCommand) throws RuntimeException {
-    // Vérification si produit appartiennent au store
-    if(!store.areProductsBelongToStore (addCommand.productsInCommand() , productRepository))
-      throw new RuntimeException("Le produit n'est pas rattaché au store");
-
     // Persistence des données
-    CommandWithCalculateDetail saveCommand = commandRepositoryHelper.saveCommand(addCommand, generateCode(CODE_COMMAND_LENGTH));
+    CommandWithCalculateDetail saveCommand = commandTransaction.saveCommand(addCommand, generateCode(CODE_COMMAND_LENGTH));
 
     return Factory.getCompleteCommandDetailDto(
             saveCommand.command(),
@@ -56,20 +60,18 @@ public class CommandServiceHelper extends RepositoryCommonMethod {
    * @return
    * @throws RuntimeException
    */
-  public UpdateProductQuantityResponseDto updateProductQuantityInCommand (UpdateProductQuantityDto updateProductQuantity)
-  throws RuntimeException {
-
-    // Vérification rattachement produit à la commande
-    CommandProductEntity findProductInCommand = findProductByIdInCommand(
+  public UpdateProductQuantityResponseDto updateProductQuantityInCommand(UpdateProductQuantityDto updateProductQuantity) throws RuntimeException {
+    // Récupération du produit a modifier
+    CommandProductEntity findProductInCommand = commandProductRepository.findOneProductByCommandIdProductId(
             updateProductQuantity.getCommandId(),
             updateProductQuantity.getProductId()
-    );
+    ).orElseThrow(()-> new RuntimeException("Le produit à modifier n'est pas associé à la commande"));
 
     // Mise a jour de la quantité de produit
     findProductInCommand.setProductQuantity(updateProductQuantity.getProductQuantity());
 
     // Persistence des données
-    ProductInCommandWithCalculateDetail productCommandWithCalculateDetail = commandRepositoryHelper.updateProductQuantityCommand(findProductInCommand);
+    ProductInCommandWithCalculateDetail productCommandWithCalculateDetail = commandTransaction.updateProductQuantityCommand(findProductInCommand);
 
     // Récupération liste produits avec quantité
     ProductWithQuantity productUpdatedWithQuantity = Factory.getProductWithQuantity(productCommandWithCalculateDetail.productInCommand());
@@ -94,7 +96,7 @@ public class CommandServiceHelper extends RepositoryCommonMethod {
             .orElseThrow(()->new RuntimeException("La commande n'est pas trouvée"));
 
     // Persistence des données
-    CommandIdWithCalculateDetail productCommandWithCalculateDetail = commandRepositoryHelper.deleteProductInCommand(
+    CommandIdWithCalculateDetail productCommandWithCalculateDetail = commandTransaction.deleteProductInCommand(
             deleteProductInCommand.commandId(),
             deleteProductInCommand.productId()
     );
@@ -111,7 +113,7 @@ public class CommandServiceHelper extends RepositoryCommonMethod {
    */
   public SimplifyCommandDetailResponseDto addProductsInCommand(AddProductsInCommandDto addProductsInCommand) {
     // Persistence des données
-    CommandIdWithCalculateDetail productCommandWithCalculateDetail = commandRepositoryHelper.addProductInExistingCommand(
+    CommandIdWithCalculateDetail productCommandWithCalculateDetail = commandTransaction.addProductInExistingCommand(
             addProductsInCommand
     );
 
@@ -129,5 +131,79 @@ public class CommandServiceHelper extends RepositoryCommonMethod {
             .toString();
     return str.toLowerCase();
   }
+
+  /**
+   * Vérification si une liste de produits appartient à store
+   * @param productsId
+   * @param storeId
+   * @return boolean
+   */
+  public boolean areProductsBelongToStore(List<BigInteger> productsId, BigInteger storeId) {
+    return productsId
+            .stream()
+            .map(productId-> isProductBelongToStore(productId, storeId))
+            .allMatch(Boolean::booleanValue);
+  }
+
+  /**
+   * Vérification si un produit appartient à store
+   * @param productId
+   * @param storeId
+   * @return boolean
+   */
+  public boolean isProductBelongToStore(BigInteger productId, BigInteger storeId) {
+    return Factory.getProduct(productId)
+            .findProductById(productRepository)
+            .getStore()
+            .getId().equals(storeId);
+  }
+
+  /**
+   * Vérification d'une commande a modifiéer
+   * @param commandId
+   * @param productsId
+   * @param storeId
+   */
+  public void verifyUpdatedCommand(BigInteger commandId, List<BigInteger> productsId, BigInteger storeId) {
+    // Reference horaire
+    final LocalDateTime TIME_REFERERENCE = LocalDateTime.now();
+
+    // Vérification existance commande si mise a jour de la commande
+    CommandEntity updatedCommand = commandRepository
+            .findById(commandId)
+            .orElseThrow(()->new RuntimeException("La commande n'est pas trouvée"));
+
+    // Vérification si le produit appartient au commerce
+    if(!areProductsBelongToStore(productsId, storeId))
+      throw new RuntimeException ("Certains produits à modifier ne sont pas rattachés au commerce");
+
+    // Vérification de l'heure de commande
+    if(updatedCommand.getSlotTime().isBefore(TIME_REFERERENCE)) throw new RuntimeException("La commande ne peut pas être dans le passée");
+
+    // Vérification rattachement produit à la commande
+    if(!areProductsInCommand(commandId, productsId))
+      throw new RuntimeException("Certains produits à modifier ne sont pas rattachés à la commande");
+  }
+
+  /**
+   * Vérification d'une commande a créer
+   * @param addCommand
+   */
+  public void verifyCreatedCommand(AddCommandDto addCommand) {
+    // Reference horaire
+    final LocalDateTime TIME_REFERERENCE = LocalDateTime.now();
+
+    if(CommonFunction.isNullOrEmpty(addCommand.clientPhone())) throw new RuntimeException("Le téléphone client est obligatoire");
+
+    if(addCommand.slotTime().isBefore(TIME_REFERERENCE)) throw new RuntimeException("La commande ne peut pas être dans le passée");
+
+    if(addCommand.productsInCommand() == null || addCommand.productsInCommand().isEmpty()) throw new RuntimeException("La commande ne peut pas être vide");
+
+    // Vérification si le produit appartient au commerce
+    List<BigInteger> productsId = addCommand.productsInCommand().stream().map(ProductWithQuantity::getProductId).collect(Collectors.toList());
+    if(!areProductsBelongToStore(productsId, addCommand.storeId()))
+      throw new RuntimeException ("Certains produits à ajouter ne sont pas rattachés au commerce");
+  }
+
 
 }

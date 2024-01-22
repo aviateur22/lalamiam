@@ -25,7 +25,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, BigInteg
 
   /**
    * Cherche tous les produits d'un store
-   * @param storeId
+   * @param store
    * @return
    */
   public List<ProductEntity> findByStore(StoreEntity store);

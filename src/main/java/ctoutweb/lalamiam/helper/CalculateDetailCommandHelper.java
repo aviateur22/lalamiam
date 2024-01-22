@@ -5,6 +5,7 @@ import ctoutweb.lalamiam.model.CalculateCommandDetail;
 import ctoutweb.lalamiam.model.ProductWithQuantity;
 import ctoutweb.lalamiam.repository.CommandProductRepository;
 import ctoutweb.lalamiam.repository.ProductRepository;
+import ctoutweb.lalamiam.repository.transaction.RepositoryCommonMethod;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;

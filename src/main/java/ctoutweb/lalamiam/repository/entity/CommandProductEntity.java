@@ -2,8 +2,6 @@ package ctoutweb.lalamiam.repository.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import ctoutweb.lalamiam.model.dto.DeleteProductInCommandDto;
-import ctoutweb.lalamiam.model.dto.UpdateProductQuantityDto;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;

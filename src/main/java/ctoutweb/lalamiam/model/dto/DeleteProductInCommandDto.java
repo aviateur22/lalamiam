@@ -4,6 +4,7 @@ import java.math.BigInteger;
 
 public record DeleteProductInCommandDto(
         BigInteger commandId,
-        BigInteger productId
+        BigInteger productId,
+        BigInteger storeId
 ) {
 }
