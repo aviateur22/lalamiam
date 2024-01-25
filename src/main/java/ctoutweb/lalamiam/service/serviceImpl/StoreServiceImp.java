@@ -1,34 +1,29 @@
 package ctoutweb.lalamiam.service.serviceImpl;
 
 import ctoutweb.lalamiam.model.dto.AddStoreDto;
-import ctoutweb.lalamiam.repository.ProRepository;
-import ctoutweb.lalamiam.repository.StoreRepository;
 import ctoutweb.lalamiam.repository.entity.StoreEntity;
+import ctoutweb.lalamiam.repository.transaction.StoreTransaction;
 import ctoutweb.lalamiam.service.StoreService;
 import ctoutweb.lalamiam.util.CommonFunction;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
-
 @Service
+@Transactional
 public class StoreServiceImp implements StoreService {
-
-  private final StoreRepository storeRepository;
-  private final ProRepository proRepository;
-  public StoreServiceImp(
-          StoreRepository storeRepository,
-          ProRepository proRepository) {
-    this.storeRepository = storeRepository;
-    this.proRepository = proRepository;
+ private final StoreTransaction storeTransaction;
+  public StoreServiceImp(StoreTransaction storeTransaction) {
+    this.storeTransaction = storeTransaction;
   }
 
   @Override
-  public StoreEntity createStore(AddStoreDto addStoreSchema) {
-    String name = addStoreSchema.name();
-    String adress = addStoreSchema.adress();
-    String city = addStoreSchema.city();
-    String cp = addStoreSchema.cp();
-    BigInteger proId = addStoreSchema.proId();
+  public StoreEntity createStore(AddStoreDto addStore) {
+    String name = addStore.name();
+    String adress = addStore.adress();
+    String city = addStore.city();
+    String cp = addStore.cp();
+    BigInteger proId = addStore.proId();
 
     if(CommonFunction.isNullOrEmpty(name)||
             CommonFunction.isNullOrEmpty(adress) ||
@@ -36,11 +31,8 @@ public class StoreServiceImp implements StoreService {
             CommonFunction.isNullOrEmpty(cp) ||
             proId == null) throw new RuntimeException("données manquantes");
 
-    // Vérification existence pro
-    proRepository.findById(addStoreSchema.proId()).orElseThrow(()->new RuntimeException("Le professionel n'existe pas"));
-
-    StoreEntity createdStore = storeRepository.save(new StoreEntity(addStoreSchema));
-
-    return createdStore;
+    BigInteger storeId = storeTransaction.SaveStore(addStore);
+    StoreEntity store = storeTransaction.getCompleteStoreInformation(storeId);
+    return store;
   }
 }

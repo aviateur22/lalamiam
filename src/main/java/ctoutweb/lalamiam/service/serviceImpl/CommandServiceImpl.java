@@ -16,11 +16,8 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class CommandServiceImpl extends RepositoryCommonMethod implements CommandService {
@@ -91,28 +88,13 @@ public class CommandServiceImpl extends RepositoryCommonMethod implements Comman
   }
 
   @Override
-  public List<LocalDateTime> findAllSlotAvailable(FindSlotTimeDto findSlotTime) {
+  public List<LocalDateTime> findAllSlotAvailable(FindListOfSlotTimeAvailableDto findListOfSlotTime) {
 // TODO une commande ne peut pas être dans le passé
     // Récuperation des données du commerce
-    StoreEntity store = storeRepository.findById(findSlotTime.getStoreId()).orElseThrow();
-
-    // Heure de la requête
-    final LocalDateTime REQUEST_TIME = LocalDateTime.now().plusDays(1);
+    StoreEntity store = storeRepository.findById(findListOfSlotTime.getStoreId()).orElseThrow();
 
     // Date de la commande
-    final LocalDate COMMAND_DATE = findSlotTime.getCommandRequestedDate();
-
-   // Nombre de minute dans 1h
-    final int MINUTES_IN_HOUR = 60;
-
-    // Nombre d' heure dans 1 journée
-    final int HOUR_IN_DAY = 24;
-
-    // Nombre d'itération de commande par heure
-    final int ITERATION_PER_HOUR = MINUTES_IN_HOUR / store.getFrequenceSlotTime();
-
-    // Nombre d'iteration pour 24h
-    final int ITERATION_PER_DAY = ITERATION_PER_HOUR * HOUR_IN_DAY;
+    final LocalDate COMMAND_DATE = findListOfSlotTime.getCommandDate();
 
     // Heure début journée du jour de la commande
     final LocalDateTime START_OF_COMMAND_DAY = LocalDateTime.of(
@@ -121,27 +103,25 @@ public class CommandServiceImpl extends RepositoryCommonMethod implements Comman
             COMMAND_DATE.getDayOfMonth(),
             0,
             0,
-            00
+            0
     );
 
     // Heure fin de journée du jour de commande
     final LocalDateTime END_OF_COMMAND_DAY = LocalDateTime.from(START_OF_COMMAND_DAY).with(LocalTime.MAX);
 
     // Reférence pour filtrage des slot diponible
-    final LocalDateTime REF_FILTER_TIME =  COMMAND_DATE.getDayOfYear() == REQUEST_TIME.getDayOfYear() ?
-            REQUEST_TIME : START_OF_COMMAND_DAY
-            ;
+    final LocalDateTime REF_FILTER_TIME =
+            START_OF_COMMAND_DAY.getDayOfYear() == findListOfSlotTime.getSlotConslutationDate().getDayOfYear() ?
+                    findListOfSlotTime.getSlotConslutationDate() : START_OF_COMMAND_DAY;
 
-    List<LocalDateTime> slotTimeInDay = Stream
-            .iterate(START_OF_COMMAND_DAY, dateTime-> dateTime.plusMinutes(store.getFrequenceSlotTime()))
-            .limit(ITERATION_PER_DAY)
-            .filter(slot->slot.isAfter(REF_FILTER_TIME.plusMinutes(findSlotTime.getCommandPreparationTime())))
-            .collect(Collectors.toList());
-
-    List<LocalDateTime> listOfSlotTimeAvailable = new ArrayList<>();
-
-
-    return null;
+    return commandServiceHelper
+            .findListOfSlotAvailable(
+                    START_OF_COMMAND_DAY,
+                    END_OF_COMMAND_DAY,
+                    REF_FILTER_TIME,
+                    findListOfSlotTime.getCommandPreparationTime(),
+                    store
+            );
   }
 
   /**

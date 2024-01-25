@@ -9,9 +9,11 @@ import org.springframework.stereotype.Repository;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface ProductRepository extends JpaRepository<ProductEntity, BigInteger> {
+  Set<ProductEntity> findAllByStore(StoreEntity store);
   @Query(value = "select count(*) from sc_lalamiam.product", nativeQuery = true)
   public long countAll();
 

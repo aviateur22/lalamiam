@@ -39,7 +39,6 @@ public class CommandEntity implements Serializable {
   @Column(name = "product_quantity")
   private Integer productQuantity;
 
-  @JsonIgnore
   @OneToMany(mappedBy = "command", fetch = FetchType.LAZY)
   private Set<CommandProductEntity> commandProducts;
 
@@ -194,8 +193,8 @@ public class CommandEntity implements Serializable {
             ", slotTime=" + slotTime +
             ", commandCode='" + commandCode + '\'' +
             ", productQuantity=" + productQuantity +
-            ", commandProducts=" + commandProducts +
-            ", store=" + store +
+            //", commandProducts=" + commandProducts +
+            //", store=" + store +
             ", createdAt=" + createdAt +
             ", updatedAt=" + updatedAt +
             '}';

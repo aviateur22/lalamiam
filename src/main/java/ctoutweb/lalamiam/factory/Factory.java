@@ -1,18 +1,11 @@
 package ctoutweb.lalamiam.factory;
 
-import ctoutweb.lalamiam.model.CalculateCommandDetail;
-import ctoutweb.lalamiam.model.CommandWithCalculateDetail;
-import ctoutweb.lalamiam.model.CommandIdWithCalculateDetail;
-import ctoutweb.lalamiam.model.ProductInCommandWithCalculateDetail;
+import ctoutweb.lalamiam.model.*;
 import ctoutweb.lalamiam.model.dto.CompleteCommandDetailResponseDto;
 import ctoutweb.lalamiam.model.dto.SimplifyCommandDetailResponseDto;
 import ctoutweb.lalamiam.model.dto.UpdateProductQuantityResponseDto;
-import ctoutweb.lalamiam.model.ProductWithQuantity;
 import ctoutweb.lalamiam.repository.builder.CommandProductEntityBuilder;
-import ctoutweb.lalamiam.repository.entity.CommandEntity;
-import ctoutweb.lalamiam.repository.entity.CommandProductEntity;
-import ctoutweb.lalamiam.repository.entity.ProductEntity;
-import ctoutweb.lalamiam.repository.entity.StoreEntity;
+import ctoutweb.lalamiam.repository.entity.*;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -162,5 +155,14 @@ public class Factory {
    */
   public static CommandIdWithCalculateDetail getProductCommandWithCalculatedDetail(BigInteger commandId, CalculateCommandDetail detail) {
     return new CommandIdWithCalculateDetail(commandId, detail);
+  }
+
+  /**
+   * Renvoie une entite ScheduleEntity
+   * @param storeSchedule
+   * @return
+   */
+  public static ScheduleEntity getSchedule(StoreSchedule storeSchedule, BigInteger storeId) {
+    return new ScheduleEntity(storeSchedule, storeId);
   }
 }

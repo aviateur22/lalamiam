@@ -14,9 +14,11 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 public class CommandServiceHelper extends RepositoryCommonMethod {
@@ -122,6 +124,35 @@ public class CommandServiceHelper extends RepositoryCommonMethod {
             productCommandWithCalculateDetail.calculateCommandDetail());
   }
 
+  public List<LocalDateTime> findListOfSlotAvailable(
+          final LocalDateTime START_OF_COMMAND_DAY,
+          final LocalDateTime END_OF_COMMAND_DAY,
+          final LocalDateTime REF_FILTER_TIME,
+          Integer commandPreparationTime,
+          StoreEntity store
+  ) {
+    // Rechechre des commandes en cours
+    var result = commandRepository.findAllBusySlotByStoreId(START_OF_COMMAND_DAY, END_OF_COMMAND_DAY, store.getId())
+            .stream().map(CommandEntity::getSlotTime).collect(Collectors.toList());
+
+    final Integer ITERATION_PER_DAY = calculateNumberOfCommandSlotForOneDay(store);
+
+    List<LocalDateTime> slotTimeInDay = Stream
+            .iterate(START_OF_COMMAND_DAY, dateTime-> dateTime.plusMinutes(store.getFrequenceSlotTime()))
+            .limit(ITERATION_PER_DAY)
+            .filter(slot->slot.isAfter(REF_FILTER_TIME.plusMinutes(commandPreparationTime)))
+            .filter(slot->!result.contains(slot))
+            .collect(Collectors.toList());
+
+    List<LocalDateTime> listOfSlotTimeAvailable = new ArrayList<>();
+
+    return null;
+  }
+  /**
+   * Génération d'un code aléatoire
+   * @param wordLength
+   * @return String
+   */
   public String generateCode(Integer wordLength) {
     Random rand = new Random();
     String str = rand.ints(48, 123)
@@ -205,5 +236,24 @@ public class CommandServiceHelper extends RepositoryCommonMethod {
       throw new RuntimeException ("Certains produits à ajouter ne sont pas rattachés au commerce");
   }
 
+  /**
+   * Calcul du nombre de créneaux pour commande disponable sur 24h pour 1 magasin
+   * Ne tient pas compte des commandes déja présentes
+   * @param store
+   * @return Integer
+   */
+  public Integer calculateNumberOfCommandSlotForOneDay(StoreEntity store) {
+    // Nombre de minute dans 1h
+    final int MINUTES_IN_HOUR = 60;
+
+    // Nombre d' heure dans 1 journée
+    final int HOUR_IN_DAY = 24;
+
+    // Nombre d'itération de commande par heure
+    final int ITERATION_PER_HOUR = MINUTES_IN_HOUR / store.getFrequenceSlotTime();
+
+    // Nombre d'iteration pour 24h
+    return ITERATION_PER_HOUR * HOUR_IN_DAY;
+  }
 
 }

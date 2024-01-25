@@ -1,6 +1,7 @@
 package ctoutweb.lalamiam.test;
 
 import ctoutweb.lalamiam.model.ProductWithQuantity;
+import ctoutweb.lalamiam.model.StoreSchedule;
 import ctoutweb.lalamiam.model.dto.*;
 import ctoutweb.lalamiam.model.dto.AddProductDto;
 import ctoutweb.lalamiam.repository.CommandRepository;
@@ -21,6 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -302,29 +304,49 @@ public class CommandServiceTest {
     List<AddProductResponseDto> createProductList = createProduct(store.getId());
     List<ProductWithQuantity> products = createProductsInCommand(createProductList);
 
+    LocalDateTime tomorrow = LocalDateTime.now().plusDays(2);
     LocalDateTime now = LocalDateTime.now().plusDays(1);
+    LocalDateTime yesterday = LocalDateTime.now();
 
     // Creation Commande
     LocalDateTime time1 = LocalDateTime.of(now.getYear(), now.getMonth() ,now.getDayOfMonth(),20,55,00);
     LocalDateTime time2 = LocalDateTime.of(now.getYear(), now.getMonth() ,now.getDayOfMonth(),19,00,00);
-    LocalDateTime time3 =  LocalDateTime.of(now.getYear(), now.getMonth() ,now.getDayOfMonth(),20,30,00);
-    LocalDateTime time4 =  LocalDateTime.of(now.getYear(), now.getMonth() ,now.getDayOfMonth(),18,30,00);
-    LocalDateTime time5 =  LocalDateTime.of(now.getYear(), now.getMonth() ,now.getDayOfMonth(),19,30,00);
+    LocalDateTime time3 = LocalDateTime.of(now.getYear(), now.getMonth() ,now.getDayOfMonth(),20,30,00);
+    LocalDateTime time4 = LocalDateTime.of(now.getYear(), now.getMonth() ,now.getDayOfMonth(),18,30,00);
+    LocalDateTime time5 = LocalDateTime.of(now.getYear(), now.getMonth() ,now.getDayOfMonth(),19,30,00);
+
+    // OldCommannd
+    LocalDateTime timeOld = LocalDateTime.of(yesterday.getYear(), yesterday.getMonth() ,yesterday.getDayOfMonth(),23,55,00);
+
+    // Future
+    LocalDateTime timeFuture = LocalDateTime.of(tomorrow.getYear(), tomorrow.getMonth() ,tomorrow.getDayOfMonth(),20,55,00);
 
     commandService.addCommand(customCommandSchema(store.getId(), time1));
     commandService.addCommand(customCommandSchema(store.getId(), time2));
     commandService.addCommand(customCommandSchema(store.getId(), time3));
     commandService.addCommand(customCommandSchema(store.getId(), time4));
     commandService.addCommand(customCommandSchema(store.getId(), time5));
+    commandService.addCommand(customCommandSchema(store.getId(), timeOld));
+    commandService.addCommand(customCommandSchema(store.getId(), timeFuture));
+
+    // Date de la commande
+    LocalDate commandDate = LocalDate.from(now);
+
+    // Date de consultation des Slot
+    LocalDateTime consultationDate = commandDate.atTime(11, 10,50);
+
+    //Temps de prépa commande
+    int preparationTime = 10;
 
     ////////////////////////
 
     Integer commandPreparationTime = 5;
     List<LocalDateTime> findAllSlotAvailable = commandService.findAllSlotAvailable(
-            new FindSlotTimeDto(
-                    LocalDate.of(now.getYear(), now.getMonth() ,now.getDayOfMonth()),
+            new FindListOfSlotTimeAvailableDto(
+                    commandDate,
                     store.getId(),
-                    30)
+                    preparationTime,
+                    consultationDate)
     );
     Assertions.assertEquals(10, findAllSlotAvailable.size());
 
@@ -431,7 +453,21 @@ public class CommandServiceTest {
    * @return StoreEntity
    */
   public StoreEntity createStore(ProInformationDto createdPro) {
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190", 10);
+
+    // horaires store
+    List<StoreSchedule> storeSchedules = List.of(
+            new StoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00)),
+            new StoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,00,00))
+    );
+
+    AddStoreDto addStoreSchema = new AddStoreDto(
+            createdPro.id(),
+            "magasin",
+            "rue des carriere",
+            "auterive",
+            "31190",
+            storeSchedules,
+            10);
     StoreEntity createdStore = storeService.createStore(addStoreSchema);
     return createdStore;
   }

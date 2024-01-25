@@ -1,6 +1,7 @@
 package ctoutweb.lalamiam.test;
 
 import ctoutweb.lalamiam.helper.CommandServiceHelper;
+import ctoutweb.lalamiam.model.StoreSchedule;
 import ctoutweb.lalamiam.model.dto.AddProductResponseDto;
 import ctoutweb.lalamiam.model.dto.ProInformationDto;
 import ctoutweb.lalamiam.model.dto.AddProductDto;
@@ -20,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,8 +59,21 @@ public class CommandServiceHelperTest {
     // Creation Pro
     ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
+    // horaires store
+    List<StoreSchedule> storeSchedules = List.of(
+            new StoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00)),
+            new StoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,00,00))
+    );
+
     // Creation Store
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190", 10);
+    AddStoreDto addStoreSchema = new AddStoreDto(
+            createdPro.id(),
+            "magasin",
+            "rue des carriere",
+            "auterive",
+            "31190",
+            storeSchedules,
+            10);
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produits
@@ -96,8 +112,21 @@ public class CommandServiceHelperTest {
     // Creation Pro
     ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
+    // horaires store
+    List<StoreSchedule> storeSchedules = List.of(
+            new StoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00)),
+            new StoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,00,00))
+    );
+
     // Creation Store
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190", 10);
+    AddStoreDto addStoreSchema = new AddStoreDto(
+            createdPro.id(),
+            "magasin",
+            "rue des carriere",
+            "auterive",
+            "31190",
+            storeSchedules,
+            10);
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produits
@@ -137,8 +166,21 @@ public class CommandServiceHelperTest {
     // Creation Pro
     ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
+    // horaires store
+    List<StoreSchedule> storeSchedules = List.of(
+            new StoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00)),
+            new StoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,00,00))
+    );
+
     // Creation Store
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190", 10);
+    AddStoreDto addStoreSchema = new AddStoreDto(
+            createdPro.id(),
+            "magasin",
+            "rue des carriere",
+            "auterive",
+            "31190",
+            storeSchedules,
+            10);
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produits

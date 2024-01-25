@@ -1,5 +1,6 @@
 package ctoutweb.lalamiam.test;
 
+import ctoutweb.lalamiam.model.StoreSchedule;
 import ctoutweb.lalamiam.model.dto.ProInformationDto;
 import ctoutweb.lalamiam.model.dto.AddProfessionalDto;
 import ctoutweb.lalamiam.model.dto.AddStoreDto;
@@ -17,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.beans.IntrospectionException;
 import java.math.BigInteger;
+import java.time.LocalTime;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -82,7 +84,13 @@ public class ProServiceTest {
     AddProfessionalDto addProfessionalInformation = new AddProfessionalDto("", "password", "aaa");
     ProInformationDto createdPro = proService.addProfessional(addProfessionalInformation);
 
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190", 10);
+    // horaires store
+    List<StoreSchedule> storeSchedules = List.of(
+            new StoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00)),
+            new StoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,00,00))
+    );
+
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190",storeSchedules, 10);
     StoreEntity createdStore =  storeService.createStore(addStoreSchema);
 
     long storeCountInDatabase = storeRepository.countAll();
@@ -97,7 +105,13 @@ public class ProServiceTest {
     AddProfessionalDto addProfessionalInformation = new AddProfessionalDto("", "password", "aaa");
     ProInformationDto createdPro = proService.addProfessional(addProfessionalInformation);
 
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "", "rue des carriere", "auterive", "31190", 10);
+    // horaires store
+    List<StoreSchedule> storeSchedules = List.of(
+            new StoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00)),
+            new StoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,00,00))
+    );
+
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "", "rue des carriere", "auterive", "31190",storeSchedules, 10);
 
     Assertions.assertThrows(RuntimeException.class, ()-> storeService.createStore(addStoreSchema));
 
@@ -107,7 +121,13 @@ public class ProServiceTest {
 
   @Test
   void should_not_create_store_with_pro_not_existing() {
-    AddStoreDto addStoreSchema = new AddStoreDto(BigInteger.valueOf(0), "d", "rue des carriere", "auterive", "31190", 10);
+    // horaires store
+    List<StoreSchedule> storeSchedules = List.of(
+            new StoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00)),
+            new StoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,00,00))
+    );
+
+    AddStoreDto addStoreSchema = new AddStoreDto(BigInteger.valueOf(0), "d", "rue des carriere", "auterive", "31190", storeSchedules,10);
     Assertions.assertThrows(RuntimeException.class, ()-> storeService.createStore(addStoreSchema));
 
     long storeCountInDatabase = storeRepository.countAll();

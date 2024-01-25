@@ -1,5 +1,6 @@
 package ctoutweb.lalamiam.repository.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import ctoutweb.lalamiam.model.dto.AddStoreDto;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -7,6 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -58,10 +60,17 @@ public class StoreEntity {
   @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
   Set<CommandEntity> commands;
 
+  @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
+  Set<ScheduleEntity> schedules;
+
 
   //////////////////////////////////////////////////////////////////////////////////////////
 
   public StoreEntity() {
+    products = new HashSet<>();
+    commands = new HashSet<>();
+    schedules = new HashSet<>();
+
   }
 
   public StoreEntity(BigInteger storeId) {
@@ -190,6 +199,14 @@ public class StoreEntity {
     this.frequenceSlotTime = frequenceSlotTime;
   }
 
+  public Set<ScheduleEntity> getSchedules() {
+    return schedules;
+  }
+
+  public void setSchedules(Set<ScheduleEntity> schedules) {
+    this.schedules = schedules;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -217,6 +234,7 @@ public class StoreEntity {
             ", createdAt=" + createdAt +
             ", updatedAt=" + updatedAt +
             ", pro=" + pro +
+            //", schedule=" + schedules +
             //", products=" + products +
             //", commands=" + commands +
             '}';
