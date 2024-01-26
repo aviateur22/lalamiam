@@ -11,5 +11,5 @@ import java.util.Set;
 
 @Repository
 public interface ScheduleRepository extends JpaRepository<ScheduleEntity, BigInteger> {
-  Set<ScheduleEntity> findAllByStore(StoreEntity store);
+  List<ScheduleEntity> findAllByStore(StoreEntity store);
 }

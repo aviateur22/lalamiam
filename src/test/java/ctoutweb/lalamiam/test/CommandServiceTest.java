@@ -194,8 +194,6 @@ public class CommandServiceTest {
             ()->commandService.updateProductQuantityInCommand(updateCommandSchema)
     );
     Assertions.assertEquals("Certains produits à modifier ne sont pas rattachés au commerce", exception.getMessage());
-
-
   }
 
   @Test
@@ -315,8 +313,13 @@ public class CommandServiceTest {
     LocalDateTime time4 = LocalDateTime.of(now.getYear(), now.getMonth() ,now.getDayOfMonth(),18,30,00);
     LocalDateTime time5 = LocalDateTime.of(now.getYear(), now.getMonth() ,now.getDayOfMonth(),19,30,00);
 
+    LocalDateTime time6 = LocalDateTime.of(now.getYear(), now.getMonth() ,now.getDayOfMonth(),12,30,00);
+    LocalDateTime time7 = LocalDateTime.of(now.getYear(), now.getMonth() ,now.getDayOfMonth(),12,20,00);
+    LocalDateTime time8 = LocalDateTime.of(now.getYear(), now.getMonth() ,now.getDayOfMonth(),12,00,00);
+    LocalDateTime time9 = LocalDateTime.of(now.getYear(), now.getMonth() ,now.getDayOfMonth(),12,40,00);
+
     // OldCommannd
-    LocalDateTime timeOld = LocalDateTime.of(yesterday.getYear(), yesterday.getMonth() ,yesterday.getDayOfMonth(),23,55,00);
+    LocalDateTime timeOld = LocalDateTime.of(yesterday.getYear(), yesterday.getMonth() ,yesterday.getDayOfMonth(),23,59,59);
 
     // Future
     LocalDateTime timeFuture = LocalDateTime.of(tomorrow.getYear(), tomorrow.getMonth() ,tomorrow.getDayOfMonth(),20,55,00);
@@ -326,6 +329,10 @@ public class CommandServiceTest {
     commandService.addCommand(customCommandSchema(store.getId(), time3));
     commandService.addCommand(customCommandSchema(store.getId(), time4));
     commandService.addCommand(customCommandSchema(store.getId(), time5));
+    commandService.addCommand(customCommandSchema(store.getId(), time6));
+    commandService.addCommand(customCommandSchema(store.getId(), time7));
+    commandService.addCommand(customCommandSchema(store.getId(), time8));
+    commandService.addCommand(customCommandSchema(store.getId(), time9));
     commandService.addCommand(customCommandSchema(store.getId(), timeOld));
     commandService.addCommand(customCommandSchema(store.getId(), timeFuture));
 
@@ -336,11 +343,10 @@ public class CommandServiceTest {
     LocalDateTime consultationDate = commandDate.atTime(11, 10,50);
 
     //Temps de prépa commande
-    int preparationTime = 10;
+    int preparationTime = 20;
 
     ////////////////////////
 
-    Integer commandPreparationTime = 5;
     List<LocalDateTime> findAllSlotAvailable = commandService.findAllSlotAvailable(
             new FindListOfSlotTimeAvailableDto(
                     commandDate,

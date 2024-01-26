@@ -91,7 +91,7 @@ public class CommandServiceImpl extends RepositoryCommonMethod implements Comman
   public List<LocalDateTime> findAllSlotAvailable(FindListOfSlotTimeAvailableDto findListOfSlotTime) {
 // TODO une commande ne peut pas être dans le passé
     // Récuperation des données du commerce
-    StoreEntity store = storeRepository.findById(findListOfSlotTime.getStoreId()).orElseThrow();
+    StoreEntity store =  storeRepository.findById(findListOfSlotTime.getStoreId()).orElseThrow();
 
     // Date de la commande
     final LocalDate COMMAND_DATE = findListOfSlotTime.getCommandDate();

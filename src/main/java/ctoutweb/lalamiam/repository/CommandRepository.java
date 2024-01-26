@@ -15,7 +15,7 @@ import java.util.Set;
 @Repository
 public interface CommandRepository extends JpaRepository<CommandEntity, BigInteger> {
 
-  Set<CommandEntity> findAllByStore(StoreEntity store);
+  List<CommandEntity> findAllByStore(StoreEntity store);
   @Query(value = "select count(*) from sc_lalamiam.command", nativeQuery = true)
   public long countAll();
 

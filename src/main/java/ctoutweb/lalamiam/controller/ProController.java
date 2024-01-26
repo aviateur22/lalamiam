@@ -19,7 +19,7 @@ public class ProController {
     this.proService = proService;
   }
 
-  @PostMapping("/")
+  @PostMapping("")
   public ResponseEntity<ProInformationDto> createProfessional(@RequestBody AddProfessionalDto addProfessionalSchema) {
     ProInformationDto addProfessional = proService.addProfessional(addProfessionalSchema);
     return new ResponseEntity<>(addProfessional, HttpStatus.OK);

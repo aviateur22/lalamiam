@@ -1,6 +1,5 @@
 package ctoutweb.lalamiam.repository.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import ctoutweb.lalamiam.model.dto.AddStoreDto;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -9,8 +8,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Table(name = "store")
@@ -55,22 +54,18 @@ public class StoreEntity {
   private ProEntity pro;
 
   @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
-  Set<ProductEntity> products;
+  List<ProductEntity> products;
 
   @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
-  Set<CommandEntity> commands;
+  List<CommandEntity> commands;
 
   @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
-  Set<ScheduleEntity> schedules;
+  List<ScheduleEntity> schedules;
 
 
   //////////////////////////////////////////////////////////////////////////////////////////
 
   public StoreEntity() {
-    products = new HashSet<>();
-    commands = new HashSet<>();
-    schedules = new HashSet<>();
-
   }
 
   public StoreEntity(BigInteger storeId) {
@@ -175,19 +170,19 @@ public class StoreEntity {
     this.pro = pro;
   }
 
-  public Set<ProductEntity> getProducts() {
+  public List<ProductEntity> getProducts() {
     return products;
   }
 
-  public void setProducts(Set<ProductEntity> products) {
+  public void setProducts(List<ProductEntity> products) {
     this.products = products;
   }
 
-  public Set<CommandEntity> getCommands() {
+  public List<CommandEntity> getCommands() {
     return commands;
   }
 
-  public void setCommands(Set<CommandEntity> commands) {
+  public void setCommands(List<CommandEntity> commands) {
     this.commands = commands;
   }
 
@@ -199,11 +194,11 @@ public class StoreEntity {
     this.frequenceSlotTime = frequenceSlotTime;
   }
 
-  public Set<ScheduleEntity> getSchedules() {
+  public List<ScheduleEntity> getSchedules() {
     return schedules;
   }
 
-  public void setSchedules(Set<ScheduleEntity> schedules) {
+  public void setSchedules(List<ScheduleEntity> schedules) {
     this.schedules = schedules;
   }
 

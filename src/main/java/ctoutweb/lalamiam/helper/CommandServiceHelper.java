@@ -3,9 +3,7 @@ package ctoutweb.lalamiam.helper;
 import ctoutweb.lalamiam.factory.Factory;
 import ctoutweb.lalamiam.model.*;
 import ctoutweb.lalamiam.model.dto.*;
-import ctoutweb.lalamiam.repository.CommandRepository;
-import ctoutweb.lalamiam.repository.CommandProductRepository;
-import ctoutweb.lalamiam.repository.ProductRepository;
+import ctoutweb.lalamiam.repository.*;
 import ctoutweb.lalamiam.repository.entity.*;
 import ctoutweb.lalamiam.repository.transaction.CommandTransaction;
 import ctoutweb.lalamiam.repository.transaction.RepositoryCommonMethod;
@@ -13,7 +11,10 @@ import ctoutweb.lalamiam.util.CommonFunction;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
+import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -27,17 +28,22 @@ public class CommandServiceHelper extends RepositoryCommonMethod {
   private final CommandRepository commandRepository;
   private final ProductRepository productRepository;
   private final CommandProductRepository commandProductRepository;
+  private final ScheduleRepository scheduleRepository;
   private final CommandTransaction commandTransaction;
 
   public CommandServiceHelper(
           CommandProductRepository commandProductRepository,
           CommandRepository commandRepository,
           ProductRepository productRepository,
-          CommandTransaction commandRepositoryHelper) {
+          ScheduleRepository scheduleRepository,
+          CommandTransaction commandRepositoryHelper
+  ) {
     super(commandProductRepository, productRepository);
     this.commandRepository = commandRepository;
     this.productRepository = productRepository;
     this.commandProductRepository = commandProductRepository;
+    this.scheduleRepository = scheduleRepository;
+
     this.commandTransaction = commandRepositoryHelper;
   }
 
@@ -124,6 +130,15 @@ public class CommandServiceHelper extends RepositoryCommonMethod {
             productCommandWithCalculateDetail.calculateCommandDetail());
   }
 
+  /**
+   * Recherche des crééneaux disponible
+   * @param START_OF_COMMAND_DAY
+   * @param END_OF_COMMAND_DAY
+   * @param REF_FILTER_TIME
+   * @param commandPreparationTime
+   * @param store
+   * @return List<LocalDateTime>
+   */
   public List<LocalDateTime> findListOfSlotAvailable(
           final LocalDateTime START_OF_COMMAND_DAY,
           final LocalDateTime END_OF_COMMAND_DAY,
@@ -132,21 +147,35 @@ public class CommandServiceHelper extends RepositoryCommonMethod {
           StoreEntity store
   ) {
     // Rechechre des commandes en cours
-    var result = commandRepository.findAllBusySlotByStoreId(START_OF_COMMAND_DAY, END_OF_COMMAND_DAY, store.getId())
+    var commands = commandRepository.findAllBusySlotByStoreId(START_OF_COMMAND_DAY, END_OF_COMMAND_DAY, store.getId())
             .stream().map(CommandEntity::getSlotTime).collect(Collectors.toList());
+
+    // Recherche des horaires du commerce
+    var storeSchedules = scheduleRepository.findAllByStore(store);
 
     final Integer ITERATION_PER_DAY = calculateNumberOfCommandSlotForOneDay(store);
 
-    List<LocalDateTime> slotTimeInDay = Stream
+    List<LocalDateTime> slotAvailibilityInDay = Stream
             .iterate(START_OF_COMMAND_DAY, dateTime-> dateTime.plusMinutes(store.getFrequenceSlotTime()))
             .limit(ITERATION_PER_DAY)
+            // Retir les slots avant REF_FILTER_TIME
             .filter(slot->slot.isAfter(REF_FILTER_TIME.plusMinutes(commandPreparationTime)))
-            .filter(slot->!result.contains(slot))
+
+            // Retire les slots déja pris par d'autres commandes
+            .filter(slot->!commands.contains(slot))
+
+            // Retire tous les slots qui ne sont pas dans les horaires du commerce
+            .filter(slot->storeSchedules
+                    .stream()
+                    .anyMatch(schedule->CommonFunction.isSlotInStoreSchedule(slot,
+                            schedule,
+                            START_OF_COMMAND_DAY.toLocalDate(),
+                            END_OF_COMMAND_DAY.toLocalDate(),
+                            commandPreparationTime
+                    )))
             .collect(Collectors.toList());
 
-    List<LocalDateTime> listOfSlotTimeAvailable = new ArrayList<>();
-
-    return null;
+    return slotAvailibilityInDay;
   }
   /**
    * Génération d'un code aléatoire
@@ -255,5 +284,7 @@ public class CommandServiceHelper extends RepositoryCommonMethod {
     // Nombre d'iteration pour 24h
     return ITERATION_PER_HOUR * HOUR_IN_DAY;
   }
+
+
 
 }

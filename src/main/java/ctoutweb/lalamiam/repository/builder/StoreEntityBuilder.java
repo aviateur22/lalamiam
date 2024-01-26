@@ -7,7 +7,7 @@ import ctoutweb.lalamiam.repository.entity.StoreEntity;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 
 public final class StoreEntityBuilder {
   private BigInteger id;
@@ -21,8 +21,8 @@ public final class StoreEntityBuilder {
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
   private ProEntity pro;
-  private Set<ProductEntity> products;
-  private Set<CommandEntity> commands;
+  private List<ProductEntity> products;
+  private List<CommandEntity> commands;
 
   private StoreEntityBuilder() {
   }
@@ -86,12 +86,12 @@ public final class StoreEntityBuilder {
     return this;
   }
 
-  public StoreEntityBuilder withProducts(Set<ProductEntity> products) {
+  public StoreEntityBuilder withProducts(List<ProductEntity> products) {
     this.products = products;
     return this;
   }
 
-  public StoreEntityBuilder withCommands(Set<CommandEntity> commands) {
+  public StoreEntityBuilder withCommands(List<CommandEntity> commands) {
     this.commands = commands;
     return this;
   }

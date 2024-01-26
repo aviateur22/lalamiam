@@ -13,7 +13,8 @@ import java.util.Set;
 
 @Repository
 public interface ProductRepository extends JpaRepository<ProductEntity, BigInteger> {
-  Set<ProductEntity> findAllByStore(StoreEntity store);
+  List<ProductEntity> findAllByStore(StoreEntity store);
+
   @Query(value = "select count(*) from sc_lalamiam.product", nativeQuery = true)
   public long countAll();
 

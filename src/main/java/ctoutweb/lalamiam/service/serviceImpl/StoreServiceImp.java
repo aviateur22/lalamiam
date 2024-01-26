@@ -5,12 +5,10 @@ import ctoutweb.lalamiam.repository.entity.StoreEntity;
 import ctoutweb.lalamiam.repository.transaction.StoreTransaction;
 import ctoutweb.lalamiam.service.StoreService;
 import ctoutweb.lalamiam.util.CommonFunction;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 @Service
-@Transactional
 public class StoreServiceImp implements StoreService {
  private final StoreTransaction storeTransaction;
   public StoreServiceImp(StoreTransaction storeTransaction) {
