@@ -13,6 +13,7 @@ import ctoutweb.lalamiam.service.CommandService;
 import ctoutweb.lalamiam.service.ProService;
 import ctoutweb.lalamiam.service.ProductService;
 import ctoutweb.lalamiam.service.StoreService;
+import ctoutweb.lalamiam.test.helper.CommonFunction;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,13 +21,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigInteger;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 //TODO vérifier qu'une commande ne puisse pas etre supprimé ou modifié par un store exterieur
 @SpringBootTest
@@ -179,7 +180,7 @@ public class CommandServiceTest {
 
     // Creation produit pour store2
     ProInformationDto pro2 = createPro();
-    StoreEntity store2 = createStore(pro2);
+    StoreEntity store2 = createStore(pro2, null);
     List<AddProductResponseDto> productStore2 = createProduct(store2.getId());
 
     // Récuperation d'un produit du store2
@@ -295,10 +296,18 @@ public class CommandServiceTest {
   }
 
   @Test
-  void should_find_first_slot_available_for_command() {
+  void should_find_list_of_slot_available_for_store_with_1_schedules_in_day() {
     // Creation store - produit - commande
     ProInformationDto pro = createPro();
-    StoreEntity store = createStore(pro);
+
+    // Horaire du commerce
+    List<StoreSchedule> storeSchedules = List.of(
+            new StoreSchedule(
+                    LocalTime.of(11, 00),
+                    LocalTime.of(14,00)
+            )
+    );
+    StoreEntity store = createStore(pro, storeSchedules);
     List<AddProductResponseDto> createProductList = createProduct(store.getId());
     List<ProductWithQuantity> products = createProductsInCommand(createProductList);
 
@@ -306,13 +315,15 @@ public class CommandServiceTest {
     LocalDateTime now = LocalDateTime.now().plusDays(1);
     LocalDateTime yesterday = LocalDateTime.now();
 
-    // Creation Commande
+    // Creation Commande du soir
     LocalDateTime time1 = LocalDateTime.of(now.getYear(), now.getMonth() ,now.getDayOfMonth(),20,55,00);
     LocalDateTime time2 = LocalDateTime.of(now.getYear(), now.getMonth() ,now.getDayOfMonth(),19,00,00);
     LocalDateTime time3 = LocalDateTime.of(now.getYear(), now.getMonth() ,now.getDayOfMonth(),20,30,00);
     LocalDateTime time4 = LocalDateTime.of(now.getYear(), now.getMonth() ,now.getDayOfMonth(),18,30,00);
     LocalDateTime time5 = LocalDateTime.of(now.getYear(), now.getMonth() ,now.getDayOfMonth(),19,30,00);
 
+    // Creation Commande du  matin
+    int mornigCommand = 4;
     LocalDateTime time6 = LocalDateTime.of(now.getYear(), now.getMonth() ,now.getDayOfMonth(),12,30,00);
     LocalDateTime time7 = LocalDateTime.of(now.getYear(), now.getMonth() ,now.getDayOfMonth(),12,20,00);
     LocalDateTime time8 = LocalDateTime.of(now.getYear(), now.getMonth() ,now.getDayOfMonth(),12,00,00);
@@ -340,10 +351,16 @@ public class CommandServiceTest {
     LocalDate commandDate = LocalDate.from(now);
 
     // Date de consultation des Slot
-    LocalDateTime consultationDate = commandDate.atTime(11, 10,50);
+    LocalDateTime consultationDate = commandDate.atTime(11, 9,50);
 
     //Temps de prépa commande
     int preparationTime = 20;
+
+    // Slot non disponible pour la commande
+    int slotMissingOpeningMorning = 1;
+    int slotMissingOpeningAfternoon = 1;
+    Duration durationMissing = Duration.between(consultationDate, consultationDate.plus(Duration.ofMinutes(preparationTime)));
+    Long slotMissing = durationMissing.toMinutes()/ store.getFrequenceSlotTime() + slotMissingOpeningMorning;
 
     ////////////////////////
 
@@ -354,10 +371,619 @@ public class CommandServiceTest {
                     preparationTime,
                     consultationDate)
     );
-    Assertions.assertEquals(10, findAllSlotAvailable.size());
+
+   long storeSlotesAvailibility = storeSchedules
+            .stream()
+            .map(storeSchedule-> Duration.between(storeSchedule.getOpeningTime(), storeSchedule.getClosingTime()))
+            .mapToLong(duration-> duration.toMinutes() / store.getFrequenceSlotTime())
+            .sum()
+           - mornigCommand
+           - slotMissing;
+
+
+    Assertions.assertEquals(storeSlotesAvailibility, findAllSlotAvailable.size());
 
   }
 
+  /**
+   * Recherche des slots diponible pour une commande avant ouvertue du commerce
+   */
+  @Test
+  void should_find_list_of_slot_available_before_opening_time() {
+    // Creation store - produit - commande
+    ProInformationDto pro = createPro();
+
+    // Horaire du commerce
+    List<StoreSchedule> storeSchedules = List.of(
+            new StoreSchedule(
+                    LocalTime.of(11, 00),
+                    LocalTime.of(14,00)
+            ),
+            new StoreSchedule(
+                    LocalTime.of(18, 00),
+                    LocalTime.of(22,00)
+            )
+    );
+
+    StoreEntity store = createStore(pro, storeSchedules);
+
+    LocalDateTime today = LocalDateTime.now().plusDays(1);
+
+    // Date de la commande
+    LocalDate commandDate = LocalDate.from(today);
+
+    // Date de consultation des Slot
+    LocalDateTime consultationDateBeforeOpeningTime = commandDate.atTime(8, 9,50);
+    LocalDateTime consultationDateBeforeOpeningTime2 = commandDate.atTime(16, 9,50);
+
+    //Temps de prépa commande
+    int preparationTime = 5;
+
+    // Calcul du nombre de slot disponible avant ouverture du restaurant
+    List<LocalDateTime> findSlotAvailableTest1 = findSlotAvail(
+            storeSchedules,
+            store,
+            preparationTime,
+            consultationDateBeforeOpeningTime
+    );
+
+    // Calcul du nombre de slot disponible avant ouverture du restaurant
+    List<LocalDateTime> findSlotAvailableTest2 = findSlotAvail(
+            storeSchedules,
+            store,
+            preparationTime,
+            consultationDateBeforeOpeningTime2
+    );
+
+    // Recherche des slots diponible avant ouverture du commerce
+    List<LocalDateTime> findAllSlotAvailableBeforeOpeningTime = commandService.findAllSlotAvailable(
+            new FindListOfSlotTimeAvailableDto(
+                    commandDate,
+                    store.getId(),
+                    preparationTime,
+                    consultationDateBeforeOpeningTime)
+
+    );
+
+    // Recherche des slots diponible avant ouverture du commerce
+    List<LocalDateTime> findAllSlotAvailableBeforeOpeningTime2 = commandService.findAllSlotAvailable(
+            new FindListOfSlotTimeAvailableDto(
+                    commandDate,
+                    store.getId(),
+                    preparationTime,
+                    consultationDateBeforeOpeningTime2)
+
+    );
+
+    Assertions.assertEquals(findSlotAvailableTest1.size(), findAllSlotAvailableBeforeOpeningTime.size());
+    Assertions.assertEquals(findSlotAvailableTest2.size(), findAllSlotAvailableBeforeOpeningTime2.size());
+  }
+
+  /**
+   * Recherche des slots diponible pour une commande avec 2 horaires d'ouverture
+   */
+  @Test
+  void should_find_list_of_slot_available_during_opening_time() {
+    // Creation store - produit - commande
+    ProInformationDto pro = createPro();
+
+    // Horaire du commerce
+    List<StoreSchedule> storeSchedules = List.of(
+            new StoreSchedule(
+                    LocalTime.of(11, 00),
+                    LocalTime.of(14,00)
+            ),
+            new StoreSchedule(
+                    LocalTime.of(18, 00),
+                    LocalTime.of(22,00)
+            )
+    );
+
+    StoreEntity store = createStore(pro, storeSchedules);
+
+    LocalDateTime today = LocalDateTime.now().plusDays(1);
+
+    // Date de la commande
+    LocalDate commandDate = LocalDate.from(today);
+
+    LocalDateTime consultationDateDuringOpeningTime1 = commandDate.atTime(12, 9,50);
+    LocalDateTime consultationDateDuringOpeningTime2 = commandDate.atTime(19, 9,50);
+
+    //Temps de prépa commande
+   int preparationTime = 5;
+
+    // Calcul du nombre de slot disponible
+    List<LocalDateTime> findSlotAvailableTest1 = findSlotAvail(
+            storeSchedules,
+            store,
+            preparationTime,
+            consultationDateDuringOpeningTime1
+    );
+
+    // Calcul du nombre de slot disponible
+    List<LocalDateTime> findSlotAvailableTest2 = findSlotAvail(
+            storeSchedules,
+            store,
+            preparationTime,
+            consultationDateDuringOpeningTime2
+    );
+
+    // Recherche des slots diponibles
+    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime1 = commandService.findAllSlotAvailable(
+            new FindListOfSlotTimeAvailableDto(
+                    commandDate,
+                    store.getId(),
+                    preparationTime,
+                    consultationDateDuringOpeningTime1)
+    );
+
+    // Recherche des slots diponibles
+    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime2 = commandService.findAllSlotAvailable(
+            new FindListOfSlotTimeAvailableDto(
+                    commandDate,
+                    store.getId(),
+                    preparationTime,
+                    consultationDateDuringOpeningTime2)
+    );
+
+    Assertions.assertEquals(findSlotAvailableTest1.size(), findAllSlotAvailableDuringOpeningTime1.size());
+    Assertions.assertEquals(findSlotAvailableTest2.size(), findAllSlotAvailableDuringOpeningTime2.size());
+
+  }
+
+  /**
+   * Recherche des slots diponible pour une commande avec 2 horaires d'ouverture
+   */
+  @Test
+  void should_find_list_of_slot_available_when_store_close() {
+    // Creation store - produit - commande
+    ProInformationDto pro = createPro();
+
+    // Horaire du commerce
+    List<StoreSchedule> storeSchedules = List.of(
+            new StoreSchedule(
+                    LocalTime.of(11, 00),
+                    LocalTime.of(14,00)
+            ),
+            new StoreSchedule(
+                    LocalTime.of(18, 00),
+                    LocalTime.of(22,00)
+            )
+    );
+
+    StoreEntity store = createStore(pro, storeSchedules);
+
+    LocalDateTime today = LocalDateTime.now().plusDays(1);
+
+    // Date de la commande
+    LocalDate commandDate = LocalDate.from(today);
+
+    LocalDateTime consultationDateDuringOpeningTime = commandDate.atTime(23, 9,50);
+
+    //Temps de prépa commande
+    int preparationTime = 5;
+
+    // Calcul du nombre de slot disponible
+    List<LocalDateTime> findSlotAvailableTest = findSlotAvail(
+            storeSchedules,
+            store,
+            preparationTime,
+            consultationDateDuringOpeningTime
+    );
+
+    // Recherche des slots diponible avant ouverture du commerce
+    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime = commandService.findAllSlotAvailable(
+            new FindListOfSlotTimeAvailableDto(
+                    commandDate,
+                    store.getId(),
+                    preparationTime,
+                    consultationDateDuringOpeningTime)
+    );
+
+    Assertions.assertEquals(findSlotAvailableTest.size(), findAllSlotAvailableDuringOpeningTime.size());
+
+  }
+
+  /**
+   * Recherche des slots diponible pour une commande avant ouvertue du commerce
+   */
+  @Test
+  void should_find_list_of_slot_available_before_opening_time_preparation_time_bigger_than_frequence_command() {
+    // Creation store - produit - commande
+    ProInformationDto pro = createPro();
+
+    // Horaire du commerce
+    List<StoreSchedule> storeSchedules = List.of(
+            new StoreSchedule(
+                    LocalTime.of(11, 00),
+                    LocalTime.of(14,00)
+            ),
+            new StoreSchedule(
+                    LocalTime.of(18, 00),
+                    LocalTime.of(22,00)
+            )
+    );
+
+    StoreEntity store = createStore(pro, storeSchedules);
+
+    LocalDateTime today = LocalDateTime.now().plusDays(1);
+
+    // Date de la commande
+    LocalDate commandDate = LocalDate.from(today);
+
+    // Date de consultation des Slot
+    LocalDateTime consultationDateBeforeOpeningTime = commandDate.atTime(8, 9,50);
+    LocalDateTime consultationDateBeforeOpeningTime2 = commandDate.atTime(16, 9,50);
+
+    //Temps de prépa commande
+    int preparationTime = 15;
+
+    // Calcul du nombre de slot disponible avant ouverture du restaurant
+    List<LocalDateTime> findSlotAvailableTest1 = findSlotAvail(
+            storeSchedules,
+            store,
+            preparationTime,
+            consultationDateBeforeOpeningTime
+    );
+
+    // Calcul du nombre de slot disponible avant ouverture du restaurant
+    List<LocalDateTime> findSlotAvailableTest2 = findSlotAvail(
+            storeSchedules,
+            store,
+            preparationTime,
+            consultationDateBeforeOpeningTime2
+    );
+
+    // Recherche des slots diponible avant ouverture du commerce
+    List<LocalDateTime> findAllSlotAvailableBeforeOpeningTime = commandService.findAllSlotAvailable(
+            new FindListOfSlotTimeAvailableDto(
+                    commandDate,
+                    store.getId(),
+                    preparationTime,
+                    consultationDateBeforeOpeningTime)
+
+    );
+
+    // Recherche des slots diponible avant ouverture du commerce
+    List<LocalDateTime> findAllSlotAvailableBeforeOpeningTime2 = commandService.findAllSlotAvailable(
+            new FindListOfSlotTimeAvailableDto(
+                    commandDate,
+                    store.getId(),
+                    preparationTime,
+                    consultationDateBeforeOpeningTime2)
+
+    );
+
+    Assertions.assertEquals(findSlotAvailableTest1.size(), findAllSlotAvailableBeforeOpeningTime.size());
+    Assertions.assertEquals(findSlotAvailableTest2.size(), findAllSlotAvailableBeforeOpeningTime2.size());
+  }
+
+  /**
+   * Recherche des slots diponible pour une commande avec 2 horaires d'ouverture
+   */
+  @Test
+  void should_find_list_of_slot_available_during_opening_time_bigger_than_frequence_command() {
+    // Creation store - produit - commande
+    ProInformationDto pro = createPro();
+
+    // Horaire du commerce
+    List<StoreSchedule> storeSchedules = List.of(
+            new StoreSchedule(
+                    LocalTime.of(11, 00),
+                    LocalTime.of(14,00)
+            ),
+            new StoreSchedule(
+                    LocalTime.of(18, 00),
+                    LocalTime.of(22,00)
+            )
+    );
+
+    StoreEntity store = createStore(pro, storeSchedules);
+
+    LocalDateTime today = LocalDateTime.now().plusDays(1);
+
+    // Date de la commande
+    LocalDate commandDate = LocalDate.from(today);
+
+    LocalDateTime consultationDateDuringOpeningTime1 = commandDate.atTime(12, 9,50);
+    LocalDateTime consultationDateDuringOpeningTime2 = commandDate.atTime(19, 9,50);
+
+    //Temps de prépa commande
+    int preparationTime = 15;
+
+    // Calcul du nombre de slot disponible
+    List<LocalDateTime> findSlotAvailableTest1 = findSlotAvail(
+            storeSchedules,
+            store,
+            preparationTime,
+            consultationDateDuringOpeningTime1
+    );
+
+    // Calcul du nombre de slot disponible
+    List<LocalDateTime> findSlotAvailableTest2 = findSlotAvail(
+            storeSchedules,
+            store,
+            preparationTime,
+            consultationDateDuringOpeningTime2
+    );
+
+    // Recherche des slots diponibles
+    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime1 = commandService.findAllSlotAvailable(
+            new FindListOfSlotTimeAvailableDto(
+                    commandDate,
+                    store.getId(),
+                    preparationTime,
+                    consultationDateDuringOpeningTime1)
+    );
+
+    // Recherche des slots diponibles
+    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime2 = commandService.findAllSlotAvailable(
+            new FindListOfSlotTimeAvailableDto(
+                    commandDate,
+                    store.getId(),
+                    preparationTime,
+                    consultationDateDuringOpeningTime2)
+    );
+
+    Assertions.assertEquals(findSlotAvailableTest1.size(), findAllSlotAvailableDuringOpeningTime1.size());
+    Assertions.assertEquals(findSlotAvailableTest2.size(), findAllSlotAvailableDuringOpeningTime2.size());
+
+  }
+
+  /**
+   * Recherche des slots diponible pour une commande avec 2 horaires d'ouverture
+   */
+  @Test
+  void should_find_list_of_slot_available_when_store_close_bigger_than_frequence_command() {
+    // Creation store - produit - commande
+    ProInformationDto pro = createPro();
+
+    // Horaire du commerce
+    List<StoreSchedule> storeSchedules = List.of(
+            new StoreSchedule(
+                    LocalTime.of(11, 00),
+                    LocalTime.of(14,00)
+            ),
+            new StoreSchedule(
+                    LocalTime.of(18, 00),
+                    LocalTime.of(22,00)
+            )
+    );
+
+    StoreEntity store = createStore(pro, storeSchedules);
+
+    LocalDateTime today = LocalDateTime.now().plusDays(1);
+
+    // Date de la commande
+    LocalDate commandDate = LocalDate.from(today);
+
+    LocalDateTime consultationDateDuringOpeningTime = commandDate.atTime(23, 9,50);
+
+    //Temps de prépa commande
+    int preparationTime = 15;
+
+    // Calcul du nombre de slot disponible
+    List<LocalDateTime> findSlotAvailableTest = findSlotAvail(
+            storeSchedules,
+            store,
+            preparationTime,
+            consultationDateDuringOpeningTime
+    );
+
+    // Recherche des slots diponible avant ouverture du commerce
+    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime = commandService.findAllSlotAvailable(
+            new FindListOfSlotTimeAvailableDto(
+                    commandDate,
+                    store.getId(),
+                    preparationTime,
+                    consultationDateDuringOpeningTime)
+    );
+
+    Assertions.assertEquals(findSlotAvailableTest.size(), findAllSlotAvailableDuringOpeningTime.size());
+
+  }
+
+  /**
+   * Recherche des slots diponible pour une commande avant ouvertue du commerce
+   */
+  @Test
+  void should_find_list_of_slot_available_before_opening_time_preparation_time_with_commands_avail_in_day() {
+    // Creation store - produit - commande
+    ProInformationDto pro = createPro();
+
+    // Horaire du commerce
+    List<StoreSchedule> storeSchedules = List.of(
+            new StoreSchedule(
+                    LocalTime.of(11, 00),
+                    LocalTime.of(14,00)
+            ),
+            new StoreSchedule(
+                    LocalTime.of(18, 00),
+                    LocalTime.of(22,00)
+            )
+    );
+
+    StoreEntity store = createStore(pro, storeSchedules);
+
+    LocalDateTime today = LocalDateTime.now().plusDays(1);
+
+    // Date de la commande
+    LocalDate commandDate = LocalDate.from(today);
+
+    // Date de consultation des Slot
+    LocalDateTime consultationDateBeforeOpeningTime = commandDate.atTime(8, 9,50);
+    LocalDateTime consultationDateBeforeOpeningTime2 = commandDate.atTime(16, 9,50);
+
+    //Temps de prépa commande
+    int preparationTime = 15;
+
+    // Génération de commande
+    createCommands(commandDate, 5, store);
+
+    // Calcul du nombre de slot disponible avant ouverture du restaurant
+    List<LocalDateTime> findSlotAvailableTest1 = findSlotAvail(
+            storeSchedules,
+            store,
+            preparationTime,
+            consultationDateBeforeOpeningTime
+    );
+
+    // Calcul du nombre de slot disponible avant ouverture du restaurant
+    List<LocalDateTime> findSlotAvailableTest2 = findSlotAvail(
+            storeSchedules,
+            store,
+            preparationTime,
+            consultationDateBeforeOpeningTime2
+    );
+
+    // Recherche des slots diponible avant ouverture du commerce
+    List<LocalDateTime> findAllSlotAvailableBeforeOpeningTime = commandService.findAllSlotAvailable(
+            new FindListOfSlotTimeAvailableDto(
+                    commandDate,
+                    store.getId(),
+                    preparationTime,
+                    consultationDateBeforeOpeningTime)
+
+    );
+
+    // Recherche des slots diponible avant ouverture du commerce
+    List<LocalDateTime> findAllSlotAvailableBeforeOpeningTime2 = commandService.findAllSlotAvailable(
+            new FindListOfSlotTimeAvailableDto(
+                    commandDate,
+                    store.getId(),
+                    preparationTime,
+                    consultationDateBeforeOpeningTime2)
+
+    );
+
+    Assertions.assertEquals(findSlotAvailableTest1.size(), findAllSlotAvailableBeforeOpeningTime.size());
+    Assertions.assertEquals(findSlotAvailableTest2.size(), findAllSlotAvailableBeforeOpeningTime2.size());
+  }
+
+  /**
+   * Recherche des slots diponible pour une commande avec 2 horaires d'ouverture
+   */
+  @Test
+  void should_find_list_of_slot_available_during_opening_time_with_commands_avail_in_day() {
+    // Creation store - produit - commande
+    ProInformationDto pro = createPro();
+
+    // Horaire du commerce
+    List<StoreSchedule> storeSchedules = List.of(
+            new StoreSchedule(
+                    LocalTime.of(11, 00),
+                    LocalTime.of(14,00)
+            ),
+            new StoreSchedule(
+                    LocalTime.of(18, 00),
+                    LocalTime.of(22,00)
+            )
+    );
+
+    StoreEntity store = createStore(pro, storeSchedules);
+
+    LocalDateTime today = LocalDateTime.now().plusDays(1);
+
+    // Date de la commande
+    LocalDate commandDate = LocalDate.from(today);
+
+    LocalDateTime consultationDateDuringOpeningTime1 = commandDate.atTime(12, 9,50);
+    LocalDateTime consultationDateDuringOpeningTime2 = commandDate.atTime(19, 9,50);
+
+    //Temps de prépa commande
+    int preparationTime = 15;
+
+    // Calcul du nombre de slot disponible
+    List<LocalDateTime> findSlotAvailableTest1 = findSlotAvail(
+            storeSchedules,
+            store,
+            preparationTime,
+            consultationDateDuringOpeningTime1
+    );
+
+    // Calcul du nombre de slot disponible
+    List<LocalDateTime> findSlotAvailableTest2 = findSlotAvail(
+            storeSchedules,
+            store,
+            preparationTime,
+            consultationDateDuringOpeningTime2
+    );
+
+    // Recherche des slots diponibles
+    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime1 = commandService.findAllSlotAvailable(
+            new FindListOfSlotTimeAvailableDto(
+                    commandDate,
+                    store.getId(),
+                    preparationTime,
+                    consultationDateDuringOpeningTime1)
+    );
+
+    // Recherche des slots diponibles
+    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime2 = commandService.findAllSlotAvailable(
+            new FindListOfSlotTimeAvailableDto(
+                    commandDate,
+                    store.getId(),
+                    preparationTime,
+                    consultationDateDuringOpeningTime2)
+    );
+
+    Assertions.assertEquals(findSlotAvailableTest1.size(), findAllSlotAvailableDuringOpeningTime1.size());
+    Assertions.assertEquals(findSlotAvailableTest2.size(), findAllSlotAvailableDuringOpeningTime2.size());
+
+  }
+
+  /**
+   * Recherche des slots diponible pour une commande avec 2 horaires d'ouverture
+   */
+  @Test
+  void should_find_list_of_slot_available_when_store_close_with_commands_avail_in_day() {
+    // Creation store - produit - commande
+    ProInformationDto pro = createPro();
+
+    // Horaire du commerce
+    List<StoreSchedule> storeSchedules = List.of(
+            new StoreSchedule(
+                    LocalTime.of(11, 00),
+                    LocalTime.of(14,00)
+            ),
+            new StoreSchedule(
+                    LocalTime.of(18, 00),
+                    LocalTime.of(22,00)
+            )
+    );
+
+    StoreEntity store = createStore(pro, storeSchedules);
+
+    LocalDateTime today = LocalDateTime.now().plusDays(1);
+
+    // Date de la commande
+    LocalDate commandDate = LocalDate.from(today);
+
+    LocalDateTime consultationDateDuringOpeningTime = commandDate.atTime(23, 9,50);
+
+    //Temps de prépa commande
+    int preparationTime = 15;
+
+    // Calcul du nombre de slot disponible
+    List<LocalDateTime> findSlotAvailableTest = findSlotAvail(
+            storeSchedules,
+            store,
+            preparationTime,
+            consultationDateDuringOpeningTime
+    );
+
+    // Recherche des slots diponible avant ouverture du commerce
+    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime = commandService.findAllSlotAvailable(
+            new FindListOfSlotTimeAvailableDto(
+                    commandDate,
+                    store.getId(),
+                    preparationTime,
+                    consultationDateDuringOpeningTime)
+    );
+
+    Assertions.assertEquals(findSlotAvailableTest.size(), findAllSlotAvailableDuringOpeningTime.size());
+
+  }
   /**
    * Création schema pour une commande
    * @return AddCommandSchema
@@ -377,7 +1003,7 @@ public class CommandServiceTest {
     ProInformationDto createdPro2;
 
     // Creation Store
-    StoreEntity createdStore = createStore(createdPro);
+    StoreEntity createdStore = createStore(createdPro, null);
     StoreEntity createdStore2;
 
     store = isStoreExist ?
@@ -393,7 +1019,7 @@ public class CommandServiceTest {
     // Creation Pro2 + Store2 + produits2 et ajout d'un produit à la commande 1
     if(!isProdutcBelongToStore) {
       createdPro2 = createPro();
-      createdStore2 = createStore(createdPro2);
+      createdStore2 = createStore(createdPro2, null);
       List<AddProductResponseDto> createProductList2 = createProduct(createdStore2.getId());
       ProductWithQuantity productStore2 = new ProductWithQuantity(createProductList2.get(0).id(), 1);
       productsInCommand.add(productStore2);
@@ -458,10 +1084,9 @@ public class CommandServiceTest {
    * @param createdPro - ProInformationDto - Données sur le professionnel
    * @return StoreEntity
    */
-  public StoreEntity createStore(ProInformationDto createdPro) {
+  public StoreEntity createStore(ProInformationDto createdPro, List<StoreSchedule> storeSchedules) {
 
-    // horaires store
-    List<StoreSchedule> storeSchedules = List.of(
+    if(storeSchedules == null || storeSchedules.isEmpty()) storeSchedules = List.of(
             new StoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00)),
             new StoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,00,00))
     );
@@ -494,6 +1119,190 @@ public class CommandServiceTest {
     return createdProductList;
   }
 
+  /**
+   * Calcul du nombre de slot disponible pour une commande
+   * @param storeSchedules
+   * @param store
+   * @param preparationTime
+   * @param consultationDate
+   * @return long
+   */
+  public List<LocalDateTime> findSlotAvail(
+          List<StoreSchedule> storeSchedules,
+          StoreEntity store,
+          int preparationTime,
+          LocalDateTime consultationDate
+  ) {
+    // Heure d'observation avant début d'ouverture du matin ou du soir
+    boolean isObservationBeforeOpening = storeSchedules
+            .stream()
+            .allMatch(storeSchedule ->storeSchedule.getOpeningTime().isAfter(consultationDate.toLocalTime()));
 
+    // Liste des slot disponible
+    List<LocalDateTime> slotsAvailibilityList = getSlotsAvailibilityInOneDay(store.getFrequenceSlotTime(), consultationDate.toLocalDate());
+
+    // Slot manquant suite temps de préparation
+    slotsAvailibilityList = filterSlotByStoreSchedule(
+            storeSchedules,
+            preparationTime,
+            consultationDate,
+            slotsAvailibilityList
+            );
+
+    // slot manquant suite à l'horaire d'observation
+    slotsAvailibilityList = filterSlotByConsultationDate(
+            preparationTime,
+            consultationDate,
+            slotsAvailibilityList);
+
+    // Filtre les slots déja occupé
+    slotsAvailibilityList = filterBusySlot(
+            consultationDate,
+            LocalDateTime.of(
+              consultationDate.getYear(),
+              consultationDate.getMonth(),
+              consultationDate.getDayOfMonth(),
+              23,
+              59,
+              59
+            ),
+            store,
+            slotsAvailibilityList);
+
+
+
+    return slotsAvailibilityList;
+  }
+
+  private List<LocalDateTime> getSlotsAvailibilityInOneDay(Integer frequenceSlotTime, LocalDate commandDate) {
+    int slotInOneDay = (int) Math.floor(24 * 60 / (float) frequenceSlotTime);
+    LocalDateTime begin = LocalDateTime.of(
+    commandDate.getYear(),
+    commandDate.getMonth(),
+    commandDate.getDayOfMonth(),
+    0,
+    0,
+    0);
+
+    LocalDateTime end = LocalDateTime.of(
+            commandDate.getYear(),
+            commandDate.getMonth(),
+            commandDate.getDayOfMonth(),
+            23,
+            59,
+            0);
+    return Stream
+            .iterate(begin, action -> action.isBefore(end), action -> action.plusMinutes(frequenceSlotTime))
+            .collect(Collectors.toList());
+  }
+
+  /**
+   * Nombre de slot manquant du au temps de préparation
+   * @param storeSchedules
+   * @param preparationTime
+   * @param consultationDate
+   * @return List<LocalDateTime>
+   */
+  public List<LocalDateTime> filterSlotByStoreSchedule(
+          List<StoreSchedule> storeSchedules,
+          int preparationTime,
+          LocalDateTime consultationDate,
+          List<LocalDateTime> slotAvailibilityList) {
+
+   List<LocalDateTime> filterSlotAvailibility = slotAvailibilityList.stream().filter(
+            slot->{
+              return storeSchedules
+                  .stream()
+                  .anyMatch(schedule-> CommonFunction.isSlotInStoreSchedule(slot, consultationDate, schedule, preparationTime));
+              })
+            .collect(Collectors.toList());
+
+    return filterSlotAvailibility;
+  }
+
+  /**
+   * Nombre de Slot manquant due à l'heure d'observation
+   * @param consultationDate
+   * @param  preparationTime
+   * @return List<LocalDateTime>
+   */
+  public List<LocalDateTime> filterSlotByConsultationDate(
+          int preparationTime,
+          LocalDateTime consultationDate,
+          List<LocalDateTime> slotAvailibilityList) {
+
+    List<LocalDateTime> filterSlotAvailibility = slotAvailibilityList
+            .stream()
+            .filter(
+            slot->slot.isAfter(consultationDate.plusMinutes(preparationTime))
+    ).collect(Collectors.toList());
+
+    return  filterSlotAvailibility;
+  }
+
+  /**
+   * Nombre de slot occupés par une commande
+   * @return
+   */
+  public List<LocalDateTime> filterBusySlot(LocalDateTime beginDay, LocalDateTime endDay, StoreEntity store, List<LocalDateTime> slotAvailibilityList) {
+
+    List<LocalDateTime> commandsSlotTime = commandRepository
+            .findCommandsByStoreIdDate(beginDay, endDay, store.getId())
+            .stream()
+            .map(CommandEntity::getSlotTime)
+            .collect(Collectors.toList());
+    List<LocalDateTime> filterSlotAvailibility = slotAvailibilityList
+            .stream()
+            .filter(slot->!commandsSlotTime.contains(slot))
+            .collect(Collectors.toList());
+    return filterSlotAvailibility;
+  }
+
+  public void createCommands(LocalDate commandDate, int numberOfCommands, StoreEntity store) {
+
+    // Génreation de produits
+    List<AddProductResponseDto> createProductList = createProduct(store.getId());
+
+    // Création d'une liste de produits
+    createProductsInCommand(createProductList);
+
+
+    Random random = new Random();
+
+    Stream.iterate(1, n -> n+1).limit(numberOfCommands).forEach(n->{
+      int morningHour = random.nextInt(11 ,14) + 1;
+      int afternoonHour = random.nextInt(18, 21) + 1;
+      int minute = (random.nextInt(6)) * 10;
+      int second = 0;
+
+      LocalTime commandTimeMorning = LocalTime.of(morningHour, minute, second);
+      LocalTime commandTimeAfternoon = LocalTime.of(afternoonHour, minute, second);
+
+      LocalDateTime commandDateTimeMorning = LocalDateTime.of(
+              commandDate.getYear(),
+              commandDate.getMonth(),
+              commandDate.getDayOfMonth(),
+              commandTimeMorning.getHour(),
+              commandTimeMorning.getMinute(),
+              commandTimeMorning.getSecond()
+      );
+
+      LocalDateTime commandDateTimeAfternoon = LocalDateTime.of(
+              commandDate.getYear(),
+              commandDate.getMonth(),
+              commandDate.getDayOfMonth(),
+              commandTimeAfternoon.getHour(),
+              commandTimeAfternoon.getMinute(),
+              commandTimeAfternoon.getSecond()
+      );
+
+      if(!commandRepository.findCommandBySlotTimeAndStore(commandDateTimeMorning, store).isPresent())
+        commandService.addCommand(customCommandSchema(store.getId(), commandDateTimeMorning));
+
+      if(!commandRepository.findCommandBySlotTimeAndStore(commandDateTimeAfternoon, store).isPresent())
+        commandService.addCommand(customCommandSchema(store.getId(), commandDateTimeAfternoon));
+    });
+
+  }
 
 }

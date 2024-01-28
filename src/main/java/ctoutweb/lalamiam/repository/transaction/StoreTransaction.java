@@ -49,7 +49,8 @@ public class StoreTransaction {
 
 
   /**
-   *
+   * Renvoie les information complete d'un commerce
+   * Commands - Products - Schedules ....
    * @param storeId
    * @return
    */

@@ -11,11 +11,7 @@ import ctoutweb.lalamiam.util.CommonFunction;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
-import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Period;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -146,15 +142,17 @@ public class CommandServiceHelper extends RepositoryCommonMethod {
           Integer commandPreparationTime,
           StoreEntity store
   ) {
-    // Rechechre des commandes en cours
-    var commands = commandRepository.findAllBusySlotByStoreId(START_OF_COMMAND_DAY, END_OF_COMMAND_DAY, store.getId())
+    // Rechechre des commandes existantes
+    var commands = commandRepository.findCommandsByStoreIdDate(START_OF_COMMAND_DAY, END_OF_COMMAND_DAY, store.getId())
             .stream().map(CommandEntity::getSlotTime).collect(Collectors.toList());
 
     // Recherche des horaires du commerce
     var storeSchedules = scheduleRepository.findAllByStore(store);
 
+    // Nombre de Slots disponible sur 24h pour le commerce
     final Integer ITERATION_PER_DAY = calculateNumberOfCommandSlotForOneDay(store);
 
+    // Recherhe de slot disponible
     List<LocalDateTime> slotAvailibilityInDay = Stream
             .iterate(START_OF_COMMAND_DAY, dateTime-> dateTime.plusMinutes(store.getFrequenceSlotTime()))
             .limit(ITERATION_PER_DAY)

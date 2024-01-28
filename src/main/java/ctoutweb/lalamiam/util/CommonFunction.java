@@ -50,8 +50,12 @@ public class CommonFunction {
           LocalDate endingDay,
           int commandPreparationTime
   ) {
-    return slot.isAfter(CommonFunction.getLocalDateTime(schedule.getOpeningTime(), startingDay)
-            .plusMinutes(commandPreparationTime))
-            && slot.isBefore(CommonFunction.getLocalDateTime(schedule.getClosingTime(), endingDay));
+    return (
+            slot.isEqual(CommonFunction.getLocalDateTime(schedule.getOpeningTime(), startingDay)
+                    .plusMinutes(commandPreparationTime)) ||
+            slot.isAfter(CommonFunction.getLocalDateTime(schedule.getOpeningTime(), startingDay)
+                    .plusMinutes(commandPreparationTime)) &&
+            slot.isBefore(CommonFunction.getLocalDateTime(schedule.getClosingTime(), endingDay))
+    );
   }
 }

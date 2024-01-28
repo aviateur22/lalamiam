@@ -1,11 +1,7 @@
 package ctoutweb.lalamiam;
 
-import ctoutweb.lalamiam.config.DatabaseSourceConfig;
-import ctoutweb.lalamiam.helper.CalculateDetailCommandHelper;
-import ctoutweb.lalamiam.helper.CommandServiceHelper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 @SpringBootApplication
 public class LalaMiam {
