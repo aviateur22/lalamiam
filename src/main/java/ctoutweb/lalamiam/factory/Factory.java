@@ -158,11 +158,45 @@ public class Factory {
   }
 
   /**
-   * Renvoie une entite ScheduleEntity
-   * @param storeSchedule
-   * @return
+   * Renvoie un WeekDayEntity
+   * @param date
+   * @return WeekDayEntity
    */
-  public static ScheduleEntity getSchedule(StoreSchedule storeSchedule, BigInteger storeId) {
-    return new ScheduleEntity(storeSchedule, storeId);
+  public static WeekDayEntity getWeekDay(LocalDateTime date) {
+    int dayOfWeek = date.getDayOfWeek().getValue();
+    return new WeekDayEntity(dayOfWeek);
+  }
+
+  /**
+   * Renvoie un WeekDayEntity
+   * @param dayOfWeek
+   * @return WeekDayEntity
+   */
+  public static WeekDayEntity getWeekDay(Integer dayOfWeek) {
+    return new WeekDayEntity(dayOfWeek);
+  }
+  /**
+   * Horaire - magasin _jour
+   * @param storeSchedule
+   * @param weekDay
+   * @param store
+   * @return StoreWeekDayEntity
+   */
+  public static StoreDayScheduleEntity getStoreWeekDaySchedule(
+          DailyStoreSchedule storeSchedule,
+          WeekDayEntity weekDay,
+          StoreEntity store
+  ) {
+    return new StoreDayScheduleEntity(storeSchedule, weekDay, store);
+  }
+
+  /**
+   * Renvoie un DailyStoreSchedule
+   * @param storeDaySchedule - StoreDayScheduleEntity
+   * @return DailyStoreSchedule
+   */
+  public static DailyStoreSchedule getDailyStoreSchedule(StoreDayScheduleEntity storeDaySchedule) {
+    return new DailyStoreSchedule(storeDaySchedule.getOpeningTime(), storeDaySchedule.getClosingTime());
+
   }
 }

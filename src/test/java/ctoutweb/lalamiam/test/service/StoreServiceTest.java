@@ -1,4 +1,4 @@
-package ctoutweb.lalamiam.test;
+package ctoutweb.lalamiam.test.service;
 
 import ctoutweb.lalamiam.repository.CommandRepository;
 import ctoutweb.lalamiam.repository.CommandProductRepository;

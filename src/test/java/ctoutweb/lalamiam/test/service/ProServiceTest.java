@@ -1,6 +1,7 @@
-package ctoutweb.lalamiam.test;
+package ctoutweb.lalamiam.test.service;
 
-import ctoutweb.lalamiam.model.StoreSchedule;
+import ctoutweb.lalamiam.model.DailyStoreSchedule;
+import ctoutweb.lalamiam.model.WeeklyStoreSchedule;
 import ctoutweb.lalamiam.model.dto.ProInformationDto;
 import ctoutweb.lalamiam.model.dto.AddProfessionalDto;
 import ctoutweb.lalamiam.model.dto.AddStoreDto;
@@ -84,13 +85,24 @@ public class ProServiceTest {
     AddProfessionalDto addProfessionalInformation = new AddProfessionalDto("", "password", "aaa");
     ProInformationDto createdPro = proService.addProfessional(addProfessionalInformation);
 
-    // horaires store
-    List<StoreSchedule> storeSchedules = List.of(
-            new StoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00)),
-            new StoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,00,00))
+    // Jours
+    List<Integer> days = List.of(2, 3, 4, 5);
+    List<Integer> dayMonday = List.of(1);
+    List<Integer> daySunday = List.of(7);
+
+    // Horaires
+    DailyStoreSchedule storeScheduleMorning = new DailyStoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00));
+    DailyStoreSchedule storeScheduleAfternoon = new DailyStoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,30,00));
+
+    // Horaires du commerce
+    List<WeeklyStoreSchedule> storeWeekDaySchedules = List.of(
+            new WeeklyStoreSchedule(days, storeScheduleMorning),
+            new WeeklyStoreSchedule(days, storeScheduleAfternoon),
+            new WeeklyStoreSchedule(dayMonday, storeScheduleAfternoon),
+            new WeeklyStoreSchedule(daySunday, storeScheduleAfternoon)
     );
 
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190",storeSchedules, 10);
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190",storeWeekDaySchedules, 10);
     StoreEntity createdStore =  storeService.createStore(addStoreSchema);
 
     long storeCountInDatabase = storeRepository.countAll();
@@ -105,13 +117,24 @@ public class ProServiceTest {
     AddProfessionalDto addProfessionalInformation = new AddProfessionalDto("", "password", "aaa");
     ProInformationDto createdPro = proService.addProfessional(addProfessionalInformation);
 
-    // horaires store
-    List<StoreSchedule> storeSchedules = List.of(
-            new StoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00)),
-            new StoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,00,00))
+    // Jours
+    List<Integer> days = List.of(2, 3, 4, 5);
+    List<Integer> dayMonday = List.of(1);
+    List<Integer> daySunday = List.of(7);
+
+    // Horaires
+    DailyStoreSchedule storeScheduleMorning = new DailyStoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00));
+    DailyStoreSchedule storeScheduleAfternoon = new DailyStoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,30,00));
+
+    // Horaires du commerce
+    List<WeeklyStoreSchedule> storeWeekDaySchedules = List.of(
+            new WeeklyStoreSchedule(days, storeScheduleMorning),
+            new WeeklyStoreSchedule(days, storeScheduleAfternoon),
+            new WeeklyStoreSchedule(dayMonday, storeScheduleAfternoon),
+            new WeeklyStoreSchedule(daySunday, storeScheduleAfternoon)
     );
 
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "", "rue des carriere", "auterive", "31190",storeSchedules, 10);
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "", "rue des carriere", "auterive", "31190",storeWeekDaySchedules, 10);
 
     Assertions.assertThrows(RuntimeException.class, ()-> storeService.createStore(addStoreSchema));
 
@@ -121,13 +144,24 @@ public class ProServiceTest {
 
   @Test
   void should_not_create_store_with_pro_not_existing() {
-    // horaires store
-    List<StoreSchedule> storeSchedules = List.of(
-            new StoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00)),
-            new StoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,00,00))
+    // Jours
+    List<Integer> days = List.of(2, 3, 4, 5);
+    List<Integer> dayMonday = List.of(1);
+    List<Integer> daySunday = List.of(7);
+
+    // Horaires
+    DailyStoreSchedule storeScheduleMorning = new DailyStoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00));
+    DailyStoreSchedule storeScheduleAfternoon = new DailyStoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,30,00));
+
+    // Horaires du commerce
+    List<WeeklyStoreSchedule> storeWeekDaySchedules = List.of(
+            new WeeklyStoreSchedule(days, storeScheduleMorning),
+            new WeeklyStoreSchedule(days, storeScheduleAfternoon),
+            new WeeklyStoreSchedule(dayMonday, storeScheduleAfternoon),
+            new WeeklyStoreSchedule(daySunday, storeScheduleAfternoon)
     );
 
-    AddStoreDto addStoreSchema = new AddStoreDto(BigInteger.valueOf(0), "d", "rue des carriere", "auterive", "31190", storeSchedules,10);
+    AddStoreDto addStoreSchema = new AddStoreDto(BigInteger.valueOf(0), "d", "rue des carriere", "auterive", "31190", storeWeekDaySchedules,10);
     Assertions.assertThrows(RuntimeException.class, ()-> storeService.createStore(addStoreSchema));
 
     long storeCountInDatabase = storeRepository.countAll();

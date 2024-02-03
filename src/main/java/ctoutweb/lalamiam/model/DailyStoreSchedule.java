@@ -3,19 +3,19 @@ package ctoutweb.lalamiam.model;
 import java.time.LocalTime;
 import java.util.Objects;
 
-public class StoreSchedule {
+public class DailyStoreSchedule {
   LocalTime openingTime;
   LocalTime closingTime;
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-  public StoreSchedule(LocalTime openingTime, LocalTime closingTime) {
+  public DailyStoreSchedule(LocalTime openingTime, LocalTime closingTime) {
     this.openingTime = openingTime;
     this.closingTime = closingTime;
   }
 
-  public StoreSchedule() {
+  public DailyStoreSchedule() {
   }
 
   public LocalTime getOpeningTime() {
@@ -38,7 +38,7 @@ public class StoreSchedule {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    StoreSchedule that = (StoreSchedule) o;
+    DailyStoreSchedule that = (DailyStoreSchedule) o;
     return Objects.equals(openingTime, that.openingTime) && Objects.equals(closingTime, that.closingTime);
   }
 

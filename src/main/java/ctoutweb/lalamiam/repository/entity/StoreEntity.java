@@ -7,7 +7,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -54,13 +53,13 @@ public class StoreEntity {
   private ProEntity pro;
 
   @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
+  private List<StoreDayScheduleEntity> storeWeekDaySchedules;
+
+  @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
   List<ProductEntity> products;
 
   @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
   List<CommandEntity> commands;
-
-  @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
-  List<ScheduleEntity> schedules;
 
 
   //////////////////////////////////////////////////////////////////////////////////////////
@@ -194,12 +193,12 @@ public class StoreEntity {
     this.frequenceSlotTime = frequenceSlotTime;
   }
 
-  public List<ScheduleEntity> getSchedules() {
-    return schedules;
+  public List<StoreDayScheduleEntity> getStoreWeekDaySchedules() {
+    return storeWeekDaySchedules;
   }
 
-  public void setSchedules(List<ScheduleEntity> schedules) {
-    this.schedules = schedules;
+  public void setStoreWeekDaySchedules(List<StoreDayScheduleEntity> storeWeekDaySchedules) {
+    this.storeWeekDaySchedules = storeWeekDaySchedules;
   }
 
   @Override

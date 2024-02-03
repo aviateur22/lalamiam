@@ -1,6 +1,7 @@
-package ctoutweb.lalamiam.test;
+package ctoutweb.lalamiam.test.service;
 
-import ctoutweb.lalamiam.model.StoreSchedule;
+import ctoutweb.lalamiam.model.DailyStoreSchedule;
+import ctoutweb.lalamiam.model.WeeklyStoreSchedule;
 import ctoutweb.lalamiam.model.dto.AddProductResponseDto;
 import ctoutweb.lalamiam.model.dto.ProInformationDto;
 import ctoutweb.lalamiam.model.dto.AddProductDto;
@@ -51,10 +52,21 @@ public class ProductServiceTest {
     // Creation Pro
     ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
-    // horaires store
-    List<StoreSchedule> storeSchedules = List.of(
-            new StoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00)),
-            new StoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,00,00))
+    // Jours
+    List<Integer> days = List.of(2, 3, 4, 5);
+    List<Integer> dayMonday = List.of(1);
+    List<Integer> daySunday = List.of(7);
+
+    // Horaires
+    DailyStoreSchedule storeScheduleMorning = new DailyStoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00));
+    DailyStoreSchedule storeScheduleAfternoon = new DailyStoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,30,00));
+
+    // Horaires du commerce
+    List<WeeklyStoreSchedule> storeWeekDaySchedules = List.of(
+            new WeeklyStoreSchedule(days, storeScheduleMorning),
+            new WeeklyStoreSchedule(days, storeScheduleAfternoon),
+            new WeeklyStoreSchedule(dayMonday, storeScheduleAfternoon),
+            new WeeklyStoreSchedule(daySunday, storeScheduleAfternoon)
     );
 
     // Creation Store
@@ -64,7 +76,7 @@ public class ProductServiceTest {
             "rue des carriere",
             "auterive",
             "31190",
-            storeSchedules,
+            storeWeekDaySchedules,
             10);
     StoreEntity store= storeService.createStore(addStoreSchema);
 
@@ -97,14 +109,25 @@ public class ProductServiceTest {
     // Creation Pro
     ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
-        // horaires store
-    List<StoreSchedule> storeSchedules = List.of(
-            new StoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00)),
-            new StoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,00,00))
+// Jours
+    List<Integer> days = List.of(2, 3, 4, 5);
+    List<Integer> dayMonday = List.of(1);
+    List<Integer> daySunday = List.of(7);
+
+    // Horaires
+    DailyStoreSchedule storeScheduleMorning = new DailyStoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00));
+    DailyStoreSchedule storeScheduleAfternoon = new DailyStoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,30,00));
+
+    // Horaires du commerce
+    List<WeeklyStoreSchedule> storeWeekDaySchedules = List.of(
+            new WeeklyStoreSchedule(days, storeScheduleMorning),
+            new WeeklyStoreSchedule(days, storeScheduleAfternoon),
+            new WeeklyStoreSchedule(dayMonday, storeScheduleAfternoon),
+            new WeeklyStoreSchedule(daySunday, storeScheduleAfternoon)
     );
 
     // Creation Store
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190",storeSchedules, 10);
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190",storeWeekDaySchedules, 10);
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produit
@@ -120,14 +143,25 @@ public class ProductServiceTest {
     // Creation Pro
     ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
-        // horaires store
-    List<StoreSchedule> storeSchedules = List.of(
-            new StoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00)),
-            new StoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,00,00))
+    // Jours
+    List<Integer> days = List.of(2, 3, 4, 5);
+    List<Integer> dayMonday = List.of(1);
+    List<Integer> daySunday = List.of(7);
+
+    // Horaires
+    DailyStoreSchedule storeScheduleMorning = new DailyStoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00));
+    DailyStoreSchedule storeScheduleAfternoon = new DailyStoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,30,00));
+
+    // Horaires du commerce
+    List<WeeklyStoreSchedule> storeWeekDaySchedules = List.of(
+            new WeeklyStoreSchedule(days, storeScheduleMorning),
+            new WeeklyStoreSchedule(days, storeScheduleAfternoon),
+            new WeeklyStoreSchedule(dayMonday, storeScheduleAfternoon),
+            new WeeklyStoreSchedule(daySunday, storeScheduleAfternoon)
     );
 
     // Creation Store
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190",storeSchedules, 10);
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190",storeWeekDaySchedules, 10);
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produit
@@ -143,14 +177,25 @@ public class ProductServiceTest {
     // Creation Pro
     ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
-        // horaires store
-    List<StoreSchedule> storeSchedules = List.of(
-            new StoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00)),
-            new StoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,00,00))
+    // Jours
+    List<Integer> days = List.of(2, 3, 4, 5);
+    List<Integer> dayMonday = List.of(1);
+    List<Integer> daySunday = List.of(7);
+
+    // Horaires
+    DailyStoreSchedule storeScheduleMorning = new DailyStoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00));
+    DailyStoreSchedule storeScheduleAfternoon = new DailyStoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,30,00));
+
+    // Horaires du commerce
+    List<WeeklyStoreSchedule> storeWeekDaySchedules = List.of(
+            new WeeklyStoreSchedule(days, storeScheduleMorning),
+            new WeeklyStoreSchedule(days, storeScheduleAfternoon),
+            new WeeklyStoreSchedule(dayMonday, storeScheduleAfternoon),
+            new WeeklyStoreSchedule(daySunday, storeScheduleAfternoon)
     );
 
     // Creation Store
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190",storeSchedules, 10);
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190",storeWeekDaySchedules, 10);
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produit
@@ -166,10 +211,21 @@ public class ProductServiceTest {
     // Creation Pro
     ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
-        // horaires store
-    List<StoreSchedule> storeSchedules = List.of(
-            new StoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00)),
-            new StoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,00,00))
+    // Jours
+    List<Integer> days = List.of(2, 3, 4, 5);
+    List<Integer> dayMonday = List.of(1);
+    List<Integer> daySunday = List.of(7);
+
+    // Horaires
+    DailyStoreSchedule storeScheduleMorning = new DailyStoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00));
+    DailyStoreSchedule storeScheduleAfternoon = new DailyStoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,30,00));
+
+    // Horaires du commerce
+    List<WeeklyStoreSchedule> storeWeekDaySchedules = List.of(
+            new WeeklyStoreSchedule(days, storeScheduleMorning),
+            new WeeklyStoreSchedule(days, storeScheduleAfternoon),
+            new WeeklyStoreSchedule(dayMonday, storeScheduleAfternoon),
+            new WeeklyStoreSchedule(daySunday, storeScheduleAfternoon)
     );
 
     // Creation Store
@@ -179,7 +235,7 @@ public class ProductServiceTest {
             "rue storeSchedules,des carriere",
             "auterive",
             "31190",
-            storeSchedules,
+            storeWeekDaySchedules,
             10);
     StoreEntity store= storeService.createStore(addStoreSchema);
 
@@ -216,10 +272,21 @@ public class ProductServiceTest {
     // Creation Pro
     ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
-        // horaires store
-    List<StoreSchedule> storeSchedules = List.of(
-            new StoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00)),
-            new StoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,00,00))
+    // Jours
+    List<Integer> days = List.of(2, 3, 4, 5);
+    List<Integer> dayMonday = List.of(1);
+    List<Integer> daySunday = List.of(7);
+
+    // Horaires
+    DailyStoreSchedule storeScheduleMorning = new DailyStoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00));
+    DailyStoreSchedule storeScheduleAfternoon = new DailyStoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,30,00));
+
+    // Horaires du commerce
+    List<WeeklyStoreSchedule> storeWeekDaySchedules = List.of(
+            new WeeklyStoreSchedule(days, storeScheduleMorning),
+            new WeeklyStoreSchedule(days, storeScheduleAfternoon),
+            new WeeklyStoreSchedule(dayMonday, storeScheduleAfternoon),
+            new WeeklyStoreSchedule(daySunday, storeScheduleAfternoon)
     );
 
     // Creation Store
@@ -227,7 +294,7 @@ public class ProductServiceTest {
             "magasin",
             "rue des carriere",
             "auterive", "31190",
-            storeSchedules,
+            storeWeekDaySchedules,
             10);
     StoreEntity store= storeService.createStore(addStoreSchema);
 
@@ -256,15 +323,25 @@ public class ProductServiceTest {
   void should_not_update_product_without_description() {
     // Creation Pro
     ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
+    // Jours
+    List<Integer> days = List.of(2, 3, 4, 5);
+    List<Integer> dayMonday = List.of(1);
+    List<Integer> daySunday = List.of(7);
 
-        // horaires store
-    List<StoreSchedule> storeSchedules = List.of(
-            new StoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00)),
-            new StoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,00,00))
+    // Horaires
+    DailyStoreSchedule storeScheduleMorning = new DailyStoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00));
+    DailyStoreSchedule storeScheduleAfternoon = new DailyStoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,30,00));
+
+    // Horaires du commerce
+    List<WeeklyStoreSchedule> storeWeekDaySchedules = List.of(
+            new WeeklyStoreSchedule(days, storeScheduleMorning),
+            new WeeklyStoreSchedule(days, storeScheduleAfternoon),
+            new WeeklyStoreSchedule(dayMonday, storeScheduleAfternoon),
+            new WeeklyStoreSchedule(daySunday, storeScheduleAfternoon)
     );
 
     // Creation Store
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190",storeSchedules, 10);
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190",storeWeekDaySchedules, 10);
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produit
@@ -290,14 +367,25 @@ public class ProductServiceTest {
     // Creation Pro
     ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
-        // horaires store
-    List<StoreSchedule> storeSchedules = List.of(
-            new StoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00)),
-            new StoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,00,00))
+    // Jours
+    List<Integer> days = List.of(2, 3, 4, 5);
+    List<Integer> dayMonday = List.of(1);
+    List<Integer> daySunday = List.of(7);
+
+    // Horaires
+    DailyStoreSchedule storeScheduleMorning = new DailyStoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00));
+    DailyStoreSchedule storeScheduleAfternoon = new DailyStoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,30,00));
+
+    // Horaires du commerce
+    List<WeeklyStoreSchedule> storeWeekDaySchedules = List.of(
+            new WeeklyStoreSchedule(days, storeScheduleMorning),
+            new WeeklyStoreSchedule(days, storeScheduleAfternoon),
+            new WeeklyStoreSchedule(dayMonday, storeScheduleAfternoon),
+            new WeeklyStoreSchedule(daySunday, storeScheduleAfternoon)
     );
 
     // Creation Store
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190",storeSchedules, 10);
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190",storeWeekDaySchedules, 10);
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produit
@@ -323,14 +411,25 @@ public class ProductServiceTest {
     // Creation Pro
     ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
-        // horaires store
-    List<StoreSchedule> storeSchedules = List.of(
-            new StoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00)),
-            new StoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,00,00))
+    // Jours
+    List<Integer> days = List.of(2, 3, 4, 5);
+    List<Integer> dayMonday = List.of(1);
+    List<Integer> daySunday = List.of(7);
+
+    // Horaires
+    DailyStoreSchedule storeScheduleMorning = new DailyStoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00));
+    DailyStoreSchedule storeScheduleAfternoon = new DailyStoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,30,00));
+
+    // Horaires du commerce
+    List<WeeklyStoreSchedule> storeWeekDaySchedules = List.of(
+            new WeeklyStoreSchedule(days, storeScheduleMorning),
+            new WeeklyStoreSchedule(days, storeScheduleAfternoon),
+            new WeeklyStoreSchedule(dayMonday, storeScheduleAfternoon),
+            new WeeklyStoreSchedule(daySunday, storeScheduleAfternoon)
     );
 
     // Creation Store
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190",storeSchedules, 10);
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190",storeWeekDaySchedules, 10);
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produit
@@ -356,14 +455,25 @@ public class ProductServiceTest {
     // Creation Pro
     ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
 
-        // horaires store
-    List<StoreSchedule> storeSchedules = List.of(
-            new StoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00)),
-            new StoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,00,00))
+    // Jours
+    List<Integer> days = List.of(2, 3, 4, 5);
+    List<Integer> dayMonday = List.of(1);
+    List<Integer> daySunday = List.of(7);
+
+    // Horaires
+    DailyStoreSchedule storeScheduleMorning = new DailyStoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00));
+    DailyStoreSchedule storeScheduleAfternoon = new DailyStoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,30,00));
+
+    // Horaires du commerce
+    List<WeeklyStoreSchedule> storeWeekDaySchedules = List.of(
+            new WeeklyStoreSchedule(days, storeScheduleMorning),
+            new WeeklyStoreSchedule(days, storeScheduleAfternoon),
+            new WeeklyStoreSchedule(dayMonday, storeScheduleAfternoon),
+            new WeeklyStoreSchedule(daySunday, storeScheduleAfternoon)
     );
 
     // Creation Store
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190",storeSchedules, 10);
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190",storeWeekDaySchedules, 10);
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Ajout produit
@@ -381,15 +491,25 @@ public class ProductServiceTest {
   void should_not_delete_if_product_not_exist() {
     // Creation Pro
     ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
+    // Jours
+    List<Integer> days = List.of(2, 3, 4, 5);
+    List<Integer> dayMonday = List.of(1);
+    List<Integer> daySunday = List.of(7);
 
-        // horaires store
-    List<StoreSchedule> storeSchedules = List.of(
-            new StoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00)),
-            new StoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,00,00))
+    // Horaires
+    DailyStoreSchedule storeScheduleMorning = new DailyStoreSchedule(LocalTime.of(11,30,00), LocalTime.of(14,00,00));
+    DailyStoreSchedule storeScheduleAfternoon = new DailyStoreSchedule(LocalTime.of(18,30,00), LocalTime.of(22,30,00));
+
+    // Horaires du commerce
+    List<WeeklyStoreSchedule> storeWeekDaySchedules = List.of(
+            new WeeklyStoreSchedule(days, storeScheduleMorning),
+            new WeeklyStoreSchedule(days, storeScheduleAfternoon),
+            new WeeklyStoreSchedule(dayMonday, storeScheduleAfternoon),
+            new WeeklyStoreSchedule(daySunday, storeScheduleAfternoon)
     );
 
     // Creation Store
-    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190",storeSchedules, 10);
+    AddStoreDto addStoreSchema = new AddStoreDto(createdPro.id(), "magasin", "rue des carriere", "auterive", "31190",storeWeekDaySchedules, 10);
     StoreEntity store= storeService.createStore(addStoreSchema);
 
     // Suppression produit inexistant

@@ -1,9 +1,11 @@
 package ctoutweb.lalamiam.repository.transaction;
 
 import ctoutweb.lalamiam.factory.Factory;
+import ctoutweb.lalamiam.model.DailyStoreSchedule;
 import ctoutweb.lalamiam.model.dto.AddStoreDto;
 import ctoutweb.lalamiam.repository.*;
 import ctoutweb.lalamiam.repository.entity.StoreEntity;
+import ctoutweb.lalamiam.repository.entity.WeekDayEntity;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.transaction.Transactional;
 import org.hibernate.Hibernate;
@@ -13,25 +15,34 @@ import org.hibernate.Transaction;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class StoreTransaction {
 
   private final EntityManagerFactory entityManagerFactory;
-  private final ScheduleRepository scheduleRepository;
+  private final StoreDayScheduleRepository storeDayScheduleRepository;
   private final StoreRepository storeRepository;
   private final ProRepository proRepository;
 
-  public StoreTransaction(CommandRepository commandRepository, ProductRepository productRepository, EntityManagerFactory entityManagerFactory, ScheduleRepository scheduleRepository, StoreRepository storeRepository, ProRepository proRepository) {
+  public StoreTransaction(
+          CommandRepository commandRepository,
+          ProductRepository productRepository,
+          EntityManagerFactory entityManagerFactory,
+          StoreDayScheduleRepository scheduleRepository,
+          StoreRepository storeRepository,
+          ProRepository proRepository
+  ) {
     this.entityManagerFactory = entityManagerFactory;
-    this.scheduleRepository = scheduleRepository;
+    this.storeDayScheduleRepository = scheduleRepository;
     this.storeRepository = storeRepository;
     this.proRepository = proRepository;
   }
 
   /**
    * Sauvegarde des horaires du magasin
-   * @param addStore
+   * @param addStore - AddStoreDto
    */
   @Transactional()
   public BigInteger SaveStore(AddStoreDto addStore) {
@@ -41,8 +52,19 @@ public class StoreTransaction {
     // Sauvegarde du Store
     StoreEntity createdStore = storeRepository.save(new StoreEntity(addStore));
 
+
+
     // Sauvegarde des horaires
-    addStore.storeSchedule().stream().forEach(storeSchedule->scheduleRepository.save(Factory.getSchedule(storeSchedule, createdStore.getId())));
+    addStore.weeklyStoreSchedules()
+            .stream()
+            .forEach(storeSchedule-> storeSchedule.days()
+                .stream()
+                .forEach(day->{
+                  WeekDayEntity weekDay = Factory.getWeekDay(day);
+                  storeDayScheduleRepository
+                          .save(Factory.getStoreWeekDaySchedule(storeSchedule.storeSchedule(), weekDay, createdStore));
+                })
+            );
 
     return createdStore.getId();
   }
@@ -51,8 +73,8 @@ public class StoreTransaction {
   /**
    * Renvoie les information complete d'un commerce
    * Commands - Products - Schedules ....
-   * @param storeId
-   * @return
+   * @param storeId - BigInteger
+   * @return StoreEntity
    */
   public StoreEntity getCompleteStoreInformation(BigInteger storeId) {
     StoreEntity store = null;
@@ -60,9 +82,9 @@ public class StoreTransaction {
     Transaction transaction = session.beginTransaction();
     try {
       store = session.get(StoreEntity.class, storeId);
-      Hibernate.initialize(store.getSchedules());
       Hibernate.initialize(store.getCommands());
       Hibernate.initialize(store.getProducts());
+      Hibernate.initialize(store.getStoreWeekDaySchedules());
       transaction.commit();
     } catch (Exception ex) {
 
@@ -71,4 +93,5 @@ public class StoreTransaction {
       return store;
     }
   }
+
 }

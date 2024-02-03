@@ -24,22 +24,21 @@ public class CommandServiceHelper extends RepositoryCommonMethod {
   private final CommandRepository commandRepository;
   private final ProductRepository productRepository;
   private final CommandProductRepository commandProductRepository;
-  private final ScheduleRepository scheduleRepository;
+  private final StoreDayScheduleRepository storeWeekDayRepository;
   private final CommandTransaction commandTransaction;
 
   public CommandServiceHelper(
           CommandProductRepository commandProductRepository,
           CommandRepository commandRepository,
           ProductRepository productRepository,
-          ScheduleRepository scheduleRepository,
+          StoreDayScheduleRepository storeWeekDayRepository,
           CommandTransaction commandRepositoryHelper
   ) {
     super(commandProductRepository, productRepository);
     this.commandRepository = commandRepository;
     this.productRepository = productRepository;
     this.commandProductRepository = commandProductRepository;
-    this.scheduleRepository = scheduleRepository;
-
+    this.storeWeekDayRepository = storeWeekDayRepository;
     this.commandTransaction = commandRepositoryHelper;
   }
 
@@ -144,10 +143,13 @@ public class CommandServiceHelper extends RepositoryCommonMethod {
   ) {
     // Rechechre des commandes existantes
     var commands = commandRepository.findCommandsByStoreIdDate(START_OF_COMMAND_DAY, END_OF_COMMAND_DAY, store.getId())
-            .stream().map(CommandEntity::getSlotTime).collect(Collectors.toList());
+            .stream().map(CommandEntity::getSlotTime).toList();
+
+    // Recherche du jour de la semaine
+    WeekDayEntity weekDay = Factory.getWeekDay(START_OF_COMMAND_DAY);
 
     // Recherche des horaires du commerce
-    var storeSchedules = scheduleRepository.findAllByStore(store);
+    List<StoreDayScheduleEntity> storeSchedules = storeWeekDayRepository.findAllByStoreAndWeekDay(store, weekDay);
 
     // Nombre de Slots disponible sur 24h pour le commerce
     final Integer ITERATION_PER_DAY = calculateNumberOfCommandSlotForOneDay(store);

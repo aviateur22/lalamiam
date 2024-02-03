@@ -1,6 +1,6 @@
 package ctoutweb.lalamiam.util;
 
-import ctoutweb.lalamiam.repository.entity.ScheduleEntity;
+import ctoutweb.lalamiam.repository.entity.StoreDayScheduleEntity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -45,7 +45,7 @@ public class CommonFunction {
    */
   public static boolean isSlotInStoreSchedule(
           LocalDateTime slot,
-          ScheduleEntity schedule,
+          StoreDayScheduleEntity schedule,
           LocalDate startingDay,
           LocalDate endingDay,
           int commandPreparationTime

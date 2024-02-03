@@ -1,6 +1,6 @@
 package ctoutweb.lalamiam.model.dto;
 
-import ctoutweb.lalamiam.model.StoreSchedule;
+import ctoutweb.lalamiam.model.WeeklyStoreSchedule;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -11,6 +11,6 @@ public record AddStoreDto(
         String adress,
         String city,
         String cp,
-        List<StoreSchedule> storeSchedule,
+        List<WeeklyStoreSchedule> weeklyStoreSchedules,
         Integer frequenceSlotTime) {
 }
