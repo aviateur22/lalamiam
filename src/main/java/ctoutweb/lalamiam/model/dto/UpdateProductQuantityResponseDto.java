@@ -8,5 +8,4 @@ public record UpdateProductQuantityResponseDto(
         ProductWithQuantity productInCommand,
         Integer commandPreparationTime,
         Integer ProductQuantity,
-        Double commandPrice) {
-}
+        Double commandPrice) {}

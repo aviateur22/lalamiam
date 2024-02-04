@@ -9,6 +9,7 @@ import ctoutweb.lalamiam.model.ProductInCommandWithCalculateDetail;
 import ctoutweb.lalamiam.model.dto.AddCommandDto;
 import ctoutweb.lalamiam.model.dto.AddProductsInCommandDto;
 import ctoutweb.lalamiam.model.ProductWithQuantity;
+import ctoutweb.lalamiam.model.dto.AddProductsInCommandResponseDto;
 import ctoutweb.lalamiam.repository.CommandProductRepository;
 import ctoutweb.lalamiam.repository.CommandRepository;
 import ctoutweb.lalamiam.repository.ProductRepository;
@@ -120,33 +121,33 @@ public class CommandTransaction extends RepositoryCommonMethod {
     return Factory.getProductCommandWithCalculatedDetail(commandId, commandDetailCalculated);
   }
 
+  /**
+   * Ajout d'un produit dans une commande
+   * @param addProductsInCommand - AddProductsInCommandDto
+   * @return
+   */
   @Transactional
-  public CommandIdWithCalculateDetail addProductInExistingCommand(AddProductsInCommandDto addProductsInCommand) {
+  public AddProductsInCommandResponseDto addProductAndUpdateExistingCommand(AddProductsInCommandDto addProductsInCommand) {
 
-    final Integer ADD_PRODUCT_QUANTITY = 1;
+    // Liste des produits dans la commande
+    List<ProductWithQuantity> productsInCommand = findAllProductInCommand(addProductsInCommand.commandId());
 
     var listProductWrapper = new Object() {
-      List<ProductWithQuantity> productsInCommand = findAllProductInCommand(addProductsInCommand.commandId());
+      final List<ProductWithQuantity> productsInCommand = findAllProductInCommand(addProductsInCommand.commandId());
     };
 
-    addProductsInCommand.productIdList().stream().forEach(productId-> {
-      findProductInCommandList(productId, listProductWrapper.productsInCommand)
-              .ifPresentOrElse((value)->{
-                // Mise a jour d'un produit
-                CommandProductEntity updateProduct = findProductByIdInCommand(
-                        addProductsInCommand.commandId(),
-                        productId
-                ).orElseThrow(()->new RuntimeException(""));
-                updateProduct.setProductQuantity(updateProduct.getProductQuantity() + ADD_PRODUCT_QUANTITY);
-                updateProductQuantityCommand(updateProduct);
-              },
+    addProductsInCommand.productWithQuantityList().stream().forEach(productWithQuantity -> {
+      findProductInCommandList(productWithQuantity.getProductId(), listProductWrapper.productsInCommand)
+              .ifPresentOrElse((product)->{
+                throw new RuntimeException(
+                        String.format("Le produit ayant l'identifiant %s est déja dans la commande", product.getProductId()));
+                },
               ()->{
-
-                // Ajout d'un produit
+                // Ajout du produit
                 CommandProductEntity addProduct = Factory.getCommandProduct(
                         addProductsInCommand.commandId(),
-                        productId,
-                        ADD_PRODUCT_QUANTITY
+                        productWithQuantity.getProductId(),
+                        productWithQuantity.getProductQuantity()
                 );
                 commandProductRepository.save(addProduct);
               });
@@ -161,7 +162,7 @@ public class CommandTransaction extends RepositoryCommonMethod {
     // sauvegarde des données de la commande
     updateCalculatedCommandDetail(addProductsInCommand.commandId(), commandDetailCalculated);
 
-    return Factory.getProductCommandWithCalculatedDetail(addProductsInCommand.commandId(), commandDetailCalculated);
+    return Factory.getAddProductsInCommandResponseDto(addProductsInCommand, commandDetailCalculated);
   }
 
   /**

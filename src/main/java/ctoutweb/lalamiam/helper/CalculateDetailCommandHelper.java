@@ -32,8 +32,9 @@ public class CalculateDetailCommandHelper extends RepositoryCommonMethod {
   /**
    * Calcule des details de la commande
    * Ex temps de preparation, prix, nombre de produit, liste des produits de la commande
-   * @param optionalProductsInCommand
-   * @return
+   * @param optionalProductsInCommand List<ProductWithQuantity> Liste des produits pour la création d'une commande
+   * @param commandId BigInteger - N° de la commande a mettre a jour = Null si creation d'une commande
+   * @return CalculateCommandDetail
    */
   public CalculateCommandDetail calculateCommandDetail(
           Optional<List<ProductWithQuantity>> optionalProductsInCommand,
@@ -53,6 +54,8 @@ public class CalculateDetailCommandHelper extends RepositoryCommonMethod {
             commandProductCount,
             commandPrice);
   }
+
+
 
   /**
    * Liste des produits d'une commande

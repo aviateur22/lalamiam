@@ -1,9 +1,7 @@
 package ctoutweb.lalamiam.factory;
 
 import ctoutweb.lalamiam.model.*;
-import ctoutweb.lalamiam.model.dto.CompleteCommandDetailResponseDto;
-import ctoutweb.lalamiam.model.dto.SimplifyCommandDetailResponseDto;
-import ctoutweb.lalamiam.model.dto.UpdateProductQuantityResponseDto;
+import ctoutweb.lalamiam.model.dto.*;
 import ctoutweb.lalamiam.repository.builder.CommandProductEntityBuilder;
 import ctoutweb.lalamiam.repository.entity.*;
 
@@ -104,11 +102,6 @@ public class Factory {
     return new ProductWithQuantity(commandProduct.getProduct().getId(), commandProduct.getProductQuantity());
   }
 
-  public static ProductWithQuantity getProductWithQuantity(BigInteger productId, Integer quantity) {
-    return new ProductWithQuantity(productId, quantity);
-  }
-
-
   /**
    *
    * @param commandId
@@ -125,6 +118,24 @@ public class Factory {
             commandDetailCalculated.commandPreparationTime(),
             commandDetailCalculated.numberOProductInCommand(),
             commandDetailCalculated.commandPrice());
+  }
+
+  /**
+   * AddProductsInCommandResponseDto
+   * @param addProductsInCommand Données sur l'ajout des produits
+   * @param calculateCommandDetail Détail de la commande mise a jour suite à l'jout des nouveaux produits
+   * @return AddProductsInCommandResponseDto
+   */
+  public static AddProductsInCommandResponseDto getAddProductsInCommandResponseDto(
+          AddProductsInCommandDto addProductsInCommand,
+          CalculateCommandDetail calculateCommandDetail
+  ) {
+  return new AddProductsInCommandResponseDto(
+          addProductsInCommand.commandId(),
+          addProductsInCommand.productWithQuantityList(),
+          calculateCommandDetail.commandPreparationTime(),
+          calculateCommandDetail.numberOProductInCommand(),
+          calculateCommandDetail.commandPrice());
   }
 
   /**

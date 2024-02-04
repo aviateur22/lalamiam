@@ -4,9 +4,18 @@ import ctoutweb.lalamiam.model.ProductWithQuantity;
 
 import java.math.BigInteger;
 import java.util.List;
-public record SimplifyCommandDetailResponseDto(
+
+/**
+ * Liste des produits ajouté a une commande
+ * @param commandId
+ * @param addProducts
+ * @param commandPreparationTime
+ * @param numberOProductInCommand
+ * @param commandPrice
+ */
+public record AddProductsInCommandResponseDto(
         BigInteger commandId,
-        List<ProductWithQuantity> productInCommandList,
+        List<ProductWithQuantity> addProducts,
         Integer commandPreparationTime,
         Integer numberOProductInCommand,
         Double commandPrice

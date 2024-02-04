@@ -2,6 +2,7 @@ package ctoutweb.lalamiam.service.serviceImpl;
 
 import ctoutweb.lalamiam.factory.Factory;
 import ctoutweb.lalamiam.helper.CommandServiceHelper;
+import ctoutweb.lalamiam.model.ProductWithQuantity;
 import ctoutweb.lalamiam.model.dto.*;
 import ctoutweb.lalamiam.repository.CommandProductRepository;
 import ctoutweb.lalamiam.repository.ProductRepository;
@@ -76,13 +77,16 @@ public class CommandServiceImpl extends RepositoryCommonMethod implements Comman
   }
 
   @Override
-  public SimplifyCommandDetailResponseDto addProductsInCommand(AddProductsInCommandDto addProductsInCommand) {
+  public AddProductsInCommandResponseDto addProductsInCommand(AddProductsInCommandDto addProductsInCommand) {
+    // Vérification existence du commerce
+    findStore(addProductsInCommand.storeId());
 
-    // Verification des données a modifier
-    verifyRequest(
-            addProductsInCommand.storeId(),
+    // Vérification du contenu des modifications
+    commandServiceHelper.verifyCommandsWithNewProducts(
             addProductsInCommand.commandId(),
-            addProductsInCommand.productIdList());
+            addProductsInCommand.productWithQuantityList().stream().map(ProductWithQuantity::getProductId).toList(),
+            addProductsInCommand.storeId()
+    );
 
    return commandServiceHelper.addProductsInCommand(addProductsInCommand);
   }

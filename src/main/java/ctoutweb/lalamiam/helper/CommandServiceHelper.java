@@ -114,15 +114,11 @@ public class CommandServiceHelper extends RepositoryCommonMethod {
    * @param addProductsInCommand
    * @return CommandDetailDto
    */
-  public SimplifyCommandDetailResponseDto addProductsInCommand(AddProductsInCommandDto addProductsInCommand) {
+  public AddProductsInCommandResponseDto addProductsInCommand(AddProductsInCommandDto addProductsInCommand) {
     // Persistence des données
-    CommandIdWithCalculateDetail productCommandWithCalculateDetail = commandTransaction.addProductInExistingCommand(
+    return commandTransaction.addProductAndUpdateExistingCommand(
             addProductsInCommand
     );
-
-    return Factory.getSimplifyCommandDetailResponse(
-            productCommandWithCalculateDetail.commandId(),
-            productCommandWithCalculateDetail.calculateCommandDetail());
   }
 
   /**
@@ -263,6 +259,29 @@ public class CommandServiceHelper extends RepositoryCommonMethod {
     List<BigInteger> productsId = addCommand.productsInCommand().stream().map(ProductWithQuantity::getProductId).collect(Collectors.toList());
     if(!areProductsBelongToStore(productsId, addCommand.storeId()))
       throw new RuntimeException ("Certains produits à ajouter ne sont pas rattachés au commerce");
+  }
+
+  /**
+   * Commande existante avec produit a ajouter
+   * @param commandId Id de la commande
+   * @param productsId Liste identifiants des produits a ajouter
+   * @param storeId Identifiant commerce
+   */
+  public void verifyCommandsWithNewProducts(BigInteger commandId, List<BigInteger> productsId, BigInteger storeId) {
+    // Reference horaire
+    final LocalDateTime TIME_REFERERENCE = LocalDateTime.now();
+
+    // Vérification existance commande si mise a jour de la commande
+    CommandEntity updatedCommand = commandRepository
+            .findById(commandId)
+            .orElseThrow(()->new RuntimeException("La commande n'est pas trouvée"));
+
+    // Vérification si le produit appartient au commerce
+    if(!areProductsBelongToStore(productsId, storeId))
+      throw new RuntimeException ("Certains produits à modifier ne sont pas rattachés au commerce");
+
+    // Vérification de l'heure de commande
+    if(updatedCommand.getSlotTime().isBefore(TIME_REFERERENCE)) throw new RuntimeException("La commande ne peut pas être dans le passée");
   }
 
   /**

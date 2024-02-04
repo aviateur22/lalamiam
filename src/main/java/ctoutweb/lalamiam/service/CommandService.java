@@ -10,6 +10,6 @@ public interface CommandService {
   CompleteCommandDetailResponseDto addCommand(AddCommandDto addCommandSchema);
   UpdateProductQuantityResponseDto updateProductQuantityInCommand(UpdateProductQuantityDto updateCommandSchema);
   SimplifyCommandDetailResponseDto deleteProductInCommand(DeleteProductInCommandDto deleteProductInCommand);
-  SimplifyCommandDetailResponseDto addProductsInCommand(AddProductsInCommandDto addProductsInCommand);
+  AddProductsInCommandResponseDto addProductsInCommand(AddProductsInCommandDto addProductsInCommand);
   List<LocalDateTime> findAllSlotAvailable(FindListOfSlotTimeAvailableDto findSlotTime);
 }

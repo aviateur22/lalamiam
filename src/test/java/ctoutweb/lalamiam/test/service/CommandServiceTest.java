@@ -21,6 +21,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.util.Assert;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -264,49 +265,60 @@ public class CommandServiceTest {
   }
 
   @Test
-  void should_add_one_or_multiple_products_to_command() {
+  void should_not_add_product_products_already_in_command() {
     // TODO 1 commande ne oeut pas etre modifié si pas existante
     // Creation Commande
     CompleteCommandDetailResponseDto addCommand = commandService.addCommand(addCommandSchema());
 
     // Récuperation produitId a ajouter
-    List<BigInteger> productIdList = new ArrayList<>();
+    List<ProductWithQuantity> productWithQuantityList = new ArrayList<>();
     BigInteger productId = productsInCommand.get(0).getProductId();
-    productIdList.add(productId);
-    AddProductsInCommandDto addProductsInCommandSchema = new AddProductsInCommandDto(store.getId(), productIdList, addCommand.commandId());
-    SimplifyCommandDetailResponseDto commandDetail = commandService.addProductsInCommand(addProductsInCommandSchema);
+    productWithQuantityList.add(new ProductWithQuantity(productId, 2));
+    AddProductsInCommandDto addProductsInCommandSchema = new AddProductsInCommandDto(store.getId(), productWithQuantityList, addCommand.commandId());
 
-    // Vérification nombre de produit
-    Assertions.assertEquals(7, commandDetail.numberOProductInCommand());
+    // Exception
+    Exception exception = Assertions.assertThrows(RuntimeException.class,  ()->commandService.addProductsInCommand(addProductsInCommandSchema));
 
-    // Vérification du nouveau prix
-    Assertions.assertEquals(130, commandDetail.commandPrice());
-
-    // Verification du nouveau temps de prepapration de la commande
-    Assertions.assertEquals(75, commandDetail.commandPreparationTime());
-
+    // Message de l'ecxeption
+    Assertions.assertEquals(String.format("Le produit ayant l'identifiant %s est déja dans la commande", productId), exception.getMessage());
   }
 
   @Test
-  void should_add_one_product_already_in_command() {
+  void should_add_one_products_with_quantity_2_in_command()  {
     // Creation Commande
     CompleteCommandDetailResponseDto addCommand = commandService.addCommand(addCommandSchema());
 
     // Récuperation produitId a ajouter
-    List<BigInteger> productIdList = new ArrayList<>();
-    BigInteger productId = productsInCommand.get(0).getProductId();
+    List<ProductWithQuantity> productWithQuantityList = new ArrayList<>();
+    BigInteger productId = productsInCommand.get(0).getProductId().add(BigInteger.valueOf(3));
 
-    productIdList.add(productId);
-    AddProductsInCommandDto addProductsInCommandSchema = new AddProductsInCommandDto(store.getId(), productIdList, addCommand.commandId());
-    SimplifyCommandDetailResponseDto commandDetail = commandService.addProductsInCommand(addProductsInCommandSchema);
+    productWithQuantityList.add(new ProductWithQuantity(productId, 2));
+    AddProductsInCommandDto addProductsInCommandSchema = new AddProductsInCommandDto(store.getId(), productWithQuantityList, addCommand.commandId());
+    AddProductsInCommandResponseDto commandDetail = commandService.addProductsInCommand(addProductsInCommandSchema);
 
     // Vérification que le produit ajouté n'est pas en doublons
     List<ProductWithQuantity> findProductIdInProductList = commandDetail
-            .productInCommandList()
+            .addProducts()
             .stream()
             .filter(product-> product.getProductId().equals(productId)).collect(Collectors.toList());
     Assertions.assertEquals(1, findProductIdInProductList.size());
-    Assertions.assertEquals(3, findProductIdInProductList.stream().filter(product->product.getProductId().equals(productId)).findFirst().get().getProductQuantity());
+
+    // Qiantité du nouveau produit
+    Assertions.assertEquals(2, findProductIdInProductList
+            .stream()
+            .filter(product->product.getProductId().equals(productId))
+            .findFirst()
+            .get()
+            .getProductQuantity());
+
+    // Vérification nombre de produit total dans la commande
+    Assertions.assertEquals(8, commandDetail.numberOProductInCommand());
+
+    // Vérification du nouveau prix
+    Assertions.assertEquals(140, commandDetail.commandPrice());
+
+    // Verification du nouveau temps de prepapration de la commande
+    Assertions.assertEquals(80, commandDetail.commandPreparationTime());
   }
 
   /**
@@ -1099,6 +1111,9 @@ public class CommandServiceTest {
     // Creation commande
     createProductsInCommand(createProductList);
 
+    // Ajout de produit non present dans la commande
+    createProductAfetrCommands(createdStore.getId());
+
     // Creation Pro2 + Store2 + produits2 et ajout d'un produit à la commande 1
     if(!isProdutcBelongToStore) {
       createdPro2 = createPro();
@@ -1179,6 +1194,22 @@ public class CommandServiceTest {
     return createdProductList;
   }
 
+  public List<AddProductResponseDto> createProductAfetrCommands(BigInteger storeId) {
+    AddProductDto addProductSchema1 = new AddProductDto("pain", 10D, "initial description", 5, "s", storeId);
+    AddProductDto addProductSchema2 = new AddProductDto("beurre", 20D, "initial description", 10, "s", storeId);
+    AddProductDto addProductSchema3 = new AddProductDto("miel", 30D, "initial description", 20, "s", storeId);
+
+    AddProductResponseDto addProduct1 =  productService.addProduct(addProductSchema1);
+    AddProductResponseDto addProduct2 =  productService.addProduct(addProductSchema2);
+    AddProductResponseDto addProduct3 =  productService.addProduct(addProductSchema3);
+
+    List<AddProductResponseDto> createdProductList = new ArrayList<>();
+    createdProductList.add(addProduct1);
+    createdProductList.add(addProduct2);
+    createdProductList.add(addProduct3);
+
+    return createdProductList;
+  }
 
 
   public void createCommands(LocalDate commandDate, int numberOfCommands, StoreEntity store) {

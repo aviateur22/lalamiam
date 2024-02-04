@@ -25,4 +25,6 @@ public class CommandController {
   UpdateProductQuantityResponseDto updateProductQuantity(@RequestBody UpdateProductQuantityDto updateProductQuantity) {
     return commandService.updateProductQuantityInCommand(updateProductQuantity);
   }
+
+
 }
