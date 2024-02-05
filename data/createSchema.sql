@@ -1,5 +1,5 @@
 BEGIN;
-DROP TABLE IF EXISTS sc_lalamiam."store_week_day",sc_lalamiam."week_day", sc_lalamiam."command_product", sc_lalamiam."product",  sc_lalamiam."command", sc_lalamiam."store", sc_lalamiam."pro";
+DROP TABLE IF EXISTS sc_lalamiam."store_day_schedule",sc_lalamiam."week_day", sc_lalamiam."command_product", sc_lalamiam."product",  sc_lalamiam."command", sc_lalamiam."store", sc_lalamiam."pro";
 
 create table IF NOT EXISTS sc_lalamiam.pro(
     "id" INTEGER PRIMARY KEY,
@@ -34,6 +34,7 @@ create table IF NOT EXISTS sc_lalamiam.command(
     "preparation_time" INTEGER NOT NULL,
     "order_price" NUMERIC NOT NULL,
     "product_quantity" INTEGER NOT NULL,
+    "is_ready" BOOLEAN NOT NULL DEFAULT FALSE,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
     "updated_at" TIMESTAMPTZ
 );
@@ -46,6 +47,7 @@ create table IF NOT EXISTS sc_lalamiam.product(
     "description" TEXT NOT NULL,
     "preparation_time" INTEGER NOT NULL,
     "photo" TEXT NOT NULL,
+    "is_avail" BOOLEAN NOT NULL DEFAULT TRUE,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
     "updated_at" TIMESTAMPTZ
 );

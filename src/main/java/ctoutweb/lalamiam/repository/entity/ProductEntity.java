@@ -36,6 +36,9 @@ public class ProductEntity {
   @Column(name = "photo")
   private String photo;
 
+  @Column(name = "is_avail")
+  private Boolean isAvail;
+
   @CreationTimestamp
   @Column(name = "created_at")
   private LocalDateTime createdAt;
@@ -89,6 +92,7 @@ public class ProductEntity {
     this.preparationTime = addProductSchema.preparationTime();
     this.description = addProductSchema.description();
     this.price = addProductSchema.price();
+    this.isAvail = true;
     this.store = new StoreEntity(addProductSchema.storeId());
   }
 
@@ -172,6 +176,14 @@ public class ProductEntity {
 
   public void setCommandProducts(Set<CommandProductEntity> commandProducts) {
     this.commandProducts = commandProducts;
+  }
+
+  public Boolean getIsAvail() {
+    return isAvail;
+  }
+
+  public void setIsAvail(Boolean avail) {
+    isAvail = avail;
   }
 
   @Override

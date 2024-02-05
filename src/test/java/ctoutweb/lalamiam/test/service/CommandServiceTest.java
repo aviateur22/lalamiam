@@ -1,7 +1,6 @@
 package ctoutweb.lalamiam.test.service;
 
 import ctoutweb.lalamiam.helper.StoreScheduleHelper;
-import ctoutweb.lalamiam.model.DailyStoreSchedule;
 import ctoutweb.lalamiam.model.ProductWithQuantity;
 import ctoutweb.lalamiam.model.dto.*;
 import ctoutweb.lalamiam.model.dto.AddProductDto;
@@ -10,10 +9,7 @@ import ctoutweb.lalamiam.repository.CommandProductRepository;
 import ctoutweb.lalamiam.repository.ProRepository;
 import ctoutweb.lalamiam.repository.builder.StoreEntityBuilder;
 import ctoutweb.lalamiam.repository.entity.*;
-import ctoutweb.lalamiam.service.CommandService;
-import ctoutweb.lalamiam.service.ProService;
-import ctoutweb.lalamiam.service.ProductService;
-import ctoutweb.lalamiam.service.StoreService;
+import ctoutweb.lalamiam.service.*;
 import helper.*;
 import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.Assertions;
@@ -21,7 +17,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.util.Assert;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -40,6 +35,12 @@ public class CommandServiceTest {
 
   @Autowired
   CommandService commandService;
+
+  @Autowired
+  CommandProductService commandProductService;
+
+  @Autowired
+  SlotService slotService;
 
   @Autowired
   CommandRepository commandRepository;
@@ -277,7 +278,7 @@ public class CommandServiceTest {
     AddProductsInCommandDto addProductsInCommandSchema = new AddProductsInCommandDto(store.getId(), productWithQuantityList, addCommand.commandId());
 
     // Exception
-    Exception exception = Assertions.assertThrows(RuntimeException.class,  ()->commandService.addProductsInCommand(addProductsInCommandSchema));
+    Exception exception = Assertions.assertThrows(RuntimeException.class,  ()->commandProductService.addProductsInCommand(addProductsInCommandSchema));
 
     // Message de l'ecxeption
     Assertions.assertEquals(String.format("Le produit ayant l'identifiant %s est déja dans la commande", productId), exception.getMessage());
@@ -294,7 +295,7 @@ public class CommandServiceTest {
 
     productWithQuantityList.add(new ProductWithQuantity(productId, 2));
     AddProductsInCommandDto addProductsInCommandSchema = new AddProductsInCommandDto(store.getId(), productWithQuantityList, addCommand.commandId());
-    AddProductsInCommandResponseDto commandDetail = commandService.addProductsInCommand(addProductsInCommandSchema);
+    AddProductsInCommandResponseDto commandDetail = commandProductService.addProductsInCommand(addProductsInCommandSchema);
 
     // Vérification que le produit ajouté n'est pas en doublons
     List<ProductWithQuantity> findProductIdInProductList = commandDetail
@@ -366,7 +367,7 @@ public class CommandServiceTest {
     );
 
     // Recherche des slots diponible avant ouverture du commerce
-    List<LocalDateTime> findAllSlotAvailableBeforeOpeningTime = commandService.findAllSlotAvailable(
+    List<LocalDateTime> findAllSlotAvailableBeforeOpeningTime = slotService.findAllSlotAvailable(
             new FindListOfSlotTimeAvailableDto(
                     commandDate,
                     store.getId(),
@@ -376,7 +377,7 @@ public class CommandServiceTest {
     );
 
     // Recherche des slots diponible avant ouverture du commerce
-    List<LocalDateTime> findAllSlotAvailableBeforeOpeningTime2 = commandService.findAllSlotAvailable(
+    List<LocalDateTime> findAllSlotAvailableBeforeOpeningTime2 = slotService.findAllSlotAvailable(
             new FindListOfSlotTimeAvailableDto(
                     commandDate,
                     store.getId(),
@@ -431,7 +432,7 @@ public class CommandServiceTest {
     );
 
     // Recherche des slots diponibles
-    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime1 = commandService.findAllSlotAvailable(
+    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime1 = slotService.findAllSlotAvailable(
             new FindListOfSlotTimeAvailableDto(
                     commandDate,
                     store.getId(),
@@ -440,7 +441,7 @@ public class CommandServiceTest {
     );
 
     // Recherche des slots diponibles
-    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime2 = commandService.findAllSlotAvailable(
+    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime2 = slotService.findAllSlotAvailable(
             new FindListOfSlotTimeAvailableDto(
                     commandDate,
                     store.getId(),
@@ -486,7 +487,7 @@ public class CommandServiceTest {
     );
 
     // Recherche des slots diponible avant ouverture du commerce
-    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime = commandService.findAllSlotAvailable(
+    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime = slotService.findAllSlotAvailable(
             new FindListOfSlotTimeAvailableDto(
                     commandDate,
                     store.getId(),
@@ -541,7 +542,7 @@ public class CommandServiceTest {
     );
 
     // Recherche des slots diponible avant ouverture du commerce
-    List<LocalDateTime> findAllSlotAvailableBeforeOpeningTime = commandService.findAllSlotAvailable(
+    List<LocalDateTime> findAllSlotAvailableBeforeOpeningTime = slotService.findAllSlotAvailable(
             new FindListOfSlotTimeAvailableDto(
                     commandDate,
                     store.getId(),
@@ -551,7 +552,7 @@ public class CommandServiceTest {
     );
 
     // Recherche des slots diponible avant ouverture du commerce
-    List<LocalDateTime> findAllSlotAvailableBeforeOpeningTime2 = commandService.findAllSlotAvailable(
+    List<LocalDateTime> findAllSlotAvailableBeforeOpeningTime2 = slotService.findAllSlotAvailable(
             new FindListOfSlotTimeAvailableDto(
                     commandDate,
                     store.getId(),
@@ -607,7 +608,7 @@ public class CommandServiceTest {
     );
 
     // Recherche des slots diponibles
-    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime1 = commandService.findAllSlotAvailable(
+    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime1 = slotService.findAllSlotAvailable(
             new FindListOfSlotTimeAvailableDto(
                     commandDate,
                     store.getId(),
@@ -616,7 +617,7 @@ public class CommandServiceTest {
     );
 
     // Recherche des slots diponibles
-    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime2 = commandService.findAllSlotAvailable(
+    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime2 = slotService.findAllSlotAvailable(
             new FindListOfSlotTimeAvailableDto(
                     commandDate,
                     store.getId(),
@@ -663,7 +664,7 @@ public class CommandServiceTest {
     );
 
     // Recherche des slots diponible avant ouverture du commerce
-    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime = commandService.findAllSlotAvailable(
+    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime = slotService.findAllSlotAvailable(
             new FindListOfSlotTimeAvailableDto(
                     commandDate,
                     store.getId(),
@@ -721,7 +722,7 @@ public class CommandServiceTest {
     );
 
     // Recherche des slots diponible avant ouverture du commerce
-    List<LocalDateTime> findAllSlotAvailableBeforeOpeningTime = commandService.findAllSlotAvailable(
+    List<LocalDateTime> findAllSlotAvailableBeforeOpeningTime = slotService.findAllSlotAvailable(
             new FindListOfSlotTimeAvailableDto(
                     commandDate,
                     store.getId(),
@@ -731,7 +732,7 @@ public class CommandServiceTest {
     );
 
     // Recherche des slots diponible avant ouverture du commerce
-    List<LocalDateTime> findAllSlotAvailableBeforeOpeningTime2 = commandService.findAllSlotAvailable(
+    List<LocalDateTime> findAllSlotAvailableBeforeOpeningTime2 = slotService.findAllSlotAvailable(
             new FindListOfSlotTimeAvailableDto(
                     commandDate,
                     store.getId(),
@@ -787,7 +788,7 @@ public class CommandServiceTest {
     );
 
     // Recherche des slots diponibles
-    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime1 = commandService.findAllSlotAvailable(
+    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime1 = slotService.findAllSlotAvailable(
             new FindListOfSlotTimeAvailableDto(
                     commandDate,
                     store.getId(),
@@ -796,7 +797,7 @@ public class CommandServiceTest {
     );
 
     // Recherche des slots diponibles
-    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime2 = commandService.findAllSlotAvailable(
+    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime2 = slotService.findAllSlotAvailable(
             new FindListOfSlotTimeAvailableDto(
                     commandDate,
                     store.getId(),
@@ -842,7 +843,7 @@ public class CommandServiceTest {
     );
 
     // Recherche des slots diponible avant ouverture du commerce
-    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime = commandService.findAllSlotAvailable(
+    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime = slotService.findAllSlotAvailable(
             new FindListOfSlotTimeAvailableDto(
                     commandDate,
                     store.getId(),
@@ -887,7 +888,7 @@ public class CommandServiceTest {
     );
 
     // Recherche des slots diponible avant ouverture du commerce
-    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime = commandService.findAllSlotAvailable(
+    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime = slotService.findAllSlotAvailable(
             new FindListOfSlotTimeAvailableDto(
                     commandDate,
                     store.getId(),
@@ -932,7 +933,7 @@ public class CommandServiceTest {
     );
 
     // Recherche des slots diponible avant ouverture du commerce
-    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime = commandService.findAllSlotAvailable(
+    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime = slotService.findAllSlotAvailable(
             new FindListOfSlotTimeAvailableDto(
                     commandDate,
                     store.getId(),
@@ -977,7 +978,7 @@ public class CommandServiceTest {
     );
 
     // Recherche des slots diponible avant ouverture du commerce
-    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime = commandService.findAllSlotAvailable(
+    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime = slotService.findAllSlotAvailable(
             new FindListOfSlotTimeAvailableDto(
                     commandDate,
                     store.getId(),
@@ -1022,7 +1023,7 @@ public class CommandServiceTest {
     );
 
     // Recherche des slots diponible avant ouverture du commerce
-    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime = commandService.findAllSlotAvailable(
+    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime = slotService.findAllSlotAvailable(
             new FindListOfSlotTimeAvailableDto(
                     commandDate,
                     store.getId(),
@@ -1067,7 +1068,7 @@ public class CommandServiceTest {
     );
 
     // Recherche des slots diponible avant ouverture du commerce
-    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime = commandService.findAllSlotAvailable(
+    List<LocalDateTime> findAllSlotAvailableDuringOpeningTime = slotService.findAllSlotAvailable(
             new FindListOfSlotTimeAvailableDto(
                     commandDate,
                     store.getId(),

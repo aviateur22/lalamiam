@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
 public class CommandServiceHelper extends RepositoryCommonMethod {
@@ -110,70 +109,6 @@ public class CommandServiceHelper extends RepositoryCommonMethod {
   }
 
   /**
-   * Ajout d'un ou plusieurs produits dans la commande
-   * @param addProductsInCommand
-   * @return CommandDetailDto
-   */
-  public AddProductsInCommandResponseDto addProductsInCommand(AddProductsInCommandDto addProductsInCommand) {
-    // Persistence des données
-    return commandTransaction.addProductAndUpdateExistingCommand(
-            addProductsInCommand
-    );
-  }
-
-  /**
-   * Recherche des crééneaux disponible
-   * @param START_OF_COMMAND_DAY
-   * @param END_OF_COMMAND_DAY
-   * @param REF_FILTER_TIME
-   * @param commandPreparationTime
-   * @param store
-   * @return List<LocalDateTime>
-   */
-  public List<LocalDateTime> findListOfSlotAvailable(
-          final LocalDateTime START_OF_COMMAND_DAY,
-          final LocalDateTime END_OF_COMMAND_DAY,
-          final LocalDateTime REF_FILTER_TIME,
-          Integer commandPreparationTime,
-          StoreEntity store
-  ) {
-    // Rechechre des commandes existantes
-    var commands = commandRepository.findCommandsByStoreIdDate(START_OF_COMMAND_DAY, END_OF_COMMAND_DAY, store.getId())
-            .stream().map(CommandEntity::getSlotTime).toList();
-
-    // Recherche du jour de la semaine
-    WeekDayEntity weekDay = Factory.getWeekDay(START_OF_COMMAND_DAY);
-
-    // Recherche des horaires du commerce
-    List<StoreDayScheduleEntity> storeSchedules = storeWeekDayRepository.findAllByStoreAndWeekDay(store, weekDay);
-
-    // Nombre de Slots disponible sur 24h pour le commerce
-    final Integer ITERATION_PER_DAY = calculateNumberOfCommandSlotForOneDay(store);
-
-    // Recherhe de slot disponible
-    List<LocalDateTime> slotAvailibilityInDay = Stream
-            .iterate(START_OF_COMMAND_DAY, dateTime-> dateTime.plusMinutes(store.getFrequenceSlotTime()))
-            .limit(ITERATION_PER_DAY)
-            // Retir les slots avant REF_FILTER_TIME
-            .filter(slot->slot.isAfter(REF_FILTER_TIME.plusMinutes(commandPreparationTime)))
-
-            // Retire les slots déja pris par d'autres commandes
-            .filter(slot->!commands.contains(slot))
-
-            // Retire tous les slots qui ne sont pas dans les horaires du commerce
-            .filter(slot->storeSchedules
-                    .stream()
-                    .anyMatch(schedule->CommonFunction.isSlotInStoreSchedule(slot,
-                            schedule,
-                            START_OF_COMMAND_DAY.toLocalDate(),
-                            END_OF_COMMAND_DAY.toLocalDate(),
-                            commandPreparationTime
-                    )))
-            .collect(Collectors.toList());
-
-    return slotAvailibilityInDay;
-  }
-  /**
    * Génération d'un code aléatoire
    * @param wordLength
    * @return String
@@ -260,50 +195,5 @@ public class CommandServiceHelper extends RepositoryCommonMethod {
     if(!areProductsBelongToStore(productsId, addCommand.storeId()))
       throw new RuntimeException ("Certains produits à ajouter ne sont pas rattachés au commerce");
   }
-
-  /**
-   * Commande existante avec produit a ajouter
-   * @param commandId Id de la commande
-   * @param productsId Liste identifiants des produits a ajouter
-   * @param storeId Identifiant commerce
-   */
-  public void verifyCommandsWithNewProducts(BigInteger commandId, List<BigInteger> productsId, BigInteger storeId) {
-    // Reference horaire
-    final LocalDateTime TIME_REFERERENCE = LocalDateTime.now();
-
-    // Vérification existance commande si mise a jour de la commande
-    CommandEntity updatedCommand = commandRepository
-            .findById(commandId)
-            .orElseThrow(()->new RuntimeException("La commande n'est pas trouvée"));
-
-    // Vérification si le produit appartient au commerce
-    if(!areProductsBelongToStore(productsId, storeId))
-      throw new RuntimeException ("Certains produits à modifier ne sont pas rattachés au commerce");
-
-    // Vérification de l'heure de commande
-    if(updatedCommand.getSlotTime().isBefore(TIME_REFERERENCE)) throw new RuntimeException("La commande ne peut pas être dans le passée");
-  }
-
-  /**
-   * Calcul du nombre de créneaux pour commande disponable sur 24h pour 1 magasin
-   * Ne tient pas compte des commandes déja présentes
-   * @param store
-   * @return Integer
-   */
-  public Integer calculateNumberOfCommandSlotForOneDay(StoreEntity store) {
-    // Nombre de minute dans 1h
-    final int MINUTES_IN_HOUR = 60;
-
-    // Nombre d' heure dans 1 journée
-    final int HOUR_IN_DAY = 24;
-
-    // Nombre d'itération de commande par heure
-    final int ITERATION_PER_HOUR = MINUTES_IN_HOUR / store.getFrequenceSlotTime();
-
-    // Nombre d'iteration pour 24h
-    return ITERATION_PER_HOUR * HOUR_IN_DAY;
-  }
-
-
 
 }

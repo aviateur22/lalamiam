@@ -7,6 +7,9 @@ import ctoutweb.lalamiam.repository.entity.ProductEntity;
 
 import java.math.BigInteger;
 
+/**
+ * Gestion des produits d'un commerce
+ */
 public interface ProductService {
 
   AddProductResponseDto addProduct(AddProductDto addProductSchema);

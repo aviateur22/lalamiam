@@ -46,6 +46,9 @@ public class CommandEntity implements Serializable {
   @JoinColumn(name="store_id", nullable=false)
   private StoreEntity store;
 
+  @Column(name = "is_ready")
+  private Boolean isReady;
+
   @CreationTimestamp
   @Column(name = "created_at")
   private LocalDateTime createdAt;
@@ -81,6 +84,7 @@ public class CommandEntity implements Serializable {
     this.slotTime = slotTime;
     this.store = Factory.getStore(storeId);
     this.clientPhone = clientPhone;
+    this.isReady = false;
   }
 
   public BigInteger getId() {
@@ -169,6 +173,14 @@ public class CommandEntity implements Serializable {
 
   public void setUpdatedAt(LocalDateTime updatedAt) {
     this.updatedAt = updatedAt;
+  }
+
+  public Boolean getIsReady() {
+    return isReady;
+  }
+
+  public void setIsReady(Boolean ready) {
+    isReady = ready;
   }
 
   @Override
