@@ -2,16 +2,24 @@ package ctoutweb.lalamiam.service.serviceImpl;
 
 import ctoutweb.lalamiam.factory.Factory;
 import ctoutweb.lalamiam.helper.CommandServiceHelper;
+import ctoutweb.lalamiam.mapper.ProductQuantityMapper;
+import ctoutweb.lalamiam.model.CalculatedCommandInformation;
+import ctoutweb.lalamiam.model.ManualCommandInformation;
+import ctoutweb.lalamiam.model.ProductWithQuantity;
+import ctoutweb.lalamiam.model.dto.CommandInformationDto;
 import ctoutweb.lalamiam.model.dto.*;
 import ctoutweb.lalamiam.repository.CommandProductRepository;
+import ctoutweb.lalamiam.repository.CommandRepository;
 import ctoutweb.lalamiam.repository.ProductRepository;
 import ctoutweb.lalamiam.repository.StoreRepository;
 import ctoutweb.lalamiam.repository.entity.*;
+import ctoutweb.lalamiam.repository.transaction.CommandTransactionSession;
 import ctoutweb.lalamiam.repository.transaction.RepositoryCommonMethod;
 import ctoutweb.lalamiam.service.CommandService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -19,14 +27,22 @@ import java.util.List;
 public class CommandServiceImpl extends RepositoryCommonMethod implements CommandService {
   private final CommandServiceHelper commandServiceHelper;
   private final StoreRepository storeRepository;
+  private final CommandTransactionSession commandTransactionSession;
+  private final CommandRepository commandRepository;
+  private final ProductQuantityMapper productQuantityMapper;
   public CommandServiceImpl (
           CommandServiceHelper commandServiceHelper,
           StoreRepository storeRepository,
           ProductRepository productRepository,
-          CommandProductRepository commandProductRepository) {
+          CommandProductRepository commandProductRepository,
+          CommandTransactionSession commandTransactionSession,
+          CommandRepository commandRepository, ProductQuantityMapper productQuantityMapper) {
     super(commandProductRepository, productRepository);
     this.commandServiceHelper = commandServiceHelper;
     this.storeRepository = storeRepository;
+    this.commandTransactionSession = commandTransactionSession;
+    this.commandRepository = commandRepository;
+    this.productQuantityMapper = productQuantityMapper;
   }
 
   @Override
@@ -68,6 +84,22 @@ public class CommandServiceImpl extends RepositoryCommonMethod implements Comman
             Arrays.asList(deleteProductInCommand.productId()));
 
     return commandServiceHelper.deleteProductInCommand(deleteProductInCommand);
+  }
+
+  @Override
+  public RegisterCommandDto getCommand(BigInteger storeId, BigInteger commandId) {
+
+    return null;
+  }
+
+  @Override
+  public CommandInformationDto createCommand(BigInteger storeId) {
+    return null;
+  }
+
+  @Override
+  public CommandInformationDto updateCommand(BigInteger storeId, BigInteger commandId) {
+    return null;
   }
 
   /**

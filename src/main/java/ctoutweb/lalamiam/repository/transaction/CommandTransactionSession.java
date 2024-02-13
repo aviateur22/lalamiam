@@ -15,7 +15,13 @@ import ctoutweb.lalamiam.repository.CommandRepository;
 import ctoutweb.lalamiam.repository.ProductRepository;
 import ctoutweb.lalamiam.repository.entity.CommandEntity;
 import ctoutweb.lalamiam.repository.entity.CommandProductEntity;
+import ctoutweb.lalamiam.repository.entity.StoreEntity;
+import jakarta.persistence.EntityManagerFactory;
 import jakarta.transaction.Transactional;
+import org.hibernate.Hibernate;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
@@ -23,21 +29,23 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class CommandTransaction extends RepositoryCommonMethod {
+public class CommandTransactionSession extends RepositoryCommonMethod {
 
+  private final EntityManagerFactory entityManagerFactory;
   private final CommandProductRepository commandProductRepository;
   private final CommandRepository commandRepository;
   private final CalculateDetailCommandHelper calculateDetailCommandHelper;
 
-  public CommandTransaction(
+  public CommandTransactionSession(
           CommandProductRepository commandProductRepository,
           CommandRepository commandRepository,
           ProductRepository productRepository,
-          CalculateDetailCommandHelper calculateDetailCommandHelper
+          EntityManagerFactory entityManagerFactory, CalculateDetailCommandHelper calculateDetailCommandHelper
   ) {
     super(commandProductRepository, productRepository);
     this.commandProductRepository = commandProductRepository;
     this.commandRepository = commandRepository;
+    this.entityManagerFactory = entityManagerFactory;
     this.calculateDetailCommandHelper = calculateDetailCommandHelper;
   }
 
@@ -200,6 +208,30 @@ public class CommandTransaction extends RepositoryCommonMethod {
             .stream()
             .filter(product->product.getProductId().equals(productId))
             .findFirst();
+  }
+
+  /**
+   * Recherche des information sur une commande
+   * @param commandId
+   * @return
+   */
+  public CommandEntity getCommand(BigInteger commandId) {
+    CommandEntity command = null;
+    Session session = entityManagerFactory.unwrap(SessionFactory.class).openSession();
+    Transaction transaction = session.beginTransaction();
+    try {
+      command = session.get(CommandEntity.class, commandId);
+      // Si pas de commande
+      if(command == null) return null;
+
+      Hibernate.initialize(command.getCommandProducts());
+      transaction.commit();
+    } catch (Exception ex) {
+
+    } finally {
+      session.close();
+      return command;
+    }
   }
 
 

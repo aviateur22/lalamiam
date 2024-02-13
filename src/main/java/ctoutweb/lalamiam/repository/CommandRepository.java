@@ -15,6 +15,7 @@ import java.util.Optional;
 public interface CommandRepository extends JpaRepository<CommandEntity, BigInteger> {
 
   List<CommandEntity> findAllByStore(StoreEntity store);
+
   Optional<CommandEntity> findCommandBySlotTimeAndStore(LocalDateTime SlotTime, StoreEntity store);
 
   @Query(value = "select count(*) from sc_lalamiam.command", nativeQuery = true)

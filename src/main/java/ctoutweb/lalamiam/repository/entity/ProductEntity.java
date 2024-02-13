@@ -82,6 +82,24 @@ public class ProductEntity {
   public ProductEntity() {
   }
 
+  public ProductEntity(
+          BigInteger id,
+          String name,
+          Double price,
+          String description,
+          Integer preparationTime,
+          String photo,
+          Boolean isAvail
+  ) {
+    this.id = id;
+    this.name = name;
+    this.price = price;
+    this.description = description;
+    this.preparationTime = preparationTime;
+    this.photo = photo;
+    this.isAvail = isAvail;
+  }
+
   public ProductEntity(BigInteger productId) {
     this.id = productId;
   }

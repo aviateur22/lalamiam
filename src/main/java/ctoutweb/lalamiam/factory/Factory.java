@@ -1,5 +1,6 @@
 package ctoutweb.lalamiam.factory;
 
+import ctoutweb.lalamiam.mapper.ProductQuantityMapper;
 import ctoutweb.lalamiam.model.*;
 import ctoutweb.lalamiam.model.dto.*;
 import ctoutweb.lalamiam.repository.builder.CommandProductEntityBuilder;
@@ -209,5 +210,52 @@ public class Factory {
   public static DailyStoreSchedule getDailyStoreSchedule(StoreDayScheduleEntity storeDaySchedule) {
     return new DailyStoreSchedule(storeDaySchedule.getOpeningTime(), storeDaySchedule.getClosingTime());
 
+  }
+
+  /**
+   * Création ProductWithQuantityDto
+   * @param product ProductEntity
+   * @return ProductWithQuantityDto
+   */
+  public static ProductWithQuantityDto getProductWithQuantityDto(ProductEntity product, Integer selectQuantity) {
+    return new ProductWithQuantityDto(product.getId(), product.getName(), product.getPhoto(), product.getPrice(),selectQuantity, product.getIsAvail());
+  }
+
+  /**
+   * Renvoie un  RegisterCommandeDto
+   * @param command CommandEntity command - Données de la commande
+   * @param products List<ProductWithQuantityDto> - Liste des produits de la commande avec les quantités assiciés
+   * @return RegisterCommandDto
+   */
+  public static RegisterCommandDto getRegisterCommand(CommandEntity command, List<ProductWithQuantityDto> products) {
+
+    ManualCommandInformation manualCommandInformation = new ManualCommandInformation();
+    manualCommandInformation.setSelectProducts(products);
+    manualCommandInformation.setPhoneClient(command.getClientPhone());
+    manualCommandInformation.setSlotTime(command.getSlotTime());
+
+    CalculatedCommandInformation calculatedCommandInformation = new CalculatedCommandInformation();
+    calculatedCommandInformation.setCommandPreparationTime(calculatedCommandInformation.getCommandPreparationTime());
+    calculatedCommandInformation.setCommandCode(command.getCommandCode());
+    calculatedCommandInformation.setCommandePrice(command.getCommandPrice());
+    calculatedCommandInformation.setProductQuantity(command.getProductQuantity());
+
+    RegisterCommandDto registerCommand = new RegisterCommandDto();
+    registerCommand.setStoreId(command.getStore().getId());
+    registerCommand.setCommandId(command.getId());
+    registerCommand.setManualCommandInformation(manualCommandInformation);
+    registerCommand.setCalculatedCommandInformation(calculatedCommandInformation);
+    return registerCommand;
+  }
+
+  public static CommandInformationDto getCommandInformationDto(RegisterCommandDto registerCommand, List<ProductWithQuantityDto> storeProductsWithQuantity) {
+
+    // Récupération du téléphone client
+    String clientPhone = registerCommand == null ? null : registerCommand.getManualCommandInformation().getPhoneClient();
+
+    // Récupératuon du créneau de resa
+    LocalDateTime commandSlot = registerCommand == null ? null : registerCommand.getManualCommandInformation().getSlotTime();
+
+    return new CommandInformationDto(storeProductsWithQuantity, clientPhone, commandSlot);
   }
 }

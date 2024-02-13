@@ -47,6 +47,11 @@ public class CommandProductEntity {
   public CommandProductEntity() {
   }
 
+  public CommandProductEntity(Integer productQuantity, ProductEntity product) {
+    this.productQuantity = productQuantity;
+    this.product = product;
+  }
+
   public BigInteger getId() {
     return id;
   }

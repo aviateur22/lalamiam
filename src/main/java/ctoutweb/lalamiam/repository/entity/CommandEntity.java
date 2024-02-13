@@ -10,6 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -40,7 +41,7 @@ public class CommandEntity implements Serializable {
   private Integer productQuantity;
 
   @OneToMany(mappedBy = "command", fetch = FetchType.LAZY)
-  private Set<CommandProductEntity> commandProducts;
+  private List<CommandProductEntity> commandProducts;
 
   @ManyToOne
   @JoinColumn(name="store_id", nullable=false)
@@ -143,11 +144,11 @@ public class CommandEntity implements Serializable {
     this.productQuantity = productQuantity;
   }
 
-  public Set<CommandProductEntity> getCommandProducts() {
+  public List<CommandProductEntity> getCommandProducts() {
     return commandProducts;
   }
 
-  public void setCommandProducts(Set<CommandProductEntity> commandProducts) {
+  public void setCommandProducts(List<CommandProductEntity> commandProducts) {
     this.commandProducts = commandProducts;
   }
 

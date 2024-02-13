@@ -5,7 +5,7 @@ import ctoutweb.lalamiam.model.*;
 import ctoutweb.lalamiam.model.dto.*;
 import ctoutweb.lalamiam.repository.*;
 import ctoutweb.lalamiam.repository.entity.*;
-import ctoutweb.lalamiam.repository.transaction.CommandTransaction;
+import ctoutweb.lalamiam.repository.transaction.CommandTransactionSession;
 import ctoutweb.lalamiam.repository.transaction.RepositoryCommonMethod;
 import ctoutweb.lalamiam.util.CommonFunction;
 import org.springframework.stereotype.Component;
@@ -24,14 +24,14 @@ public class CommandServiceHelper extends RepositoryCommonMethod {
   private final ProductRepository productRepository;
   private final CommandProductRepository commandProductRepository;
   private final StoreDayScheduleRepository storeWeekDayRepository;
-  private final CommandTransaction commandTransaction;
+  private final CommandTransactionSession commandTransaction;
 
   public CommandServiceHelper(
           CommandProductRepository commandProductRepository,
           CommandRepository commandRepository,
           ProductRepository productRepository,
           StoreDayScheduleRepository storeWeekDayRepository,
-          CommandTransaction commandRepositoryHelper
+          CommandTransactionSession commandRepositoryHelper
   ) {
     super(commandProductRepository, productRepository);
     this.commandRepository = commandRepository;

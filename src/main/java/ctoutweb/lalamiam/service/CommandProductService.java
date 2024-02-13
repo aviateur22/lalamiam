@@ -29,8 +29,7 @@ public interface CommandProductService {
   /**
    * Récuperation de la liste des produits d'un commerce pour une commande en cours de création
    * @param storeId BigInteger - Identifiant commerce
-   * @param productsInCommand List<BigInteger> - Liste des produits dans la commande
    * @return List<ProductEntity>
    */
-  List<ProductEntity> getStoreProducts(BigInteger storeId, List<BigInteger> productsInCommand);
+  List<ProductEntity> getStoreProducts(BigInteger storeId);
 }

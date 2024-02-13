@@ -41,7 +41,7 @@ public class CommandProductServiceImpl implements CommandProductService {
   }
 
   @Override
-  public List<ProductEntity> getStoreProducts(BigInteger storeId, List<BigInteger> productsInCommand) {
+  public List<ProductEntity> getStoreProducts(BigInteger storeId) {
     return null;
   }
 }

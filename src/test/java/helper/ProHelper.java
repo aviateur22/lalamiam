@@ -12,4 +12,13 @@ public class ProHelper {
     this.proService = proService;
   }
 
+  /**
+   * Creation Professionnel
+   * @return ProInformationDto
+   */
+  public ProInformationDto createPro() {
+    ProInformationDto createdPro = proService.addProfessional(new AddProfessionalDto("", "password", "aaa"));
+    return createdPro;
+  }
+
 }

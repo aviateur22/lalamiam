@@ -8,7 +8,7 @@ import ctoutweb.lalamiam.repository.ProductRepository;
 import ctoutweb.lalamiam.repository.StoreRepository;
 import ctoutweb.lalamiam.repository.entity.CommandEntity;
 import ctoutweb.lalamiam.repository.entity.StoreEntity;
-import ctoutweb.lalamiam.repository.transaction.CommandTransaction;
+import ctoutweb.lalamiam.repository.transaction.CommandTransactionSession;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
@@ -17,13 +17,13 @@ import java.util.List;
 @Component
 public class CommandProductServiceHelper {
 
-  private final CommandTransaction commandTransaction;
+  private final CommandTransactionSession commandTransaction;
   private final ProductRepository productRepository;
   private final CommandRepository commandRepository;
   private final StoreRepository storeRepository;
 
   public CommandProductServiceHelper(
-          CommandTransaction commandTransaction,
+          CommandTransactionSession commandTransaction,
           ProductRepository productRepository,
           CommandRepository commandRepository,
           StoreRepository storeRepository) {

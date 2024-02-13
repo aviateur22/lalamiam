@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Gestion des commandes afficheés sur le tableau de bord
  */
-public interface CommandDayService {
+public interface CommandDashboardService {
 
   /**
    * Affichage des commande du jour
