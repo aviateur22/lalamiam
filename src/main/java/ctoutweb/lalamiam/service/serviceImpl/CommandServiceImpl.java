@@ -3,10 +3,7 @@ package ctoutweb.lalamiam.service.serviceImpl;
 import ctoutweb.lalamiam.factory.Factory;
 import ctoutweb.lalamiam.helper.CommandServiceHelper;
 import ctoutweb.lalamiam.mapper.ProductQuantityMapper;
-import ctoutweb.lalamiam.model.CalculatedCommandInformation;
-import ctoutweb.lalamiam.model.ManualCommandInformation;
-import ctoutweb.lalamiam.model.ProductWithQuantity;
-import ctoutweb.lalamiam.model.dto.CommandInformationDto;
+import ctoutweb.lalamiam.model.dto.StoreProductsInformationDto;
 import ctoutweb.lalamiam.model.dto.*;
 import ctoutweb.lalamiam.repository.CommandProductRepository;
 import ctoutweb.lalamiam.repository.CommandRepository;
@@ -19,7 +16,6 @@ import ctoutweb.lalamiam.service.CommandService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -93,12 +89,12 @@ public class CommandServiceImpl extends RepositoryCommonMethod implements Comman
   }
 
   @Override
-  public CommandInformationDto createCommand(BigInteger storeId) {
+  public StoreProductsInformationDto createCommand(BigInteger storeId) {
     return null;
   }
 
   @Override
-  public CommandInformationDto updateCommand(BigInteger storeId, BigInteger commandId) {
+  public StoreProductsInformationDto updateCommand(BigInteger storeId, BigInteger commandId) {
     return null;
   }
 

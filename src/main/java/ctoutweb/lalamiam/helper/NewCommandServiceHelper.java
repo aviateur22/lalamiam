@@ -2,27 +2,33 @@ package ctoutweb.lalamiam.helper;
 
 import ctoutweb.lalamiam.factory.Factory;
 import ctoutweb.lalamiam.mapper.ProductQuantityMapper;
+import ctoutweb.lalamiam.model.ProductWithQuantity;
 import ctoutweb.lalamiam.model.dto.ProductWithQuantityDto;
 import ctoutweb.lalamiam.model.dto.RegisterCommandDto;
 import ctoutweb.lalamiam.repository.entity.CommandEntity;
+import ctoutweb.lalamiam.repository.entity.ProductEntity;
 import ctoutweb.lalamiam.service.CommandProductService;
+import ctoutweb.lalamiam.service.ProductService;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class NewCommandServiceHelper {
 
   private final CommandProductService commandProductService;
   private final ProductQuantityMapper productQuantityMapper;
+  private final ProductService productService;
 
   public NewCommandServiceHelper(
           CommandProductService commandProductService,
-          ProductQuantityMapper productQuantityMapper
-  ) {
+          ProductQuantityMapper productQuantityMapper,
+          ProductService productService) {
     this.commandProductService = commandProductService;
     this.productQuantityMapper = productQuantityMapper;
+    this.productService = productService;
   }
 
   /**
@@ -50,7 +56,10 @@ public class NewCommandServiceHelper {
    * @param registerCommand RegisterCommandDto - données sur la commande
    * @return List<ProductWithQuantityDto>
    */
-  public List<ProductWithQuantityDto> getStoreProductsWithCommandQuantity(BigInteger storeId, RegisterCommandDto registerCommand) {
+  public List<ProductWithQuantityDto> getStoreProductsWithCommandQuantity(
+          BigInteger storeId,
+          RegisterCommandDto registerCommand
+  ) {
     final int CREATE_COMMAND_QUANTITY = 0;
 
     // Si commande en cours de création
@@ -75,4 +84,18 @@ public class NewCommandServiceHelper {
             .toList();
   }
 
+  /**
+   * Calcul du temps de préparation d'une commande
+   * @param productsSelected List<ProductWithQuantity> - Liste des produits selectionnés pour la comma,de
+   * @return Integer
+   */
+  public Integer calculateCommandPreparationTime(List<ProductWithQuantity> productsSelected) {
+    if(productsSelected == null || productsSelected.isEmpty()) return null;
+    return productsSelected
+      .stream()
+      .map(productWithQuantity -> {
+        ProductEntity product = productService.findProduct(productWithQuantity.getProductId());
+        return product.getPreparationTime() * productWithQuantity.getProductQuantity();
+      }).collect(Collectors.summingInt(Integer::intValue));
+  }
 }

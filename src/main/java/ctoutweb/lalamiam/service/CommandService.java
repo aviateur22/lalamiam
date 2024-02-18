@@ -1,6 +1,6 @@
 package ctoutweb.lalamiam.service;
 
-import ctoutweb.lalamiam.model.dto.CommandInformationDto;
+import ctoutweb.lalamiam.model.dto.StoreProductsInformationDto;
 import ctoutweb.lalamiam.model.dto.*;
 
 import java.math.BigInteger;
@@ -43,7 +43,7 @@ public interface CommandService {
    * @param storeId BigInt - Identifiant commerce
    * @return CommandInformationDto
    */
-  CommandInformationDto createCommand(BigInteger storeId);
+  StoreProductsInformationDto createCommand(BigInteger storeId);
 
   /**
    * Modification d'une commande
@@ -51,6 +51,6 @@ public interface CommandService {
    * @param commandId BigInt - Identifiant commande
    * @return CommandInformationDto
    */
-  CommandInformationDto updateCommand(BigInteger storeId, BigInteger commandId);
+  StoreProductsInformationDto updateCommand(BigInteger storeId, BigInteger commandId);
 
 }

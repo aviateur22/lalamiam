@@ -235,7 +235,7 @@ public class Factory {
     manualCommandInformation.setSlotTime(command.getSlotTime());
 
     CalculatedCommandInformation calculatedCommandInformation = new CalculatedCommandInformation();
-    calculatedCommandInformation.setCommandPreparationTime(calculatedCommandInformation.getCommandPreparationTime());
+    calculatedCommandInformation.setCommandPreparationTime(command.getPreparationTime());
     calculatedCommandInformation.setCommandCode(command.getCommandCode());
     calculatedCommandInformation.setCommandePrice(command.getCommandPrice());
     calculatedCommandInformation.setProductQuantity(command.getProductQuantity());
@@ -248,14 +248,33 @@ public class Factory {
     return registerCommand;
   }
 
-  public static CommandInformationDto getCommandInformationDto(RegisterCommandDto registerCommand, List<ProductWithQuantityDto> storeProductsWithQuantity) {
+  /**
+   * Renvoie un StoreProductsInformationDto
+   * @param registerCommand RegisterCommandDto
+   * @param storeProductsWithQuantity storeProductsWithQuantity
+   * @return StoreProductsInformationDto
+   */
+  public static StoreProductsInformationDto getCommandInformationDto(RegisterCommandDto registerCommand, List<ProductWithQuantityDto> storeProductsWithQuantity) {
 
     // Récupération du téléphone client
     String clientPhone = registerCommand == null ? null : registerCommand.getManualCommandInformation().getPhoneClient();
 
-    // Récupératuon du créneau de resa
-    LocalDateTime commandSlot = registerCommand == null ? null : registerCommand.getManualCommandInformation().getSlotTime();
+    return new StoreProductsInformationDto(storeProductsWithQuantity, clientPhone);
+  }
 
-    return new CommandInformationDto(storeProductsWithQuantity, clientPhone, commandSlot);
+  /**
+   * Renvoie un SlotAndStoreSchedule
+   * @param busySlots List<LocalDateTime> - Liste des creneaux occupés
+   * @param storeSchedules List<StoreDayScheduleEntity> - Horaires d'ouvertures
+   * @param slotTimeAvailibilityInOneDay List<LocalDateTime> - Liste des créneaux disponible sur 24h avant filtrage
+   * @return SlotAndStoreSchedule
+   */
+  public static SlotAndStoreSchedule getSlotAndStoreSchedule(
+          List<LocalDateTime> busySlots,
+          List<StoreDayScheduleEntity> storeSchedules,
+          List<LocalDateTime> slotTimeAvailibilityInOneDay) {
+  // Todo faire test unitaire
+    return new SlotAndStoreSchedule(storeSchedules, slotTimeAvailibilityInOneDay, busySlots);
+
   }
 }
