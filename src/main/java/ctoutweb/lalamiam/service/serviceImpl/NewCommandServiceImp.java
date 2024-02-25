@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class NewCommandServiceImp implements NewCommandService {
@@ -63,7 +64,7 @@ public class NewCommandServiceImp implements NewCommandService {
       throw new RuntimeException("Cette commande n'est pas rattaché au commerce");
 
     // Recherche d'une commande
-    return commandServiceHelper.findRegisterCommandInformation(storeId, command);
+    return commandServiceHelper.findRegisterCommandInformation(command);
   }
 
   @Override
@@ -78,7 +79,7 @@ public class NewCommandServiceImp implements NewCommandService {
 
 
     // Recherche d'une commande
-    RegisterCommandDto registerCommand = commandServiceHelper.findRegisterCommandInformation(storeId, command);
+    RegisterCommandDto registerCommand = commandServiceHelper.findRegisterCommandInformation(command);
 
     // Recherche des produits du commerce avec ajout des quantité de présente dans la commande
     List<ProductWithQuantityDto> findStoreProductsWithQuantity = commandServiceHelper.getStoreProductsWithCommandQuantity(storeId, registerCommand);
@@ -88,11 +89,11 @@ public class NewCommandServiceImp implements NewCommandService {
 
   @Override
   public void validateProductsSelection(BigInteger storeId, BigInteger commandId, ProductSelectInformationDto productSelectInformation) {
-    // Todo implementer les tests unitaires
     if(storeId == null)  throw new RuntimeException("Identifiant commerce obligatoire");
 
     // N°Tel
-    if(productSelectInformation.clientPhone() == null) throw new RuntimeException("Le numéro de téléphone est obligatoire");
+    if(productSelectInformation.clientPhone() == null || productSelectInformation.clientPhone().isEmpty())
+      throw new RuntimeException("Le numéro de téléphone est obligatoire");
 
     CommandEntity command = null;
     if(commandId != null) command = commandTransactionSession.getCommand(commandId);
@@ -102,7 +103,7 @@ public class NewCommandServiceImp implements NewCommandService {
       throw new RuntimeException("Cette commande n'est pas rattaché au commerce");
 
     // Verifier liste de produits > 0 et produit appartient au commerce
-    if(productSelectInformation.productSelectList().size() == 0)
+    if(productSelectInformation.productSelectList() ==null || productSelectInformation.productSelectList().size() == 0)
       throw new RuntimeException("La commande ne peut pas être vide");
 
     productSelectInformation.productSelectList().forEach(productWithQuantity -> {
@@ -123,7 +124,8 @@ public class NewCommandServiceImp implements NewCommandService {
 
   @Override
   public List<LocalDateTime> getStoreSlotAvailibility (CommandInformationDto commandInformation) {
-
+    // Todo rajouter le creneau selectionné si modification d'une commande
+    // Todo mettre a jour test unitaire
     // Date de la commande
     LocalDate refCommandDate = commandInformation.commandId() == null ? LocalDate.now() : commandInformation.commandDate();
 
@@ -158,13 +160,76 @@ public class NewCommandServiceImp implements NewCommandService {
   }
 
   @Override
-  public void validateSlot() {
+  public void validateSlot(CommandInformationDto commandInformation, LocalDateTime selectSlotTime) {
+    // Todo Test unitaire
+    // Récuperation des créneaux disponible
+    List<LocalDateTime> storeAvailibiltySlots = getStoreSlotAvailibility(commandInformation);
 
+    if(storeAvailibiltySlots
+            .stream()
+            .filter(storeSlot->selectSlotTime.equals(storeSlot))
+            .collect(Collectors.toList())
+            .size() == 0) throw new RuntimeException("Le créneau demandé n'est plus disponible");
   }
 
   @Override
-  public RegisterCommandDto persistCommand() {
-    return null;
+  public RegisterCommandDto persistCommand(PersitCommandDto persitCommand) {
+    // Todo Implementer les tests unitaires
+
+    final int COMMAND_CODE_LENGTH = 5;
+
+    ProductSelectInformationDto productSelectInformation = Factory.getProductSelectInformationDto(
+            persitCommand.selectProducts(),
+            persitCommand.clientPhone()
+    );
+
+
+    CommandInformationDto commandInformation = Factory.getCommandInformationDto(
+            persitCommand.storeId(),
+            persitCommand.commandId(),
+            persitCommand.commandDate(),
+            persitCommand.consultationDate(),
+            persitCommand.selectProducts()
+    );
+
+    // Verification validité de la commande
+    validateProductsSelection(commandInformation.storeId(), commandInformation.commandId(), productSelectInformation);
+
+    // Validation du creneau de la commande
+    validateSlot(commandInformation,persitCommand.selectSlotTime());
+
+    // Code de la commande
+    String commandCode = commandServiceHelper.generateCode(COMMAND_CODE_LENGTH);
+
+    // Calcul du temps de preparation
+    Integer preparationTime = commandServiceHelper.calculateCommandPreparationTime(persitCommand.selectProducts());
+
+    // Calcul du prix de la commande
+    Double commandPrice = commandServiceHelper.calculateCommandPrice(persitCommand.selectProducts());
+
+    // Calcul du nombre de produit
+    Integer numberOfProductInCommand = commandServiceHelper.calculateNumberOfProductInCommand(persitCommand.selectProducts());
+
+    CommandEntity command = persitCommand.commandId() == null ?
+
+      commandTransactionSession.saveCommand(
+        Factory.getCommandInformationToSave(
+          persitCommand,
+          commandCode,
+          preparationTime,
+          numberOfProductInCommand,
+          commandPrice
+        )):
+      commandTransactionSession.updateCommand(
+        Factory.getCommandInformationToUpdate(
+          persitCommand,
+          preparationTime,
+          numberOfProductInCommand,
+          commandPrice
+        ));
+
+    return commandServiceHelper.findRegisterCommandInformation(command);
+
   }
 
 

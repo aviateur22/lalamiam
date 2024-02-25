@@ -112,7 +112,6 @@ public class NewCommandServiceHelperTest {
             productService);
 
     RegisterCommandDto registerCommand = commandServiceHelper.findRegisterCommandInformation(
-            BigInteger.valueOf(1),
             null
     );
 
@@ -146,7 +145,6 @@ public class NewCommandServiceHelperTest {
             productService);
 
     RegisterCommandDto registerCommand = commandServiceHelper.findRegisterCommandInformation(
-            storeId,
             getFakeCommandEntity(storeId, commandId)
     );
 
@@ -224,6 +222,167 @@ public class NewCommandServiceHelperTest {
     Integer commandPreparationTime = commandServiceHelper.calculateCommandPreparationTime(Arrays.asList());
 
     Assertions.assertNull(commandPreparationTime);
+  }
+  @Test
+  void calculateCommandPrice_with_products() {
+
+    // Mock CommandProductService
+    CommandProductService commandProductService = mock(CommandProductService.class);
+
+    // ProductQuantityMapper
+    ProductQuantityMapper productQuantityMapper = new ProductQuantityMapper();
+
+    // Mock ProductService
+    ProductService productService = mock(ProductService.class);
+    when(productService.findProduct(BigInteger.valueOf(1))).thenReturn(
+            fakeStoreProductEntiy()
+                    .stream()
+                    .filter(product -> product.getId().equals(BigInteger.valueOf(1))).findFirst()
+                    .orElseThrow(()->new RuntimeException("")));
+
+    when(productService.findProduct(BigInteger.valueOf(2))).thenReturn(
+            fakeStoreProductEntiy()
+                    .stream()
+                    .filter(product -> product.getId().equals(BigInteger.valueOf(2))).findFirst()
+                    .orElseThrow(()->new RuntimeException("")));
+
+    when(productService.findProduct(BigInteger.valueOf(3))).thenReturn(
+            fakeStoreProductEntiy()
+                    .stream()
+                    .filter(product -> product.getId().equals(BigInteger.valueOf(3))).findFirst()
+                    .orElseThrow(()->new RuntimeException("")));
+
+    when(productService.findProduct(BigInteger.valueOf(4))).thenReturn(
+            fakeStoreProductEntiy()
+                    .stream()
+                    .filter(product -> product.getId().equals(BigInteger.valueOf(4))).findFirst()
+                    .orElseThrow(()->new RuntimeException("")));
+
+    NewCommandServiceHelper commandServiceHelper = new NewCommandServiceHelper(
+            commandProductService,
+            productQuantityMapper,
+            productService
+    );
+
+    Double commandPrice = commandServiceHelper.calculateCommandPrice(getFakeProductList());
+
+    Assertions.assertEquals(37D, commandPrice);
+  }
+  @Test
+  void calculateCommandPrice_without_products() {
+
+    // Mock CommandProductService
+    CommandProductService commandProductService = mock(CommandProductService.class);
+
+    // ProductQuantityMapper
+    ProductQuantityMapper productQuantityMapper = new ProductQuantityMapper();
+
+    // Mock ProductService
+    ProductService productService = mock(ProductService.class);
+
+    NewCommandServiceHelper commandServiceHelper = new NewCommandServiceHelper(
+            commandProductService,
+            productQuantityMapper,
+            productService
+    );
+
+    Double commandPrice = commandServiceHelper.calculateCommandPrice(Arrays.asList());
+
+    Assertions.assertNull(commandPrice);
+  }
+  @Test
+  void calculateNumberOfProductInCommand_with_products() {
+
+    // Mock CommandProductService
+    CommandProductService commandProductService = mock(CommandProductService.class);
+
+    // ProductQuantityMapper
+    ProductQuantityMapper productQuantityMapper = new ProductQuantityMapper();
+
+    // Mock ProductService
+    ProductService productService = mock(ProductService.class);
+    when(productService.findProduct(BigInteger.valueOf(1))).thenReturn(
+            fakeStoreProductEntiy()
+                    .stream()
+                    .filter(product -> product.getId().equals(BigInteger.valueOf(1))).findFirst()
+                    .orElseThrow(()->new RuntimeException("")));
+
+    when(productService.findProduct(BigInteger.valueOf(2))).thenReturn(
+            fakeStoreProductEntiy()
+                    .stream()
+                    .filter(product -> product.getId().equals(BigInteger.valueOf(2))).findFirst()
+                    .orElseThrow(()->new RuntimeException("")));
+
+    when(productService.findProduct(BigInteger.valueOf(3))).thenReturn(
+            fakeStoreProductEntiy()
+                    .stream()
+                    .filter(product -> product.getId().equals(BigInteger.valueOf(3))).findFirst()
+                    .orElseThrow(()->new RuntimeException("")));
+
+    when(productService.findProduct(BigInteger.valueOf(4))).thenReturn(
+            fakeStoreProductEntiy()
+                    .stream()
+                    .filter(product -> product.getId().equals(BigInteger.valueOf(4))).findFirst()
+                    .orElseThrow(()->new RuntimeException("")));
+
+    NewCommandServiceHelper commandServiceHelper = new NewCommandServiceHelper(
+            commandProductService,
+            productQuantityMapper,
+            productService
+    );
+
+    Integer numberOfProductInCommand = commandServiceHelper.calculateNumberOfProductInCommand(getFakeProductList());
+
+    Assertions.assertEquals(5, numberOfProductInCommand);
+  }
+  @Test
+  void calculateNumberOfProductInCommand_without_products() {
+
+    // Mock CommandProductService
+    CommandProductService commandProductService = mock(CommandProductService.class);
+
+    // ProductQuantityMapper
+    ProductQuantityMapper productQuantityMapper = new ProductQuantityMapper();
+
+    // Mock ProductService
+    ProductService productService = mock(ProductService.class);
+
+    NewCommandServiceHelper commandServiceHelper = new NewCommandServiceHelper(
+            commandProductService,
+            productQuantityMapper,
+            productService
+    );
+
+    Integer numberOfProductInCommand = commandServiceHelper.calculateNumberOfProductInCommand(Arrays.asList());
+
+    Assertions.assertNull(numberOfProductInCommand);
+  }
+
+  @Test
+  void generateCode() {
+    // Mock CommandProductService
+    CommandProductService commandProductService = mock(CommandProductService.class);
+
+    // ProductQuantityMapper
+    ProductQuantityMapper productQuantityMapper = new ProductQuantityMapper();
+
+    // Mock ProductService
+    ProductService productService = mock(ProductService.class);
+
+    NewCommandServiceHelper commandServiceHelper = new NewCommandServiceHelper(
+            commandProductService,
+            productQuantityMapper,
+            productService
+    );
+
+    String generateCode6CaracLength = commandServiceHelper.generateCode(6);
+    String generateCode7CaracLength = commandServiceHelper.generateCode(7);
+
+    Assertions.assertEquals(6, generateCode6CaracLength.length());
+    Assertions.assertEquals(7, generateCode7CaracLength.length());
+
+
+
   }
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -356,10 +515,10 @@ public class NewCommandServiceHelperTest {
    */
   private List<ProductEntity> fakeStoreProductEntiy() {
     return Arrays.asList(
-            new ProductEntity(BigInteger.valueOf(1), "test", 15D,  "photo", 4, "photo", true),
-            new ProductEntity(BigInteger.valueOf(2), "test", 15D,  "photo", 7, "photo", true),
-            new ProductEntity(BigInteger.valueOf(3), "test", 15D,  "photo", 5, "photo", true),
-            new ProductEntity(BigInteger.valueOf(4), "test", 15D,  "photo", 6, "photo", true),
+            new ProductEntity(BigInteger.valueOf(1), "test", 10D,  "photo", 4, "photo", true),
+            new ProductEntity(BigInteger.valueOf(2), "test", 5D,  "photo", 7, "photo", true),
+            new ProductEntity(BigInteger.valueOf(3), "test", 7D,  "photo", 5, "photo", true),
+            new ProductEntity(BigInteger.valueOf(4), "test", 10D,  "photo", 6, "photo", true),
             new ProductEntity(BigInteger.valueOf(5), "test", 15D,  "photo", 10, "photo", true),
             new ProductEntity(BigInteger.valueOf(6), "test", 15D,  "photo", 10, "photo", true),
             new ProductEntity(BigInteger.valueOf(7), "test", 15D,  "photo", 10, "photo", true),

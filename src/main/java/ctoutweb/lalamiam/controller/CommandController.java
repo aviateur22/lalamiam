@@ -1,10 +1,10 @@
 package ctoutweb.lalamiam.controller;
 
 import ctoutweb.lalamiam.model.dto.*;
-import ctoutweb.lalamiam.service.CommandService;
+
+import ctoutweb.lalamiam.service.NewCommandService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
@@ -12,20 +12,24 @@ import java.math.BigInteger;
 @RestController
 @RequestMapping("api/lalamiam/v1/command")
 public class CommandController {
-  private final CommandService commandService;
+  private final NewCommandService commandService;
 
-  public CommandController(CommandService commandService) {
+  public CommandController(NewCommandService commandService) {
     this.commandService = commandService;
   }
 
-  @PostMapping("/")
-  ResponseEntity<CompleteCommandDetailResponseDto> AddCommand(@RequestBody AddCommandDto addCommandSchema) {
-    CompleteCommandDetailResponseDto addCommand = commandService.addCommand(addCommandSchema);
+  @GetMapping("/create/{storeId}")
+  ResponseEntity<StoreProductsInformationDto> createCommand(@RequestParam BigInteger storeId) {
+    StoreProductsInformationDto addCommand = commandService.createCommand(storeId);
     return new ResponseEntity<>(addCommand, HttpStatus.OK);
   }
-  @PatchMapping("/update-product-quantity-in-command")
-  UpdateProductQuantityResponseDto updateProductQuantity(@RequestBody UpdateProductQuantityDto updateProductQuantity) {
-    return commandService.updateProductQuantityInCommand(updateProductQuantity);
+  @GetMapping("/update/{storeId}/command/{commandId}")
+  ResponseEntity<StoreProductsInformationDto> updateCommand(@RequestParam BigInteger storeId, BigInteger commandId) {
+    return new ResponseEntity<>(commandService.updateCommand(storeId, commandId), HttpStatus.OK);
+  }
+  @GetMapping("/get/{storeId}/command/{commandId}")
+  ResponseEntity<RegisterCommandDto> getCommand(@RequestParam BigInteger storeId, BigInteger commandId) {
+    return new ResponseEntity<>(commandService.getCommand(storeId, commandId), HttpStatus.OK);
   }
 
 }

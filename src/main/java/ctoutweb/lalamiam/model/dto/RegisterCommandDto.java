@@ -6,7 +6,7 @@ import ctoutweb.lalamiam.model.ManualCommandInformation;
 import java.math.BigInteger;
 
 /**
- * Contient l'ensemble des données d'un commande
+ * Contient l'ensemble des données d'un commande qui se trouve en base de données
  */
 public class RegisterCommandDto {
   private BigInteger storeId;

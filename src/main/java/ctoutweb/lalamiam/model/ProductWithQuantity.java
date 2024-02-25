@@ -6,11 +6,6 @@ public class ProductWithQuantity {
   private BigInteger productId;
   private Integer productQuantity;
 
-
-  /**
-   *
-   */
-
   public ProductWithQuantity() {
   }
 

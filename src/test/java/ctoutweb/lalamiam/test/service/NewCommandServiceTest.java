@@ -28,8 +28,7 @@ import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 public class NewCommandServiceTest {
@@ -295,7 +294,413 @@ NewCommandServiceImp commandService;
 
   }
   @Test
-  void validateProductsSelection() {}
+  void validateProductsSelection_() {
+    BigInteger storeId = BigInteger.valueOf(1);
+    BigInteger commandId = BigInteger.valueOf(1);
+    String clientPhone = "06402101";
+    List<ProductWithQuantity> productsSelect = getFakeProductWithQuantityList();
+
+    ProductSelectInformationDto productSelectInformation = new ProductSelectInformationDto(
+            productsSelect,
+            clientPhone
+    );
+
+    // Mock NewCommandServiceHelper
+    NewCommandServiceHelper commandServiceHelper = mock(NewCommandServiceHelper.class);
+
+    // Mock CommandTransactionSession
+    CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
+    when(commandTransactionSession.getCommand(commandId)).thenReturn(getFakeCommandEntity(
+            storeId,
+            commandId,
+            LocalDateTime.now()));
+
+    // Mock CommandRepository
+    CommandRepository commandRepository = mock(CommandRepository.class);
+
+    // Mock ProductService
+    ProductService productService = mock(ProductService.class);
+    when(productService.findProduct(any(BigInteger.class))).thenReturn(getFakeProduct(storeId, BigInteger.valueOf(1)));
+
+    // Mock NewSlotHelper
+    NewSlotHelper slotHelper = mock(NewSlotHelper.class);
+
+    NewCommandServiceImp commandService = new NewCommandServiceImp(
+            commandServiceHelper,
+            commandTransactionSession,
+            commandRepository,
+            productService,
+            slotHelper
+    );
+
+    commandService.validateProductsSelection(storeId, commandId, productSelectInformation);
+
+
+  }
+  @Test
+  void validateProductsSelection_without_command_id() {
+    BigInteger storeId = BigInteger.valueOf(1);
+    BigInteger commandId = null;
+    String clientPhone = "0623471";
+    List<ProductWithQuantity> productsSelect = getFakeProductWithQuantityList();
+
+    ProductSelectInformationDto productSelectInformation = new ProductSelectInformationDto(
+            productsSelect,
+            clientPhone
+    );
+
+    // Mock NewCommandServiceHelper
+    NewCommandServiceHelper commandServiceHelper = mock(NewCommandServiceHelper.class);
+
+    // Mock CommandTransactionSession
+    CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
+
+    // Mock CommandRepository
+    CommandRepository commandRepository = mock(CommandRepository.class);
+
+    // Mock ProductService
+    ProductService productService = mock(ProductService.class);
+    when(productService.findProduct(any(BigInteger.class))).thenReturn(getFakeProduct(storeId, BigInteger.valueOf(1)));
+
+    // Mock NewSlotHelper
+    NewSlotHelper slotHelper = mock(NewSlotHelper.class);
+
+    NewCommandServiceImp commandService = new NewCommandServiceImp(
+            commandServiceHelper,
+            commandTransactionSession,
+            commandRepository,
+            productService,
+            slotHelper
+    );
+
+    commandService.validateProductsSelection(storeId, commandId, productSelectInformation);
+
+  }
+  @Test
+  void validateProductsSelection_with_command_not_belong_to_store() {
+    BigInteger storeId = BigInteger.valueOf(1);
+    BigInteger commandId = BigInteger.valueOf(1);
+    String clientPhone = "0623471";
+    List<ProductWithQuantity> productsSelect = getFakeProductWithQuantityList();
+
+    ProductSelectInformationDto productSelectInformation = new ProductSelectInformationDto(
+            productsSelect,
+            clientPhone
+    );
+
+    // Mock NewCommandServiceHelper
+    NewCommandServiceHelper commandServiceHelper = mock(NewCommandServiceHelper.class);
+
+    // Mock CommandTransactionSession
+    CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
+    when(commandTransactionSession.getCommand(commandId)).thenReturn(getFakeCommandEntity(
+            BigInteger.valueOf(2),
+            commandId,
+            LocalDateTime.now()));
+
+    // Mock CommandRepository
+    CommandRepository commandRepository = mock(CommandRepository.class);
+
+    // Mock ProductService
+    ProductService productService = mock(ProductService.class);
+    when(productService.findProduct(any(BigInteger.class))).thenReturn(getFakeProduct(storeId, BigInteger.valueOf(1)));
+
+    // Mock NewSlotHelper
+    NewSlotHelper slotHelper = mock(NewSlotHelper.class);
+
+    NewCommandServiceImp commandService = new NewCommandServiceImp(
+            commandServiceHelper,
+            commandTransactionSession,
+            commandRepository,
+            productService,
+            slotHelper
+    );
+
+    Exception exception = Assertions.assertThrows(RuntimeException.class, ()->commandService.validateProductsSelection(
+            storeId,
+            commandId,
+            productSelectInformation)
+    );
+    Assertions.assertEquals("Cette commande n'est pas rattaché au commerce", exception.getMessage());
+
+  }
+  @Test
+  void validateProductsSelection_without_phone() {
+    BigInteger storeId = BigInteger.valueOf(1);
+    BigInteger commandId = BigInteger.valueOf(1);
+    String clientPhone = "";
+    List<ProductWithQuantity> productsSelect = getFakeProductWithQuantityList();
+
+    ProductSelectInformationDto productSelectInformation = new ProductSelectInformationDto(
+            productsSelect,
+            clientPhone
+    );
+
+    // Mock NewCommandServiceHelper
+    NewCommandServiceHelper commandServiceHelper = mock(NewCommandServiceHelper.class);
+
+    // Mock CommandTransactionSession
+    CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
+    when(commandTransactionSession.getCommand(commandId)).thenReturn(getFakeCommandEntity(
+            storeId,
+            commandId,
+            LocalDateTime.now()));
+    // Mock CommandRepository
+    CommandRepository commandRepository = mock(CommandRepository.class);
+
+    // Mock ProductService
+    ProductService productService = mock(ProductService.class);
+    when(productService.findProduct(any(BigInteger.class))).thenReturn(getFakeProduct(storeId, BigInteger.valueOf(1)));
+
+    // Mock NewSlotHelper
+    NewSlotHelper slotHelper = mock(NewSlotHelper.class);
+
+    NewCommandServiceImp commandService = new NewCommandServiceImp(
+            commandServiceHelper,
+            commandTransactionSession,
+            commandRepository,
+            productService,
+            slotHelper
+    );
+
+    Exception exception = Assertions.assertThrows(RuntimeException.class, ()->commandService.validateProductsSelection(storeId, commandId, productSelectInformation));
+    Assertions.assertEquals("Le numéro de téléphone est obligatoire", exception.getMessage());
+
+  }
+  @Test
+  void validateProductsSelection_with_empty_command() {
+    BigInteger storeId = BigInteger.valueOf(1);
+    BigInteger commandId = BigInteger.valueOf(1);
+    String clientPhone = "062357";
+    List<ProductWithQuantity> productsSelect = Arrays.asList();
+
+    ProductSelectInformationDto productSelectInformation = new ProductSelectInformationDto(
+            productsSelect,
+            clientPhone
+    );
+
+    // Mock NewCommandServiceHelper
+    NewCommandServiceHelper commandServiceHelper = mock(NewCommandServiceHelper.class);
+
+    // Mock CommandTransactionSession
+    CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
+    when(commandTransactionSession.getCommand(commandId)).thenReturn(getFakeCommandEntity(
+            storeId,
+            commandId,
+            LocalDateTime.now()));
+
+    // Mock CommandRepository
+    CommandRepository commandRepository = mock(CommandRepository.class);
+
+    // Mock ProductService
+    ProductService productService = mock(ProductService.class);
+    when(productService.findProduct(any(BigInteger.class))).thenReturn(getFakeProduct(storeId, BigInteger.valueOf(1)));
+
+    // Mock NewSlotHelper
+    NewSlotHelper slotHelper = mock(NewSlotHelper.class);
+
+    NewCommandServiceImp commandService = new NewCommandServiceImp(
+            commandServiceHelper,
+            commandTransactionSession,
+            commandRepository,
+            productService,
+            slotHelper
+    );
+
+    Exception exception = Assertions.assertThrows(RuntimeException.class, ()->commandService.validateProductsSelection(storeId, commandId, productSelectInformation));
+    Assertions.assertEquals("La commande ne peut pas être vide", exception.getMessage());
+
+  }
+  @Test
+  void validateProductsSelection_with_null_command() {
+    BigInteger storeId = BigInteger.valueOf(1);
+    BigInteger commandId = BigInteger.valueOf(1);
+    String clientPhone = "062357";
+    List<ProductWithQuantity> productsSelect = null;
+
+    ProductSelectInformationDto productSelectInformation = new ProductSelectInformationDto(
+            productsSelect,
+            clientPhone
+    );
+
+    // Mock NewCommandServiceHelper
+    NewCommandServiceHelper commandServiceHelper = mock(NewCommandServiceHelper.class);
+
+    // Mock CommandTransactionSession
+    CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
+    when(commandTransactionSession.getCommand(commandId)).thenReturn(getFakeCommandEntity(
+            storeId,
+            commandId,
+            LocalDateTime.now()));
+
+    // Mock CommandRepository
+    CommandRepository commandRepository = mock(CommandRepository.class);
+
+    // Mock ProductService
+    ProductService productService = mock(ProductService.class);
+    when(productService.findProduct(any(BigInteger.class))).thenReturn(getFakeProduct(storeId, BigInteger.valueOf(1)));
+
+    // Mock NewSlotHelper
+    NewSlotHelper slotHelper = mock(NewSlotHelper.class);
+
+    NewCommandServiceImp commandService = new NewCommandServiceImp(
+            commandServiceHelper,
+            commandTransactionSession,
+            commandRepository,
+            productService,
+            slotHelper
+    );
+
+    Exception exception = Assertions.assertThrows(RuntimeException.class, ()->commandService.validateProductsSelection(storeId, commandId, productSelectInformation));
+    Assertions.assertEquals("La commande ne peut pas être vide", exception.getMessage());
+
+  }
+  @Test
+  void validateProductsSelection_with_product_not_belong_to_store() {
+    BigInteger storeId = BigInteger.valueOf(1);
+    BigInteger commandId = BigInteger.valueOf(1);
+    String clientPhone = "062357";
+    List<ProductWithQuantity> productsSelect = getFakeProductWithQuantityList();
+
+    ProductSelectInformationDto productSelectInformation = new ProductSelectInformationDto(
+            productsSelect,
+            clientPhone
+    );
+
+    // Mock NewCommandServiceHelper
+    NewCommandServiceHelper commandServiceHelper = mock(NewCommandServiceHelper.class);
+
+    // Mock CommandTransactionSession
+    CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
+    when(commandTransactionSession.getCommand(commandId)).thenReturn(getFakeCommandEntity(
+            storeId,
+            commandId,
+            LocalDateTime.now()));
+
+    // Mock CommandRepository
+    CommandRepository commandRepository = mock(CommandRepository.class);
+
+    // Mock ProductService ProdutcId1
+    ProductService productService = mock(ProductService.class);
+    when(productService.findProduct(BigInteger.valueOf(1))).thenReturn(getFakeProductNotBelongToStore(BigInteger.valueOf(1)));
+
+    when(productService.findProduct(BigInteger.valueOf(2))).thenReturn(getFakeProductNotBelongToStore(BigInteger.valueOf(2)));
+
+    when(productService.findProduct(BigInteger.valueOf(3))).thenReturn(getFakeProductNotBelongToStore(BigInteger.valueOf(3)));
+
+    when(productService.findProduct(BigInteger.valueOf(4))).thenReturn(getFakeProductNotBelongToStore(BigInteger.valueOf(4)));
+
+
+    // Mock NewSlotHelper
+    NewSlotHelper slotHelper = mock(NewSlotHelper.class);
+
+    NewCommandServiceImp commandService = new NewCommandServiceImp(
+            commandServiceHelper,
+            commandTransactionSession,
+            commandRepository,
+            productService,
+            slotHelper
+    );
+
+    Exception exception = Assertions.assertThrows(RuntimeException.class, ()->commandService.validateProductsSelection(storeId, commandId, productSelectInformation));
+    Assertions.assertEquals("Le produit coco n'est pas référencé dans ce commerce", exception.getMessage());
+
+  }
+  @Test
+  void validateProductsSelection_with_product_not_available() {
+    BigInteger storeId = BigInteger.valueOf(1);
+    BigInteger commandId = BigInteger.valueOf(1);
+    String clientPhone = "062357";
+    List<ProductWithQuantity> productsSelect = getFakeProductWithQuantityList();
+
+    ProductSelectInformationDto productSelectInformation = new ProductSelectInformationDto(
+            productsSelect,
+            clientPhone
+    );
+
+    // Mock NewCommandServiceHelper
+    NewCommandServiceHelper commandServiceHelper = mock(NewCommandServiceHelper.class);
+
+    // Mock CommandTransactionSession
+    CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
+    when(commandTransactionSession.getCommand(commandId)).thenReturn(getFakeCommandEntity(
+            storeId,
+            commandId,
+            LocalDateTime.now()));
+
+    // Mock CommandRepository
+    CommandRepository commandRepository = mock(CommandRepository.class);
+
+    // Mock ProductService ProdutcId1
+    ProductService productService = mock(ProductService.class);
+    when(productService.findProduct(BigInteger.valueOf(1))).thenReturn(getFakeProductNotAvailable(BigInteger.valueOf(1)));
+
+    when(productService.findProduct(BigInteger.valueOf(2))).thenReturn(getFakeProductNotAvailable(BigInteger.valueOf(2)));
+
+    when(productService.findProduct(BigInteger.valueOf(3))).thenReturn(getFakeProductNotAvailable(BigInteger.valueOf(3)));
+
+    when(productService.findProduct(BigInteger.valueOf(4))).thenReturn(getFakeProductNotAvailable(BigInteger.valueOf(4)));
+
+
+    // Mock NewSlotHelper
+    NewSlotHelper slotHelper = mock(NewSlotHelper.class);
+
+    NewCommandServiceImp commandService = new NewCommandServiceImp(
+            commandServiceHelper,
+            commandTransactionSession,
+            commandRepository,
+            productService,
+            slotHelper
+    );
+
+    Exception exception = Assertions.assertThrows(RuntimeException.class, ()->commandService.validateProductsSelection(storeId, commandId, productSelectInformation));
+    Assertions.assertEquals("Le produit coco n'est plus disponible", exception.getMessage());
+
+  }
+  @Test
+  void validateProductsSelection_without_product_quantity() {
+    BigInteger storeId = BigInteger.valueOf(1);
+    BigInteger commandId = BigInteger.valueOf(1);
+    String clientPhone = "062357";
+    List<ProductWithQuantity> productsSelect = getFakeProductWithoutQuantityList();
+
+    ProductSelectInformationDto productSelectInformation = new ProductSelectInformationDto(
+            productsSelect,
+            clientPhone
+    );
+
+    // Mock NewCommandServiceHelper
+    NewCommandServiceHelper commandServiceHelper = mock(NewCommandServiceHelper.class);
+
+    // Mock CommandTransactionSession
+    CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
+    when(commandTransactionSession.getCommand(commandId)).thenReturn(getFakeCommandEntity(
+            storeId,
+            commandId,
+            LocalDateTime.now()));
+
+    // Mock CommandRepository
+    CommandRepository commandRepository = mock(CommandRepository.class);
+
+    // Mock ProductService ProdutcId1
+    ProductService productService = mock(ProductService.class);
+    when(productService.findProduct(BigInteger.valueOf(1))).thenReturn(getFakeProduct(storeId, BigInteger.valueOf(1)));
+
+    // Mock NewSlotHelper
+    NewSlotHelper slotHelper = mock(NewSlotHelper.class);
+
+    NewCommandServiceImp commandService = new NewCommandServiceImp(
+            commandServiceHelper,
+            commandTransactionSession,
+            commandRepository,
+            productService,
+            slotHelper
+    );
+
+    Exception exception = Assertions.assertThrows(RuntimeException.class, ()->commandService.validateProductsSelection(storeId, commandId, productSelectInformation));
+    Assertions.assertEquals("Merci d'indiquer la quantité pour le produit coco", exception.getMessage());
+
+  }
   @Test
   void getStoreSlotAvailibility_without_commands_in_store() {
 
@@ -311,7 +716,7 @@ NewCommandServiceImp commandService;
             commandId,
             commandDate,
             consulationDate,
-            getFakeProductList()
+            getFakeProductWithQuantityList()
     );
 
     // Mock StoreService
@@ -370,7 +775,7 @@ NewCommandServiceImp commandService;
             commandId,
             commandDate,
             consulationDate,
-            getFakeProductList()
+            getFakeProductWithQuantityList()
     );
 
     // Mock StoreService
@@ -436,7 +841,7 @@ NewCommandServiceImp commandService;
             commandId,
             commandDate,
             consulationDate,
-            getFakeProductList()
+            getFakeProductWithQuantityList()
     );
 
     // Mock StoreService
@@ -495,7 +900,7 @@ NewCommandServiceImp commandService;
             commandId,
             commandDate,
             consulationDate,
-            getFakeProductList()
+            getFakeProductWithQuantityList()
     );
 
     // Mock StoreService
@@ -560,6 +965,21 @@ NewCommandServiceImp commandService;
             new CommandProductEntity(3, new ProductEntity(BigInteger.valueOf(3),"test", 1D , "description", 5,"photo", true)),
             new CommandProductEntity(4, new ProductEntity(BigInteger.valueOf(4),"test", 1D , "description", 5,"photo", true))
     );
+  }
+
+  /**
+   * Fake productEntity
+   * @param storeId BigInteger
+   * @param productId storeId
+   * @return ProductEntity
+   */
+  private ProductEntity getFakeProduct(BigInteger storeId, BigInteger productId) {
+    ProductEntity product = new ProductEntity(productId);
+    product.setStore(new StoreEntity(storeId));
+    product.setName("coco");
+    product.setIsAvail(true);
+    return product;
+
   }
 
   /**
@@ -801,7 +1221,7 @@ NewCommandServiceImp commandService;
    * Fake Renvoie une fausse liste de produits dans une commande
    * @return List<ProductWithQuantity>
    */
-  private List<ProductWithQuantity> getFakeProductList() {
+  private List<ProductWithQuantity> getFakeProductWithQuantityList() {
     ProductWithQuantity productWithQuantity1 = new ProductWithQuantity(BigInteger.valueOf(1), 2);
     ProductWithQuantity productWithQuantity2 = new ProductWithQuantity(BigInteger.valueOf(2),2);
     ProductWithQuantity productWithQuantity3 = new ProductWithQuantity(BigInteger.valueOf(3),1);
@@ -811,5 +1231,81 @@ NewCommandServiceImp commandService;
 
   }
 
+  /**
+   * Fake Renvoie une fausse liste de produits dans une commande
+   * @return List<ProductWithQuantity>
+   */
+  private List<ProductWithQuantity> getFakeProductWithoutQuantityList() {
+    ProductWithQuantity productWithQuantity1 = new ProductWithQuantity(BigInteger.valueOf(1), 0);
+    ProductWithQuantity productWithQuantity2 = new ProductWithQuantity(BigInteger.valueOf(2),2);
+    ProductWithQuantity productWithQuantity3 = new ProductWithQuantity(BigInteger.valueOf(3),1);
+
+    return Arrays.asList(productWithQuantity1, productWithQuantity2, productWithQuantity3);
+
+
+  }
+
+  /**
+   * Fake d'un produit n'appartenant au commerce
+   * @param productId BigInteger - Identifiant Produit
+   * @return ProductEntity
+   */
+  private ProductEntity getFakeProductNotBelongToStore(BigInteger productId) {
+    ProductEntity product1 = new ProductEntity(productId);
+    product1.setStore(new StoreEntity(BigInteger.valueOf(10)));
+    product1.setName("coco");
+    product1.setIsAvail(true);
+
+    ProductEntity product2 = new ProductEntity(productId);
+    product2.setStore(new StoreEntity(BigInteger.valueOf(10)));
+    product2.setIsAvail(true);
+
+    ProductEntity product3 = new ProductEntity(productId);
+    product3.setStore(new StoreEntity(BigInteger.valueOf(10)));
+    product3.setIsAvail(true);
+
+    ProductEntity product4 = new ProductEntity(productId);
+    product4.setStore(new StoreEntity(BigInteger.valueOf(10)));
+    product4.setIsAvail(true);
+
+
+    List<ProductEntity> storeProducts = Arrays.asList(
+          product1, product2, product3, product4
+    );
+
+    return storeProducts.stream().filter(product->productId.equals(product.getId())).findFirst().orElse(null);
+  }
+
+  /**
+   * Fake d'un produit n'ayant pas de dsiponiobilité
+   * @param productId BigInteger - Identifiant Produit
+   * @return ProductEntity
+   */
+  private ProductEntity getFakeProductNotAvailable(BigInteger productId) {
+    ProductEntity product1 = new ProductEntity(productId);
+    product1.setStore(new StoreEntity(BigInteger.valueOf(1)));
+    product1.setName("coco");
+    product1.setIsAvail(false);
+
+    ProductEntity product2 = new ProductEntity(productId);
+    product2.setStore(new StoreEntity(BigInteger.valueOf(10)));
+    product2.setIsAvail(true);
+
+    ProductEntity product3 = new ProductEntity(productId);
+    product3.setStore(new StoreEntity(BigInteger.valueOf(10)));
+    product3.setIsAvail(true);
+
+    ProductEntity product4 = new ProductEntity(productId);
+    product4.setStore(new StoreEntity(BigInteger.valueOf(10)));
+    product4.setIsAvail(true);
+
+
+    List<ProductEntity> storeProducts = Arrays.asList(
+            product1, product2, product3, product4
+    );
+
+    return storeProducts.stream().filter(product->productId.equals(product.getId())).findFirst().orElse(null);
+  }
 
 }
+

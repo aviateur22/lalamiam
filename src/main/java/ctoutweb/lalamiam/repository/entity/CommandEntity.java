@@ -1,8 +1,7 @@
 package ctoutweb.lalamiam.repository.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import ctoutweb.lalamiam.factory.Factory;
-import ctoutweb.lalamiam.model.CalculateCommandDetail;
+import ctoutweb.lalamiam.model.CommandInformationToSave;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -12,7 +11,6 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Table(name = "command")
@@ -71,21 +69,25 @@ public class CommandEntity implements Serializable {
     this.id = commandId;
   }
 
-  public CommandEntity(
-          CalculateCommandDetail calculateCommandDetail,
-          String commandCode,
-          LocalDateTime slotTime,
-          BigInteger storeId,
-          String clientPhone
-  ) {
-    this.preparationTime = calculateCommandDetail.commandPreparationTime();
-    this.productQuantity = calculateCommandDetail.numberOProductInCommand();
-    this.commandPrice = calculateCommandDetail.commandPrice();
-    this.commandCode = commandCode;
-    this.slotTime = slotTime;
-    this.store = Factory.getStore(storeId);
+  public CommandEntity(BigInteger id, String clientPhone, Integer preparationTime, Double commandPrice, LocalDateTime slotTime, String commandCode, Integer productQuantity, List<CommandProductEntity> commandProducts, StoreEntity store, LocalDateTime updatedAt) {
+    this.id = id;
     this.clientPhone = clientPhone;
-    this.isReady = false;
+    this.preparationTime = preparationTime;
+    this.commandPrice = commandPrice;
+    this.slotTime = slotTime;
+    this.productQuantity = productQuantity;
+    this.commandProducts = commandProducts;
+    this.updatedAt = updatedAt;
+  }
+
+  public CommandEntity(CommandInformationToSave commandInformationToSave) {
+    this.store = Factory.getStore(commandInformationToSave.storeId());
+    this.clientPhone = commandInformationToSave.clientPhone();
+    this.commandCode = commandInformationToSave.commandCode();
+    this.preparationTime = commandInformationToSave.preparationTime();
+    this.commandPrice = commandInformationToSave.commandPrice();
+    this.slotTime = commandInformationToSave.slotTime();
+    this.productQuantity = commandInformationToSave.numberOfProductInCommand();
   }
 
   public BigInteger getId() {

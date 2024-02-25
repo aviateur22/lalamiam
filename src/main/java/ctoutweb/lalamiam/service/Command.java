@@ -1,9 +1,6 @@
 package ctoutweb.lalamiam.service;
 
-import ctoutweb.lalamiam.model.dto.StoreProductsInformationDto;
-import ctoutweb.lalamiam.model.dto.ProductSelectInformationDto;
-import ctoutweb.lalamiam.model.dto.RegisterCommandDto;
-import ctoutweb.lalamiam.model.dto.CommandInformationDto;
+import ctoutweb.lalamiam.model.dto.*;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -29,11 +26,23 @@ public interface Command {
 
   /**
    * Récupération d'une liste de slot disponible pour un commerce
-   * @param storeSlotInformation StoreSlotInformationDto
+   * @param storeSlotInformation CommandInformationDto - Information sur la commande
    * @return List<LocalDateTime> Liste des slots disponibles
    */
   List<LocalDateTime> getStoreSlotAvailibility(CommandInformationDto storeSlotInformation);
-  void validateSlot();
-  RegisterCommandDto persistCommand();
+
+  /**
+   * Validation d'un créneaux
+   * @param commandInformation CommandInformationDto - Information sur la commande
+   * @param selectSlotTime LocalDateTime - Créneau choisi pour la cammande
+   */
+  void validateSlot(CommandInformationDto commandInformation, LocalDateTime selectSlotTime);
+
+  /**
+   * Controle et persistance de la commande
+   * @param persitCommand PersitCommandDto - Données pour enregistrée une commande
+   * @return RegisterCommandDto
+   */
+  RegisterCommandDto persistCommand(PersitCommandDto persitCommand);
 
 }

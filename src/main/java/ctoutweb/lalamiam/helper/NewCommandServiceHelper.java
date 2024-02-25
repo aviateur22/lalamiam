@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Component
@@ -33,11 +34,10 @@ public class NewCommandServiceHelper {
 
   /**
    * Recherche des données d'une commande
-   * @param storeId BigInteger - Identitifiant commerce
    * @param command CommandEntity - Identifiant commande
    * @return RegisterCommandDto
    */
-  public RegisterCommandDto findRegisterCommandInformation(BigInteger storeId, CommandEntity command) {
+  public RegisterCommandDto findRegisterCommandInformation(CommandEntity command) {
     // Si commande en cours de création
     if(command == null) return null;
 
@@ -86,7 +86,7 @@ public class NewCommandServiceHelper {
 
   /**
    * Calcul du temps de préparation d'une commande
-   * @param productsSelected List<ProductWithQuantity> - Liste des produits selectionnés pour la comma,de
+   * @param productsSelected List<ProductWithQuantity> - Liste des produits selectionnés pour la commande
    * @return Integer
    */
   public Integer calculateCommandPreparationTime(List<ProductWithQuantity> productsSelected) {
@@ -97,5 +97,49 @@ public class NewCommandServiceHelper {
         ProductEntity product = productService.findProduct(productWithQuantity.getProductId());
         return product.getPreparationTime() * productWithQuantity.getProductQuantity();
       }).collect(Collectors.summingInt(Integer::intValue));
+  }
+
+  /**
+   * Calcul le prix d'une commande
+   * @param selectProducts List<ProductWithQuantity> - Liste des produits selectionnés pour la commande
+   * @return Double - Prix de la commande
+   */
+  public Double calculateCommandPrice(List<ProductWithQuantity> selectProducts) {
+
+    if(selectProducts == null || selectProducts.isEmpty()) return null;
+    return selectProducts
+            .stream()
+            .map(productWithQuantity -> {
+              ProductEntity product = productService.findProduct(productWithQuantity.getProductId());
+              return product.getPrice() * productWithQuantity.getProductQuantity();
+            }).collect(Collectors.summingDouble(Double::doubleValue));
+  }
+
+  /**
+   * Calcul le nombre de produits dans une commande
+   * @param selectProducts List<ProductWithQuantity> - Liste des produits selectionnés pour la commande
+   * @return Integer - Produit dans une commande
+   */
+  public Integer calculateNumberOfProductInCommand(List<ProductWithQuantity> selectProducts) {
+    if(selectProducts == null || selectProducts.isEmpty()) return null;
+    return selectProducts
+            .stream()
+            .map(productWithQuantity -> productWithQuantity.getProductQuantity())
+            .collect(Collectors.summingInt(Integer::intValue));
+  }
+
+  /**
+   * Génération d'un code aléatoire
+   * @param wordLength Integer - Longueur du code
+   * @return String
+   */
+  public String generateCode(Integer wordLength) {
+    Random rand = new Random();
+    String str = rand.ints(48, 123)
+            .filter(num->(num < 58 || num > 64) && (num < 91 || num > 96))
+            .limit(wordLength)
+            .mapToObj(c->(char) c).collect(StringBuffer::new , StringBuffer::append, StringBuffer::append)
+            .toString();
+    return str.toLowerCase();
   }
 }

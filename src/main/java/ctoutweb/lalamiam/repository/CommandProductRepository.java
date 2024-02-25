@@ -37,4 +37,9 @@ public interface CommandProductRepository extends JpaRepository<CommandProductEn
   @Transactional
   @Query(value = "delete from sc_lalamiam.command_product where command_id = ?1 and product_id = ?2", nativeQuery = true)
   public int deleteProductByCommandIdAndProductId(BigInteger commandId, BigInteger productId);
+
+  @Modifying
+  @Transactional
+  @Query(value = "delete from sc_lalamiam.command_product where command_id = ?1", nativeQuery = true)
+  public int deleteProductByCommandId(BigInteger commandId);
 }
