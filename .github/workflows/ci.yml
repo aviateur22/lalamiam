@@ -27,5 +27,3 @@ jobs:
 
       - name: Coveralls
         uses: coverallsapp/github-action@v2.1.2
-        with:
-          github-token: rXSHy5dMT9dhCMcM5QzLzLhqgw1VH26TH
