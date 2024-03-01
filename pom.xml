@@ -84,6 +84,14 @@
                     <target>17</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.eluder.coveralls</groupId>
+                <artifactId>coveralls-maven-plugin</artifactId>
+                <version>4.3.0</version>
+                <configuration>
+                    <repoToken>rXSHy5dMT9dhCMcM5QzLzLhqgw1VH26TH</repoToken>
+                </configuration>
+            </plugin>
 <!--            <plugin>-->
 <!--                <groupId>org.codehaus.mojo</groupId>-->
 <!--                <artifactId>properties-maven-plugin</artifactId>-->
