@@ -56,10 +56,6 @@ public class CommandEntity implements Serializable {
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
 
-
-
-
-
   /////////////////////////////////////////////////////////////////////////////////////////
 
   public CommandEntity() {
@@ -69,14 +65,27 @@ public class CommandEntity implements Serializable {
     this.id = commandId;
   }
 
-  public CommandEntity(BigInteger id, String clientPhone, Integer preparationTime, Double commandPrice, LocalDateTime slotTime, String commandCode, Integer productQuantity, List<CommandProductEntity> commandProducts, StoreEntity store, LocalDateTime updatedAt) {
+  public CommandEntity(
+          BigInteger id,
+          String clientPhone,
+          Integer preparationTime,
+          Double commandPrice,
+          LocalDateTime slotTime,
+          String commandCode,
+          Integer productQuantity,
+          List<CommandProductEntity> commandProducts,
+          StoreEntity store,
+          LocalDateTime updatedAt
+  ) {
     this.id = id;
     this.clientPhone = clientPhone;
+    this.commandCode = commandCode;
     this.preparationTime = preparationTime;
     this.commandPrice = commandPrice;
     this.slotTime = slotTime;
     this.productQuantity = productQuantity;
     this.commandProducts = commandProducts;
+    this.store = store;
     this.updatedAt = updatedAt;
   }
 

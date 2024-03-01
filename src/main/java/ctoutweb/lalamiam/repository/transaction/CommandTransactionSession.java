@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class CommandTransactionSession extends RepositoryCommonMethod {
+public class CommandTransactionSession  {
 
   private final EntityManagerFactory entityManagerFactory;
   private final CommandProductRepository commandProductRepository;
@@ -29,10 +29,8 @@ public class CommandTransactionSession extends RepositoryCommonMethod {
   public CommandTransactionSession(
           CommandProductRepository commandProductRepository,
           CommandRepository commandRepository,
-          ProductRepository productRepository,
           EntityManagerFactory entityManagerFactory
   ) {
-    super(commandProductRepository, productRepository);
     this.commandProductRepository = commandProductRepository;
     this.commandRepository = commandRepository;
     this.entityManagerFactory = entityManagerFactory;
@@ -42,6 +40,9 @@ public class CommandTransactionSession extends RepositoryCommonMethod {
   public CommandEntity updateCommand(CommandInformationToUpdate commandInformationToUpdate) {
     // Todo faire test uintaire
     CommandEntity findCommand = getCommand(commandInformationToUpdate.commandId());
+
+    if(findCommand == null)
+      throw new RuntimeException(String.format("La commande N° %s n'existe pas", findCommand.getCommandCode()));
 
     if(!findCommand.getStore().getId().equals(commandInformationToUpdate.storeId()))
       throw new RuntimeException(String.format("La commande N° %s n'appartient pas rattaché au commerce", findCommand.getCommandCode()));
@@ -94,7 +95,6 @@ public class CommandTransactionSession extends RepositoryCommonMethod {
     commandToSave.setCommandProducts(selectCommandProducts);
     return commandToSave;
   }
-
 
   /**
    * Recherche des information sur une commande
