@@ -106,14 +106,6 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <version>3.3.2</version>
             </plugin>
-            <plugin>
-                <groupId>com.github.hazendaz.maven</groupId>
-                <artifactId>coveralls-maven-plugin</artifactId>
-                <version>4.5.0-M2</version>
-                <configuration>
-                    <repoToken>${env.properties.file}</repoToken>
-                </configuration>
-            </plugin>
         </plugins>
         <resources>
             <resource>
