@@ -25,7 +25,7 @@ jobs:
       - name: Run unit tests
         run: mvn test
 
-      - name: Coveralls
-        uses: coverallsapp/github-action@v2.2.3
+      - name: Codecov
+        uses: codecov/codecoe-action@4.0.1
         with:
-          github-token: ${{ github.token }}
+          token: ${{ secrets.CODECOV_TOKEN }}
