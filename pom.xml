@@ -10,7 +10,6 @@
     <packaging>war</packaging>
     <url>http://www.example.com</url>
     <properties>
-        <configFile>env_properties/env.properties</configFile>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -84,19 +83,6 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.6</version>
-                <executions>
-                    <execution>
-                        <id>prepare-agent</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>properties-maven-plugin</artifactId>
                 <version>1.0.0</version>
@@ -108,7 +94,7 @@
                         </goals>
                         <configuration>
                             <files>
-                                <file>${project.basedir}/env.properties</file>
+                                <file>src/main/resources/env.properties</file>
                             </files>
                         </configuration>
                     </execution>

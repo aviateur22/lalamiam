@@ -1,5 +1,5 @@
 target/
-env.properties
+src/main/resources/env.properties
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
