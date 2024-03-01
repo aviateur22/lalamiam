@@ -51,7 +51,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>RELEASE</version>
+            <version>3.8.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -69,7 +69,6 @@
                 <application.log.level>info</application.log.level>
                 <spring.log.level>info</spring.log.level>
                 <hibernate.log.level>info</hibernate.log.level>
-
             </properties>
         </profile>
     </profiles>
@@ -111,7 +110,7 @@
                 <artifactId>coveralls-maven-plugin</artifactId>
                 <version>4.5.0-M2</version>
                 <configuration>
-                    <repoToken>${coveralls_token}</repoToken>
+                    <repoToken>${coveralls}</repoToken>
                 </configuration>
             </plugin>
         </plugins>
