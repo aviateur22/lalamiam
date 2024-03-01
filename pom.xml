@@ -94,7 +94,7 @@
                         </goals>
                         <configuration>
                             <files>
-                                <file>src/main/resources/env.properties</file>
+                                <file>src/main/resources/ev.properties</file>
                             </files>
                         </configuration>
                     </execution>
