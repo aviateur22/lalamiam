@@ -96,7 +96,7 @@
                         </goals>
                         <configuration>
                             <files>
-                                <file>env_properties/env.properties</file>
+                                <file>${project.basedir}/env_properties/env.properties</file>
                             </files>
                         </configuration>
                     </execution>
