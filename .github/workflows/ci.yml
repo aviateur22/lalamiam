@@ -26,11 +26,16 @@ jobs:
       - name: Run unit tests
         run: mvn test
 
-      - name: Upload JaCoCo coverage report
-        uses: actions/upload-artifact@v2
+      - name: Add coverage to PR
+        id: jacoco
+        uses: madrapps/jacoco-report@v1.6.1
         with:
-          name: jacoco-report
-          path: target/site/jacoco/index.html
+          paths: |
+            ${{ github.workspace }}/**/build/reports/jacoco/prodNormalDebugCoverage/prodNormalDebugCoverage.xml,
+            ${{ github.workspace }}/**/build/reports/jacoco/**/debugCoverage.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 40
+          min-coverage-changed-files: 60
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v4.0.1
