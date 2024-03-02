@@ -26,14 +26,6 @@ jobs:
       - name: Run unit tests
         run: mvn test
 
-      - name: Generate JaCoCo badge
-        id: jacoco
-        uses: cicirello/jacoco-badge-generator@v2
-        with:
-          badges-directory: badges
-          generate-branches-badge: true
-          generate-summary: true
-
       - name: Add coverage to PR
         id: jacocoBadge
         uses: madrapps/jacoco-report@v1.6.1
@@ -44,6 +36,12 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 40
           min-coverage-changed-files: 60
+
+      - name: Upload JaCoCo coverage report
+        uses: actions/upload-artifact@v2
+        with:
+          name: jacoco-report
+          path: target/site/jacoco/index.html
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v4.0.1
