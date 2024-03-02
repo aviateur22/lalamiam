@@ -20,14 +20,13 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Build with Maven and Cobertura
-        run: mvn -B clean cobertura:cobertura
+      - name: Build with Maven
+        run: mvn -B clean --file pom.xml
 
-      - name: Install cobertura-coverage-report
-        run: npm install -g cobertura-coverage-report
+      - name: Run unit tests
+        run: mvn test
 
-      - name: Convert Cobertura XML to Coveralls JSON
-        run: cobertura-coverage-report --format coveralls target/site/cobertura/coverage.xml
-
-      - name: Upload to Coveralls
-        run: curl -F 'json_file=@coveralls.json' https://coveralls.io/api/v1/jobs
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
