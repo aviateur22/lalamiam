@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Repository
-public interface ProductRepository extends JpaRepository<ProductEntity, BigInteger> {
+public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
   List<ProductEntity> findAllByStore(StoreEntity store);
 
   @Query(value = "select count(*) from sc_lalamiam.product", nativeQuery = true)

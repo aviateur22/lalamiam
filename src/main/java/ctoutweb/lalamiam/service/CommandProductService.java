@@ -31,5 +31,5 @@ public interface CommandProductService {
    * @param storeId BigInteger - Identifiant commerce
    * @return List<ProductEntity>
    */
-  List<ProductEntity> getStoreProducts(BigInteger storeId);
+  List<ProductEntity> getStoreProducts(Long storeId);
 }

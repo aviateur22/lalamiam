@@ -19,16 +19,16 @@ public class CommandController {
   }
 
   @GetMapping("/create/{storeId}")
-  ResponseEntity<StoreProductsInformationDto> createCommand(@RequestParam BigInteger storeId) {
+  ResponseEntity<StoreProductsInformationDto> createCommand(@RequestParam Long storeId) {
     StoreProductsInformationDto addCommand = commandService.createCommand(storeId);
     return new ResponseEntity<>(addCommand, HttpStatus.OK);
   }
   @GetMapping("/update/{storeId}/command/{commandId}")
-  ResponseEntity<StoreProductsInformationDto> updateCommand(@RequestParam BigInteger storeId, BigInteger commandId) {
+  ResponseEntity<StoreProductsInformationDto> updateCommand(@RequestParam Long storeId, Long commandId) {
     return new ResponseEntity<>(commandService.updateCommand(storeId, commandId), HttpStatus.OK);
   }
   @GetMapping("/get/{storeId}/command/{commandId}")
-  ResponseEntity<RegisterCommandDto> getCommand(@RequestParam BigInteger storeId, BigInteger commandId) {
+  ResponseEntity<RegisterCommandDto> getCommand(@RequestParam Long storeId, Long commandId) {
     return new ResponseEntity<>(commandService.getCommand(storeId, commandId), HttpStatus.OK);
   }
 

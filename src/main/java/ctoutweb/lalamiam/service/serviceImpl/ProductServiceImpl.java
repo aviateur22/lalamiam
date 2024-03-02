@@ -11,7 +11,6 @@ import ctoutweb.lalamiam.service.ProductService;
 import ctoutweb.lalamiam.util.CommonFunction;
 import org.springframework.stereotype.Service;
 
-import java.math.BigInteger;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -71,12 +70,12 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public ProductEntity findProduct(BigInteger productId) {
+  public ProductEntity findProduct(Long productId) {
     return productRepository.findById(productId).orElseThrow(()->new RuntimeException("Le produit n'exsite pas"));
   }
 
   @Override
-  public void deleteProduct(BigInteger productId) {
+  public void deleteProduct(Long productId) {
     findProduct(productId);
     productRepository.deleteById(productId);
   }

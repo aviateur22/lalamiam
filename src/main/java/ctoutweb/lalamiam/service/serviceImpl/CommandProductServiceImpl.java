@@ -33,7 +33,7 @@ public class CommandProductServiceImpl implements CommandProductService {
 //  }
 
   @Override
-  public List<ProductEntity> getStoreProducts(BigInteger storeId) {
+  public List<ProductEntity> getStoreProducts(Long storeId) {
     return null;
   }
 }

@@ -31,15 +31,15 @@ public interface CommandProductRepository extends JpaRepository<CommandProductEn
           "where command_id = ?1 "+
           "order by created_at desc",
         nativeQuery = true)
-  public List<CommandProductEntity> findProductsByCommandId(BigInteger commandId);
+  public List<CommandProductEntity> findProductsByCommandId(Long commandId);
 
   @Modifying
   @Transactional
   @Query(value = "delete from sc_lalamiam.command_product where command_id = ?1 and product_id = ?2", nativeQuery = true)
-  public int deleteProductByCommandIdAndProductId(BigInteger commandId, BigInteger productId);
+  public int deleteProductByCommandIdAndProductId(Long commandId, Long productId);
 
   @Modifying
   @Transactional
   @Query(value = "delete from sc_lalamiam.command_product where command_id = ?1", nativeQuery = true)
-  public int deleteProductByCommandId(BigInteger commandId);
+  public int deleteProductByCommandId(Long commandId);
 }

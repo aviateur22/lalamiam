@@ -4,7 +4,6 @@ import ctoutweb.lalamiam.factory.Factory;
 import ctoutweb.lalamiam.model.*;
 import ctoutweb.lalamiam.repository.CommandProductRepository;
 import ctoutweb.lalamiam.repository.CommandRepository;
-import ctoutweb.lalamiam.repository.ProductRepository;
 import ctoutweb.lalamiam.repository.entity.CommandEntity;
 import ctoutweb.lalamiam.repository.entity.CommandProductEntity;
 import jakarta.persistence.EntityManagerFactory;
@@ -15,7 +14,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.springframework.stereotype.Component;
 
-import java.math.BigInteger;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -101,7 +99,7 @@ public class CommandTransactionSession  {
    * @param commandId
    * @return
    */
-  public CommandEntity getCommand(BigInteger commandId) {
+  public CommandEntity getCommand(Long commandId) {
     CommandEntity command = null;
     Session session = entityManagerFactory.unwrap(SessionFactory.class).openSession();
     Transaction transaction = session.beginTransaction();

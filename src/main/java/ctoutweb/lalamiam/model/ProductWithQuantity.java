@@ -3,22 +3,22 @@ package ctoutweb.lalamiam.model;
 import java.math.BigInteger;
 
 public class ProductWithQuantity {
-  private BigInteger productId;
+  private Long productId;
   private Integer productQuantity;
 
   public ProductWithQuantity() {
   }
 
-  public ProductWithQuantity(BigInteger productId, Integer productQuantity) {
+  public ProductWithQuantity(Long productId, Integer productQuantity) {
     this.productId = productId;
     this.productQuantity = productQuantity;
   }
 
-  public BigInteger getProductId() {
+  public Long getProductId() {
     return productId;
   }
 
-  public void setProductId(BigInteger productId) {
+  public void setProductId(Long productId) {
     this.productId = productId;
   }
 

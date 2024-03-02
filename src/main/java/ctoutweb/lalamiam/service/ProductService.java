@@ -16,7 +16,7 @@ public interface ProductService {
 
   ProductEntity updateProduct(UpdateProductDto updateProductSchema);
 
-  ProductEntity findProduct(BigInteger productId);
+  ProductEntity findProduct(Long productId);
 
-  void deleteProduct(BigInteger prductId);
+  void deleteProduct(Long prductId);
 }

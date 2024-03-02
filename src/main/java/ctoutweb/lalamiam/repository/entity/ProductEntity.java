@@ -19,7 +19,7 @@ public class ProductEntity {
   @Id
   @SequenceGenerator(name="productPkSeq", sequenceName="PRODUCT_PK_SEQ", allocationSize=1, initialValue = 1)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "productPkSeq")
-  private BigInteger id;
+  private Long id;
 
   @Column(name = "name")
   private String name;
@@ -83,7 +83,7 @@ public class ProductEntity {
   }
 
   public ProductEntity(
-          BigInteger id,
+          Long id,
           String name,
           Double price,
           String description,
@@ -100,7 +100,7 @@ public class ProductEntity {
     this.isAvail = isAvail;
   }
 
-  public ProductEntity(BigInteger productId) {
+  public ProductEntity(Long productId) {
     this.id = productId;
   }
 
@@ -114,11 +114,11 @@ public class ProductEntity {
     this.store = new StoreEntity(addProductSchema.storeId());
   }
 
-  public BigInteger getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(BigInteger id) {
+  public void setId(Long id) {
     this.id = id;
   }
 

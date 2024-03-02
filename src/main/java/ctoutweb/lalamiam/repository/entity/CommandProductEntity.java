@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -16,7 +15,7 @@ public class CommandProductEntity {
   @Id
   @SequenceGenerator(name="command_product_pk_seq", sequenceName="command_product_pk_seq", allocationSize=1, initialValue = 1)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "command_product_pk_seq")
-  private BigInteger id;
+  private Long id;
 
   @Column(name = "product_quantity")
   private Integer productQuantity;
@@ -52,11 +51,11 @@ public class CommandProductEntity {
     this.product = product;
   }
 
-  public BigInteger getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(BigInteger id) {
+  public void setId(Long id) {
     this.id = id;
   }
 

@@ -1,29 +1,27 @@
 package ctoutweb.lalamiam.factory;
 
-import ctoutweb.lalamiam.mapper.ProductQuantityMapper;
 import ctoutweb.lalamiam.model.*;
 import ctoutweb.lalamiam.model.dto.*;
 import ctoutweb.lalamiam.repository.builder.CommandProductEntityBuilder;
 import ctoutweb.lalamiam.repository.entity.*;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class Factory {
-  public  static ProductEntity getProduct(BigInteger productId) {
+  public  static ProductEntity getProduct(Long productId) {
     return new ProductEntity(productId);
   }
-  public static CommandEntity getCommand(BigInteger commandId) { return new CommandEntity(commandId);}
+  public static CommandEntity getCommand(Long commandId) { return new CommandEntity(commandId);}
 
   public static CommandEntity getCommand(CommandInformationToSave commandInformationToSave) {
     return new CommandEntity(commandInformationToSave);
   }
 
-  public static StoreEntity getStore(BigInteger storeId) { return new StoreEntity(storeId);}
+  public static StoreEntity getStore(Long storeId) { return new StoreEntity(storeId);}
 
-  public static CommandProductEntity getCommandProduct(BigInteger commandId, BigInteger productId, Integer productQuantity) {
+  public static CommandProductEntity getCommandProduct(Long commandId, Long productId, Integer productQuantity) {
     return CommandProductEntityBuilder.aCommandProductEntity()
             .withCommand(getCommand(commandId))
             .withProduct(getProduct(productId))
@@ -124,8 +122,8 @@ public class Factory {
    * @return CommandInformationDto
    */
   public static CommandInformationDto getCommandInformationDto(
-          BigInteger storeId,
-          BigInteger commandId,
+          Long storeId,
+          Long commandId,
           LocalDate commandDate,
           LocalDateTime consulationDate,
           List<ProductWithQuantity> selectProductsWithQuantity

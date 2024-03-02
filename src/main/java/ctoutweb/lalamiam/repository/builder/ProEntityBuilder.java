@@ -6,7 +6,7 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 public final class ProEntityBuilder {
-  private BigInteger id;
+  private Long id;
   private String email;
   private String phone;
   private String password;
@@ -20,7 +20,7 @@ public final class ProEntityBuilder {
     return new ProEntityBuilder();
   }
 
-  public ProEntityBuilder withId(BigInteger id) {
+  public ProEntityBuilder withId(Long id) {
     this.id = id;
     return this;
   }

@@ -8,7 +8,7 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 public final class CommandProductEntityBuilder {
-  private BigInteger id;
+  private Long id;
   private Integer productQuantity;
   private CommandEntity command;
   private ProductEntity product;
@@ -22,7 +22,7 @@ public final class CommandProductEntityBuilder {
     return new CommandProductEntityBuilder();
   }
 
-  public CommandProductEntityBuilder withId(BigInteger id) {
+  public CommandProductEntityBuilder withId(Long id) {
     this.id = id;
     return this;
   }

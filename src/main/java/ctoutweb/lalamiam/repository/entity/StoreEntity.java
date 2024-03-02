@@ -16,7 +16,7 @@ public class StoreEntity {
   @Id
   @SequenceGenerator(name="storePkSeq", sequenceName="STORE_PK_SEQ", allocationSize=1, initialValue = 1)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "storePkSeq")
-  private BigInteger id;
+  private Long id;
   @Column(name = "name")
   private String name;
 
@@ -67,7 +67,7 @@ public class StoreEntity {
   public StoreEntity() {
   }
 
-  public StoreEntity(BigInteger storeId) {
+  public StoreEntity(Long storeId) {
     this.id = storeId;
   }
 
@@ -81,11 +81,11 @@ public class StoreEntity {
 
   }
 
-  public BigInteger getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(BigInteger id) {
+  public void setId(Long id) {
     this.id = id;
   }
 

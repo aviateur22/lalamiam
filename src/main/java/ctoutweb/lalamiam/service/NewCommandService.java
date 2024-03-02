@@ -12,7 +12,7 @@ public interface NewCommandService extends Command {
    * @param storeId BigInt - Identifiant commerce
    * @return CommandInformationDto
    */
-  StoreProductsInformationDto createCommand(BigInteger storeId);
+  StoreProductsInformationDto createCommand(Long storeId);
 
   /**
    * Modification d'une commande
@@ -20,7 +20,7 @@ public interface NewCommandService extends Command {
    * @param commandId BigInt - Identifiant commande
    * @return CommandInformationDto
    */
-  StoreProductsInformationDto updateCommand(BigInteger storeId, BigInteger commandId);
+  StoreProductsInformationDto updateCommand(Long storeId, Long commandId);
 
   /**
    *  Renvoie les données nécessaire à l'affichage d'une commande
@@ -28,5 +28,5 @@ public interface NewCommandService extends Command {
    * @param commandId BigInt - Identifiant commande
    * @return RegisterCommandDto
    */
-  RegisterCommandDto getCommand(BigInteger storeId, BigInteger commandId);
+  RegisterCommandDto getCommand(Long storeId, Long commandId);
 }

@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.math.BigInteger;
 import java.util.List;
 
-public interface ProRepository extends JpaRepository<ProEntity, BigInteger> {
+public interface ProRepository extends JpaRepository<ProEntity, Long> {
 
   @Query(value = "select count(*) from sc_lalamiam.pro", nativeQuery = true)
   Integer countProInDatabase();

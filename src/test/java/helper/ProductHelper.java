@@ -4,7 +4,6 @@ import ctoutweb.lalamiam.model.dto.AddProductDto;
 import ctoutweb.lalamiam.model.dto.AddProductResponseDto;
 import ctoutweb.lalamiam.service.ProductService;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +20,7 @@ public class ProductHelper {
    * @param storeId BigInteger - Identifiant Commerce
    * @return List<AddProductResponseDto>
    */
-  public List<AddProductResponseDto> createProduct(BigInteger storeId) {
+  public List<AddProductResponseDto> createProduct(Long storeId) {
     AddProductDto addProductSchema1 = new AddProductDto("lait", 10D, "initial description", 5, "s", storeId);
     AddProductDto addProductSchema2 = new AddProductDto("coco", 20D, "initial description", 10, "s", storeId);
     AddProductDto addProductSchema3 = new AddProductDto("orange", 30D, "initial description", 20, "s", storeId);
@@ -40,10 +39,10 @@ public class ProductHelper {
 
   /**
    * Ajout de nouveau produit apres création dela commande
-   * @param storeId BigInteger - Identifiant
+   * @param storeId Long - Identifiant
    * @return List<AddProductResponseDto>
    */
-  public List<AddProductResponseDto> createProductAfetrCommands(BigInteger storeId) {
+  public List<AddProductResponseDto> createProductAfetrCommands(Long storeId) {
     AddProductDto addProductSchema1 = new AddProductDto("pain", 10D, "initial description", 5, "s", storeId);
     AddProductDto addProductSchema2 = new AddProductDto("beurre", 20D, "initial description", 10, "s", storeId);
     AddProductDto addProductSchema3 = new AddProductDto("miel", 30D, "initial description", 20, "s", storeId);

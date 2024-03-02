@@ -9,8 +9,6 @@ import ctoutweb.lalamiam.repository.entity.ProEntity;
 import ctoutweb.lalamiam.service.ProService;
 import org.springframework.stereotype.Service;
 
-import java.math.BigInteger;
-
 @Service
 public class ProServiceImpl implements ProService {
 
@@ -39,7 +37,7 @@ public class ProServiceImpl implements ProService {
   }
 
   @Override
-  public ProInformationDto getProfessionalInformation(BigInteger professionalId) {
+  public ProInformationDto getProfessionalInformation(Long professionalId) {
     ProEntity proEntity = proRepository.findById(professionalId).orElseThrow(()-> new RuntimeException("pas connu"));
     return proInformationMapper.apply(proEntity);
   }

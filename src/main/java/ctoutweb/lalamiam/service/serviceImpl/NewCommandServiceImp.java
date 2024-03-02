@@ -12,7 +12,6 @@ import ctoutweb.lalamiam.service.NewCommandService;
 import ctoutweb.lalamiam.service.ProductService;
 import org.springframework.stereotype.Service;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -41,17 +40,17 @@ public class NewCommandServiceImp implements NewCommandService {
   }
 
   @Override
-  public StoreProductsInformationDto createCommand(BigInteger storeId) {
+  public StoreProductsInformationDto createCommand(Long storeId) {
     return getStoreProductsForCommand(storeId, null);
   }
 
   @Override
-  public StoreProductsInformationDto updateCommand(BigInteger storeId, BigInteger commandId) {
+  public StoreProductsInformationDto updateCommand(Long storeId, Long commandId) {
     return getStoreProductsForCommand(storeId, commandId);
   }
 
   @Override
-  public RegisterCommandDto getCommand(BigInteger storeId, BigInteger commandId) {
+  public RegisterCommandDto getCommand(Long storeId, Long commandId) {
     // Récupération de la commande
     CommandEntity command = commandTransactionSession.getCommand(commandId);
 
@@ -68,7 +67,7 @@ public class NewCommandServiceImp implements NewCommandService {
   }
 
   @Override
-  public StoreProductsInformationDto getStoreProductsForCommand(BigInteger storeId, BigInteger commandId) {
+  public StoreProductsInformationDto getStoreProductsForCommand(Long storeId, Long commandId) {
 
     // Récupération de la commande
     CommandEntity command = commandTransactionSession.getCommand(commandId);
@@ -88,7 +87,7 @@ public class NewCommandServiceImp implements NewCommandService {
   }
 
   @Override
-  public void validateProductsSelection(BigInteger storeId, BigInteger commandId, ProductSelectInformationDto productSelectInformation) {
+  public void validateProductsSelection(Long storeId, Long commandId, ProductSelectInformationDto productSelectInformation) {
     if(storeId == null)  throw new RuntimeException("Identifiant commerce obligatoire");
 
     // N°Tel
