@@ -3,8 +3,6 @@ package ctoutweb.lalamiam.model.dto;
 import ctoutweb.lalamiam.model.CalculatedCommandInformation;
 import ctoutweb.lalamiam.model.ManualCommandInformation;
 
-import java.math.BigInteger;
-
 /**
  * Contient l'ensemble des données d'un commande qui se trouve en base de données
  */

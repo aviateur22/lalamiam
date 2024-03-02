@@ -1,7 +1,5 @@
 package ctoutweb.lalamiam.model;
 
-import java.math.BigInteger;
-
 public class ProductWithQuantity {
   private Long productId;
   private Integer productQuantity;
