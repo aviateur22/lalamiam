@@ -18,7 +18,7 @@ public class CommandEntity implements Serializable {
   @Id
   @SequenceGenerator(name="commandPkSeq", sequenceName="COMMAND_PK_SEQ", allocationSize=1, initialValue = 1)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "commandPkSeq")
-  private BigInteger id;
+  private Long id;
 
   @Column(name = "client_phone")
   private String clientPhone;
@@ -61,12 +61,12 @@ public class CommandEntity implements Serializable {
   public CommandEntity() {
   }
 
-  public CommandEntity(BigInteger commandId) {
+  public CommandEntity(Long commandId) {
     this.id = commandId;
   }
 
   public CommandEntity(
-          BigInteger id,
+          Long id,
           String clientPhone,
           Integer preparationTime,
           Double commandPrice,
@@ -99,11 +99,11 @@ public class CommandEntity implements Serializable {
     this.productQuantity = commandInformationToSave.numberOfProductInCommand();
   }
 
-  public BigInteger getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(BigInteger id) {
+  public void setId(Long id) {
     this.id = id;
   }
 

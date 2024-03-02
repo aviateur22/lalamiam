@@ -1,6 +1,5 @@
 package ctoutweb.lalamiam.model;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -16,7 +15,7 @@ import java.util.List;
  * @param slotTime
  */
 public record CommandInformationToSave(
-        BigInteger storeId,
+        Long storeId,
         String clientPhone,
         List<ProductWithQuantity> selectProducts,
         LocalDateTime slotTime,

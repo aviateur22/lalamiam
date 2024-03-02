@@ -17,7 +17,6 @@ import ctoutweb.lalamiam.service.ProductService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -30,7 +29,7 @@ public class NewCommandServiceHelperTest {
 
   @Test
   void getStoreProductsWithCommandQuantity_without_existing_command() {
-    BigInteger storeId = BigInteger.valueOf(1);
+    Long storeId = Long.valueOf(1);
 
     CommandProductService commandProductService = mock(CommandProductService.class);
     ProductQuantityMapper productQuantityMapper = mock(ProductQuantityMapper.class);
@@ -63,8 +62,8 @@ public class NewCommandServiceHelperTest {
      * Given
      */
     // Données pour ManualCommandInformation
-    BigInteger storeId = BigInteger.valueOf(1);
-    BigInteger commandId = BigInteger.valueOf(1);
+    Long storeId = Long.valueOf(1);
+    Long commandId = Long.valueOf(1);
 
     CommandProductService commandProductService = mock(CommandProductService.class);
     CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
@@ -92,10 +91,10 @@ public class NewCommandServiceHelperTest {
      * Then
      */
     Assertions.assertEquals(4, storeProducts.size());
-    Assertions.assertEquals(1, getProductWithQuantityById(BigInteger.valueOf(1), storeProducts).selectQuantity());
-    Assertions.assertEquals(2, getProductWithQuantityById(BigInteger.valueOf(2), storeProducts).selectQuantity());
-    Assertions.assertEquals(3, getProductWithQuantityById(BigInteger.valueOf(3), storeProducts).selectQuantity());
-    Assertions.assertEquals(4, getProductWithQuantityById(BigInteger.valueOf(4), storeProducts).selectQuantity());
+    Assertions.assertEquals(1, getProductWithQuantityById(Long.valueOf(1), storeProducts).selectQuantity());
+    Assertions.assertEquals(2, getProductWithQuantityById(Long.valueOf(2), storeProducts).selectQuantity());
+    Assertions.assertEquals(3, getProductWithQuantityById(Long.valueOf(3), storeProducts).selectQuantity());
+    Assertions.assertEquals(4, getProductWithQuantityById(Long.valueOf(4), storeProducts).selectQuantity());
   }
 
   @Test
@@ -123,8 +122,8 @@ public class NewCommandServiceHelperTest {
     /**
      * Given
      */
-    BigInteger storeId = BigInteger.valueOf(1);
-    BigInteger commandId = BigInteger.valueOf(1);
+    Long storeId = Long.valueOf(1);
+    Long commandId = Long.valueOf(1);
 
     CommandProductService commandProductService = mock(CommandProductService.class);
     CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
@@ -132,7 +131,7 @@ public class NewCommandServiceHelperTest {
 
     ProductQuantityMapper productQuantityMapper = new ProductQuantityMapper();
 
-    when(commandTransactionSession.getCommand(any(BigInteger.class))).thenReturn(
+    when(commandTransactionSession.getCommand(any(Long.class))).thenReturn(
             getFakeCommandEntity(storeId, commandId)
     );
 
@@ -166,28 +165,28 @@ public class NewCommandServiceHelperTest {
 
     // Mock ProductService
     ProductService productService = mock(ProductService.class);
-    when(productService.findProduct(BigInteger.valueOf(1))).thenReturn(
+    when(productService.findProduct(Long.valueOf(1))).thenReturn(
             fakeStoreProductEntiy()
                     .stream()
-                    .filter(product -> product.getId().equals(BigInteger.valueOf(1))).findFirst()
+                    .filter(product -> product.getId().equals(Long.valueOf(1))).findFirst()
                     .orElseThrow(()->new RuntimeException("")));
 
-    when(productService.findProduct(BigInteger.valueOf(2))).thenReturn(
+    when(productService.findProduct(Long.valueOf(2))).thenReturn(
             fakeStoreProductEntiy()
                     .stream()
-                    .filter(product -> product.getId().equals(BigInteger.valueOf(2))).findFirst()
+                    .filter(product -> product.getId().equals(Long.valueOf(2))).findFirst()
                     .orElseThrow(()->new RuntimeException("")));
 
-    when(productService.findProduct(BigInteger.valueOf(3))).thenReturn(
+    when(productService.findProduct(Long.valueOf(3))).thenReturn(
             fakeStoreProductEntiy()
                     .stream()
-                    .filter(product -> product.getId().equals(BigInteger.valueOf(3))).findFirst()
+                    .filter(product -> product.getId().equals(Long.valueOf(3))).findFirst()
                     .orElseThrow(()->new RuntimeException("")));
 
-    when(productService.findProduct(BigInteger.valueOf(4))).thenReturn(
+    when(productService.findProduct(Long.valueOf(4))).thenReturn(
             fakeStoreProductEntiy()
                     .stream()
-                    .filter(product -> product.getId().equals(BigInteger.valueOf(4))).findFirst()
+                    .filter(product -> product.getId().equals(Long.valueOf(4))).findFirst()
                     .orElseThrow(()->new RuntimeException("")));
 
     NewCommandServiceHelper commandServiceHelper = new NewCommandServiceHelper(
@@ -234,28 +233,28 @@ public class NewCommandServiceHelperTest {
 
     // Mock ProductService
     ProductService productService = mock(ProductService.class);
-    when(productService.findProduct(BigInteger.valueOf(1))).thenReturn(
+    when(productService.findProduct(Long.valueOf(1))).thenReturn(
             fakeStoreProductEntiy()
                     .stream()
-                    .filter(product -> product.getId().equals(BigInteger.valueOf(1))).findFirst()
+                    .filter(product -> product.getId().equals(Long.valueOf(1))).findFirst()
                     .orElseThrow(()->new RuntimeException("")));
 
-    when(productService.findProduct(BigInteger.valueOf(2))).thenReturn(
+    when(productService.findProduct(Long.valueOf(2))).thenReturn(
             fakeStoreProductEntiy()
                     .stream()
-                    .filter(product -> product.getId().equals(BigInteger.valueOf(2))).findFirst()
+                    .filter(product -> product.getId().equals(Long.valueOf(2))).findFirst()
                     .orElseThrow(()->new RuntimeException("")));
 
-    when(productService.findProduct(BigInteger.valueOf(3))).thenReturn(
+    when(productService.findProduct(Long.valueOf(3))).thenReturn(
             fakeStoreProductEntiy()
                     .stream()
-                    .filter(product -> product.getId().equals(BigInteger.valueOf(3))).findFirst()
+                    .filter(product -> product.getId().equals(Long.valueOf(3))).findFirst()
                     .orElseThrow(()->new RuntimeException("")));
 
-    when(productService.findProduct(BigInteger.valueOf(4))).thenReturn(
+    when(productService.findProduct(Long.valueOf(4))).thenReturn(
             fakeStoreProductEntiy()
                     .stream()
-                    .filter(product -> product.getId().equals(BigInteger.valueOf(4))).findFirst()
+                    .filter(product -> product.getId().equals(Long.valueOf(4))).findFirst()
                     .orElseThrow(()->new RuntimeException("")));
 
     NewCommandServiceHelper commandServiceHelper = new NewCommandServiceHelper(
@@ -301,28 +300,28 @@ public class NewCommandServiceHelperTest {
 
     // Mock ProductService
     ProductService productService = mock(ProductService.class);
-    when(productService.findProduct(BigInteger.valueOf(1))).thenReturn(
+    when(productService.findProduct(Long.valueOf(1))).thenReturn(
             fakeStoreProductEntiy()
                     .stream()
-                    .filter(product -> product.getId().equals(BigInteger.valueOf(1))).findFirst()
+                    .filter(product -> product.getId().equals(Long.valueOf(1))).findFirst()
                     .orElseThrow(()->new RuntimeException("")));
 
-    when(productService.findProduct(BigInteger.valueOf(2))).thenReturn(
+    when(productService.findProduct(Long.valueOf(2))).thenReturn(
             fakeStoreProductEntiy()
                     .stream()
-                    .filter(product -> product.getId().equals(BigInteger.valueOf(2))).findFirst()
+                    .filter(product -> product.getId().equals(Long.valueOf(2))).findFirst()
                     .orElseThrow(()->new RuntimeException("")));
 
-    when(productService.findProduct(BigInteger.valueOf(3))).thenReturn(
+    when(productService.findProduct(Long.valueOf(3))).thenReturn(
             fakeStoreProductEntiy()
                     .stream()
-                    .filter(product -> product.getId().equals(BigInteger.valueOf(3))).findFirst()
+                    .filter(product -> product.getId().equals(Long.valueOf(3))).findFirst()
                     .orElseThrow(()->new RuntimeException("")));
 
-    when(productService.findProduct(BigInteger.valueOf(4))).thenReturn(
+    when(productService.findProduct(Long.valueOf(4))).thenReturn(
             fakeStoreProductEntiy()
                     .stream()
-                    .filter(product -> product.getId().equals(BigInteger.valueOf(4))).findFirst()
+                    .filter(product -> product.getId().equals(Long.valueOf(4))).findFirst()
                     .orElseThrow(()->new RuntimeException("")));
 
     NewCommandServiceHelper commandServiceHelper = new NewCommandServiceHelper(
@@ -391,10 +390,10 @@ public class NewCommandServiceHelperTest {
    */
   private List<ProductEntity> fakeProductList() {
     return Arrays.asList(
-            new ProductEntity(BigInteger.valueOf(1)),
-            new ProductEntity(BigInteger.valueOf(2)),
-            new ProductEntity(BigInteger.valueOf(3)),
-            new ProductEntity(BigInteger.valueOf(4))
+            new ProductEntity(Long.valueOf(1)),
+            new ProductEntity(Long.valueOf(2)),
+            new ProductEntity(Long.valueOf(3)),
+            new ProductEntity(Long.valueOf(4))
     );
   }
 
@@ -404,10 +403,10 @@ public class NewCommandServiceHelperTest {
    */
   private List<ProductWithQuantityDto> fakeProductWithQuantityDto() {
     return Arrays.asList(
-            new ProductWithQuantityDto(BigInteger.valueOf(1), "test", "photo", 1D, 1, true),
-            new ProductWithQuantityDto(BigInteger.valueOf(2), "test", "photo", 1D, 2, true),
-            new ProductWithQuantityDto(BigInteger.valueOf(3), "test", "photo", 1D, 3, true),
-            new ProductWithQuantityDto(BigInteger.valueOf(4), "test", "photo", 1D, 4, true)
+            new ProductWithQuantityDto(Long.valueOf(1), "test", "photo", 1D, 1, true),
+            new ProductWithQuantityDto(Long.valueOf(2), "test", "photo", 1D, 2, true),
+            new ProductWithQuantityDto(Long.valueOf(3), "test", "photo", 1D, 3, true),
+            new ProductWithQuantityDto(Long.valueOf(4), "test", "photo", 1D, 4, true)
     );
   }
 
@@ -417,10 +416,10 @@ public class NewCommandServiceHelperTest {
    */
   private List<CommandProductEntity> fakeCommandProducList() {
     return Arrays.asList(
-            new CommandProductEntity(1, new ProductEntity(BigInteger.valueOf(1),"test", 1D , "description", 5,"photo", true)),
-            new CommandProductEntity(2, new ProductEntity(BigInteger.valueOf(2),"test", 1D , "description", 5,"photo", true)),
-            new CommandProductEntity(3, new ProductEntity(BigInteger.valueOf(3),"test", 1D , "description", 5,"photo", true)),
-            new CommandProductEntity(4, new ProductEntity(BigInteger.valueOf(4),"test", 1D , "description", 5,"photo", true))
+            new CommandProductEntity(1, new ProductEntity(Long.valueOf(1),"test", 1D , "description", 5,"photo", true)),
+            new CommandProductEntity(2, new ProductEntity(Long.valueOf(2),"test", 1D , "description", 5,"photo", true)),
+            new CommandProductEntity(3, new ProductEntity(Long.valueOf(3),"test", 1D , "description", 5,"photo", true)),
+            new CommandProductEntity(4, new ProductEntity(Long.valueOf(4),"test", 1D , "description", 5,"photo", true))
     );
   }
 
@@ -429,7 +428,7 @@ public class NewCommandServiceHelperTest {
    * @return ProductEntity
    */
   private ProductEntity fakeProduct() {
-    return new ProductEntity(BigInteger.valueOf(1));
+    return new ProductEntity(Long.valueOf(1));
   }
 
   /**
@@ -438,7 +437,7 @@ public class NewCommandServiceHelperTest {
    * @param commandId BigInteger
    * @return RegisterCommandDto
    */
-  private RegisterCommandDto getFakeRegisterCommand(BigInteger storeId, BigInteger commandId) {
+  private RegisterCommandDto getFakeRegisterCommand(Long storeId, Long commandId) {
     // Fake liste d eproduit avec quantité
     ManualCommandInformation manualCommandInformation = new ManualCommandInformation();
     manualCommandInformation.setSelectProducts(fakeProductWithQuantityDto());
@@ -466,7 +465,7 @@ public class NewCommandServiceHelperTest {
    * @param commandId BigInteger
    * @return CommandEntity
    */
-  private CommandEntity getFakeCommandEntity(BigInteger storeId, BigInteger commandId) {
+  private CommandEntity getFakeCommandEntity(Long storeId, Long commandId) {
     // Fake liste d eproduit avec quantité
     CommandEntity command = new CommandEntity();
 
@@ -492,7 +491,7 @@ public class NewCommandServiceHelperTest {
    * @param storeProducts List<ProductWithQuantityDto>
    * @return ProductWithQuantityDto
    */
-  private ProductWithQuantityDto getProductWithQuantityById(BigInteger id, List<ProductWithQuantityDto> storeProducts) {
+  private ProductWithQuantityDto getProductWithQuantityById(Long id, List<ProductWithQuantityDto> storeProducts) {
     return storeProducts.stream().filter(product->id.equals(product.productId())).findFirst().orElse(null);
   }
 
@@ -502,9 +501,9 @@ public class NewCommandServiceHelperTest {
    * @return List<ProductWithQuantity>
    */
   private List<ProductWithQuantity> getFakeProductList() {
-    ProductWithQuantity productWithQuantity1 = new ProductWithQuantity(BigInteger.valueOf(1), 2);
-    ProductWithQuantity productWithQuantity2 = new ProductWithQuantity(BigInteger.valueOf(2),2);
-    ProductWithQuantity productWithQuantity3 = new ProductWithQuantity(BigInteger.valueOf(3),1);
+    ProductWithQuantity productWithQuantity1 = new ProductWithQuantity(Long.valueOf(1), 2);
+    ProductWithQuantity productWithQuantity2 = new ProductWithQuantity(Long.valueOf(2),2);
+    ProductWithQuantity productWithQuantity3 = new ProductWithQuantity(Long.valueOf(3),1);
 
     return Arrays.asList(productWithQuantity1, productWithQuantity2, productWithQuantity3);
   }
@@ -515,16 +514,16 @@ public class NewCommandServiceHelperTest {
    */
   private List<ProductEntity> fakeStoreProductEntiy() {
     return Arrays.asList(
-            new ProductEntity(BigInteger.valueOf(1), "test", 10D,  "photo", 4, "photo", true),
-            new ProductEntity(BigInteger.valueOf(2), "test", 5D,  "photo", 7, "photo", true),
-            new ProductEntity(BigInteger.valueOf(3), "test", 7D,  "photo", 5, "photo", true),
-            new ProductEntity(BigInteger.valueOf(4), "test", 10D,  "photo", 6, "photo", true),
-            new ProductEntity(BigInteger.valueOf(5), "test", 15D,  "photo", 10, "photo", true),
-            new ProductEntity(BigInteger.valueOf(6), "test", 15D,  "photo", 10, "photo", true),
-            new ProductEntity(BigInteger.valueOf(7), "test", 15D,  "photo", 10, "photo", true),
-            new ProductEntity(BigInteger.valueOf(8), "test", 15D,  "photo", 10, "photo", true),
-            new ProductEntity(BigInteger.valueOf(9), "test", 15D,  "photo", 10, "photo", true),
-            new ProductEntity(BigInteger.valueOf(10), "test", 15D,  "photo", 10, "photo", true)
+            new ProductEntity(Long.valueOf(1), "test", 10D,  "photo", 4, "photo", true),
+            new ProductEntity(Long.valueOf(2), "test", 5D,  "photo", 7, "photo", true),
+            new ProductEntity(Long.valueOf(3), "test", 7D,  "photo", 5, "photo", true),
+            new ProductEntity(Long.valueOf(4), "test", 10D,  "photo", 6, "photo", true),
+            new ProductEntity(Long.valueOf(5), "test", 15D,  "photo", 10, "photo", true),
+            new ProductEntity(Long.valueOf(6), "test", 15D,  "photo", 10, "photo", true),
+            new ProductEntity(Long.valueOf(7), "test", 15D,  "photo", 10, "photo", true),
+            new ProductEntity(Long.valueOf(8), "test", 15D,  "photo", 10, "photo", true),
+            new ProductEntity(Long.valueOf(9), "test", 15D,  "photo", 10, "photo", true),
+            new ProductEntity(Long.valueOf(10), "test", 15D,  "photo", 10, "photo", true)
     );
   }
 }

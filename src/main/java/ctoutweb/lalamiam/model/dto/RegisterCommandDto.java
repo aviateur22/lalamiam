@@ -9,26 +9,26 @@ import java.math.BigInteger;
  * Contient l'ensemble des données d'un commande qui se trouve en base de données
  */
 public class RegisterCommandDto {
-  private BigInteger storeId;
-  private BigInteger commandId;
+  private Long storeId;
+  private Long commandId;
   private ManualCommandInformation manualCommandInformation;
   private CalculatedCommandInformation calculatedCommandInformation;
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  public BigInteger getStoreId() {
+  public Long getStoreId() {
     return storeId;
   }
 
-  public void setStoreId(BigInteger storeId) {
+  public void setStoreId(Long storeId) {
     this.storeId = storeId;
   }
 
-  public BigInteger getCommandId() {
+  public Long getCommandId() {
     return commandId;
   }
 
-  public void setCommandId(BigInteger commandId) {
+  public void setCommandId(Long commandId) {
     this.commandId = commandId;
   }
 

@@ -34,7 +34,7 @@ public class NewSlotHelper {
    * @param storeId BigInteger - Identifiant commerce
    * @return List<LocalDateTime> - Liste des slots disponible pour la commande
    */
-  public List<LocalDateTime> getStoreSlotAvailibility(BigInteger storeId, List<CommandEntity> storeCommandsInDay) {
+  public List<LocalDateTime> getStoreSlotAvailibility(Long storeId, List<CommandEntity> storeCommandsInDay) {
 
     // Recherche Info Commerce
     StoreEntity store = storeService.findStoreById(storeId);

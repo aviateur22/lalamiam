@@ -1,9 +1,6 @@
 package ctoutweb.lalamiam.model.dto;
-
-import java.math.BigInteger;
-
 public record ProductWithQuantityDto(
-        BigInteger productId,
+        Long productId,
         String name,
         String photo,
         Double price,

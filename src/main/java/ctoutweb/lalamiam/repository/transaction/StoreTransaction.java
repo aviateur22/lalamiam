@@ -44,7 +44,7 @@ public class StoreTransaction {
    * @param addStore - AddStoreDto
    */
   @Transactional()
-  public BigInteger SaveStore(AddStoreDto addStore) {
+  public Long SaveStore(AddStoreDto addStore) {
     // Vérification existence pro
     proRepository.findById(addStore.proId()).orElseThrow(()->new RuntimeException("Le professionel n'existe pas"));
 
@@ -73,7 +73,7 @@ public class StoreTransaction {
    * @param storeId - BigInteger
    * @return StoreEntity
    */
-  public StoreEntity getCompleteStoreInformation(BigInteger storeId) {
+  public StoreEntity getCompleteStoreInformation(Long storeId) {
     StoreEntity store = null;
     Session session = entityManagerFactory.unwrap(SessionFactory.class).openSession();
     Transaction transaction = session.beginTransaction();

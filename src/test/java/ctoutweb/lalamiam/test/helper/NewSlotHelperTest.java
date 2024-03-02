@@ -1,7 +1,6 @@
 package ctoutweb.lalamiam.test.helper;
 
 import ctoutweb.lalamiam.helper.NewSlotHelper;
-import ctoutweb.lalamiam.model.ProductWithQuantity;
 import ctoutweb.lalamiam.repository.entity.CommandEntity;
 import ctoutweb.lalamiam.repository.entity.StoreDayScheduleEntity;
 import ctoutweb.lalamiam.repository.entity.StoreEntity;
@@ -27,7 +26,7 @@ public class NewSlotHelperTest {
 
   @Test
   void getStoreSlotAvailibility_without_command() {
-    BigInteger storeId = BigInteger.valueOf(1);
+    Long storeId = Long.valueOf(1);
     StoreEntity fakeStore = getFakeStore(storeId);
 
     // Jour lundi
@@ -44,7 +43,7 @@ public class NewSlotHelperTest {
     StoreService storeService = mock(StoreService.class);
 
     // Mock StoreEntity StoreEntity
-    when(storeService.findStoreById(any(BigInteger.class))).thenReturn(fakeStore);
+    when(storeService.findStoreById(any(Long.class))).thenReturn(fakeStore);
 
     // Mock List<LocalDateTime> SlotsWithoutConstraintByDay
     when(storeService.findStorSlotsWithoutConstraintByDay(
@@ -69,7 +68,7 @@ public class NewSlotHelperTest {
 
   @Test
   void getStoreSlotAvailibility_with_command() {
-    BigInteger storeId = BigInteger.valueOf(1);
+    Long storeId = Long.valueOf(1);
     StoreEntity fakeStore = getFakeStore(storeId);
 
     // Jour lundi
@@ -86,7 +85,7 @@ public class NewSlotHelperTest {
     StoreService storeService = mock(StoreService.class);
 
     // Mock StoreEntity StoreEntity
-    when(storeService.findStoreById(any(BigInteger.class))).thenReturn(fakeStore);
+    when(storeService.findStoreById(any(Long.class))).thenReturn(fakeStore);
 
     // Mock List<LocalDateTime> SlotsWithoutConstraintByDay
     when(storeService.findStorSlotsWithoutConstraintByDay(
@@ -118,7 +117,7 @@ public class NewSlotHelperTest {
 
   @Test
   void getStoreSlotAvailibility_without_command_two_schedule_by_day(){
-    BigInteger storeId = BigInteger.valueOf(1);
+    Long storeId = Long.valueOf(1);
     StoreEntity fakeStore = getFakeStore(storeId);
 
     // Jour lundi
@@ -135,7 +134,7 @@ public class NewSlotHelperTest {
     StoreService storeService = mock(StoreService.class);
 
     // Mock StoreEntity StoreEntity
-    when(storeService.findStoreById(any(BigInteger.class))).thenReturn(fakeStore);
+    when(storeService.findStoreById(any(Long.class))).thenReturn(fakeStore);
 
     // Mock List<LocalDateTime> SlotsWithoutConstraintByDay
     when(storeService.findStorSlotsWithoutConstraintByDay(
@@ -160,7 +159,7 @@ public class NewSlotHelperTest {
 
   @Test
   void getStoreSlotAvailibility_with_command_two_schedule_by_day(){
-    BigInteger storeId = BigInteger.valueOf(1);
+    Long storeId = Long.valueOf(1);
     StoreEntity fakeStore = getFakeStore(storeId);
 
     // Jour lundi
@@ -177,7 +176,7 @@ public class NewSlotHelperTest {
     StoreService storeService = mock(StoreService.class);
 
     // Mock StoreEntity StoreEntity
-    when(storeService.findStoreById(any(BigInteger.class))).thenReturn(fakeStore);
+    when(storeService.findStoreById(any(Long.class))).thenReturn(fakeStore);
 
     // Mock List<LocalDateTime> SlotsWithoutConstraintByDay
     when(storeService.findStorSlotsWithoutConstraintByDay(
@@ -209,7 +208,7 @@ public class NewSlotHelperTest {
 
   @Test
   void getStoreSlotAvailibility_with_command_before_open(){
-    BigInteger storeId = BigInteger.valueOf(1);
+    Long storeId = Long.valueOf(1);
     StoreEntity fakeStore = getFakeStore(storeId);
 
     // Jour lundi
@@ -226,7 +225,7 @@ public class NewSlotHelperTest {
     StoreService storeService = mock(StoreService.class);
 
     // Mock StoreEntity StoreEntity
-    when(storeService.findStoreById(any(BigInteger.class))).thenReturn(fakeStore);
+    when(storeService.findStoreById(any(Long.class))).thenReturn(fakeStore);
 
     // Mock List<LocalDateTime> SlotsWithoutConstraintByDay
     when(storeService.findStorSlotsWithoutConstraintByDay(
@@ -258,7 +257,7 @@ public class NewSlotHelperTest {
 
   @Test
   void getStoreSlotAvailibility_with_command_after_closure(){
-    BigInteger storeId = BigInteger.valueOf(1);
+    Long storeId = Long.valueOf(1);
     StoreEntity fakeStore = getFakeStore(storeId);
 
     // Jour lundi
@@ -275,7 +274,7 @@ public class NewSlotHelperTest {
     StoreService storeService = mock(StoreService.class);
 
     // Mock StoreEntity StoreEntity
-    when(storeService.findStoreById(any(BigInteger.class))).thenReturn(fakeStore);
+    when(storeService.findStoreById(any(Long.class))).thenReturn(fakeStore);
 
     // Mock List<LocalDateTime> SlotsWithoutConstraintByDay
     when(storeService.findStorSlotsWithoutConstraintByDay(
@@ -307,7 +306,7 @@ public class NewSlotHelperTest {
 
   @Test
   void filterSlot_before_store_open() {
-    BigInteger storeId = BigInteger.valueOf(1);
+    Long storeId = Long.valueOf(1);
     StoreEntity fakeStore = getFakeStore(storeId);
 
     // Jour lundi
@@ -349,7 +348,7 @@ public class NewSlotHelperTest {
 
   @Test
   void filterSlot_after_store_open() {
-    BigInteger storeId = BigInteger.valueOf(1);
+    Long storeId = Long.valueOf(1);
     StoreEntity fakeStore = getFakeStore(storeId);
 
     // Jour lundi
@@ -391,7 +390,7 @@ public class NewSlotHelperTest {
 
   @Test
   void filterSlot_with_busy_slot() {
-    BigInteger storeId = BigInteger.valueOf(1);
+    Long storeId = Long.valueOf(1);
     StoreEntity fakeStore = getFakeStore(storeId);
 
     // Jour lundi
@@ -434,7 +433,7 @@ public class NewSlotHelperTest {
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  StoreEntity getFakeStore(BigInteger storeId) {
+  StoreEntity getFakeStore(Long storeId) {
     StoreEntity store = new StoreEntity();
     store.setId(storeId);
     store.setFrequenceSlotTime(10);

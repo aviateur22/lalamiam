@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CommandRepository extends JpaRepository<CommandEntity, BigInteger> {
+public interface CommandRepository extends JpaRepository<CommandEntity, Long> {
 
   List<CommandEntity> findAllByStore(StoreEntity store);
 
@@ -22,7 +22,7 @@ public interface CommandRepository extends JpaRepository<CommandEntity, BigInteg
   public long countAll();
 
   @Query(value = "select * from sc_lalamiam.command where slot_time between ?1 and ?2 and store_id=?3", nativeQuery = true)
-  public List<CommandEntity> findCommandsByStoreIdDate(LocalDateTime startOfDay, LocalDateTime endOfDay, BigInteger storeId);
+  public List<CommandEntity> findCommandsByStoreIdDate(LocalDateTime startOfDay, LocalDateTime endOfDay, Long storeId);
 
 
 

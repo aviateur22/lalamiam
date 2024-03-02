@@ -17,7 +17,7 @@ public class ProEntity {
   @Id
   @SequenceGenerator(name="proPkSeq", sequenceName="PRO_PK_SEQ", allocationSize=1, initialValue = 1)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "proPkSeq")
-  private BigInteger id;
+  private Long id;
 
   @Column(name = "email")
   private String email;
@@ -45,7 +45,7 @@ public class ProEntity {
   public ProEntity() {
   }
 
-  public ProEntity(BigInteger id, String email, String phone, String password, LocalDateTime createdAt, LocalDateTime updatedAt) {
+  public ProEntity(Long id, String email, String phone, String password, LocalDateTime createdAt, LocalDateTime updatedAt) {
     this.id = id;
     this.email = email;
     this.phone = phone;
@@ -60,15 +60,15 @@ public class ProEntity {
     this.password = addProfessionalSchema.password();
   }
 
-  public ProEntity(BigInteger proId) {
+  public ProEntity(Long proId) {
     this.id = proId;
   }
 
-  public BigInteger getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(BigInteger id) {
+  public void setId(Long id) {
     this.id = id;
   }
 

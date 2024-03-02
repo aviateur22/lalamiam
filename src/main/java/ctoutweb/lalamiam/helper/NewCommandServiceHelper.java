@@ -57,7 +57,7 @@ public class NewCommandServiceHelper {
    * @return List<ProductWithQuantityDto>
    */
   public List<ProductWithQuantityDto> getStoreProductsWithCommandQuantity(
-          BigInteger storeId,
+          Long storeId,
           RegisterCommandDto registerCommand
   ) {
     final int CREATE_COMMAND_QUANTITY = 0;

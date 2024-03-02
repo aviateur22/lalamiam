@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public final class StoreEntityBuilder {
-  private BigInteger id;
+  private Long id;
   private String name;
   private String presentation;
   private String adress;
@@ -31,7 +31,7 @@ public final class StoreEntityBuilder {
     return new StoreEntityBuilder();
   }
 
-  public StoreEntityBuilder withId(BigInteger id) {
+  public StoreEntityBuilder withId(Long id) {
     this.id = id;
     return this;
   }

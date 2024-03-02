@@ -14,7 +14,7 @@ public interface Command {
    * @param commandId BigInteger - identifiant de la commande (null si commande en cours de création)
    * @return CommandInformationDto
    */
-  StoreProductsInformationDto getStoreProductsForCommand(BigInteger storeId, BigInteger commandId);
+  StoreProductsInformationDto getStoreProductsForCommand(Long storeId, Long commandId);
 
   /**
    * Validation de la commande
@@ -22,7 +22,7 @@ public interface Command {
    * @param commandId BigInteger - identifiant de la commande (null si commande en cours de création)
    * @param productSelectInformation ProductSelectInformationDto - Données renseignées dans la commande
    */
-  void validateProductsSelection(BigInteger storeId, BigInteger commandId, ProductSelectInformationDto productSelectInformation);
+  void validateProductsSelection(Long storeId, Long commandId, ProductSelectInformationDto productSelectInformation);
 
   /**
    * Récupération d'une liste de slot disponible pour un commerce

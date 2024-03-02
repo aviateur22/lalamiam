@@ -18,7 +18,6 @@ import ctoutweb.lalamiam.service.serviceImpl.NewCommandServiceImp;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -37,8 +36,8 @@ NewCommandServiceImp commandService;
 
   @Test
   void getStoreProductsForCommand_with_command_and_store_produst() {
-    BigInteger storeId = BigInteger.valueOf(1);
-    BigInteger commandId = BigInteger.valueOf(1);
+    Long storeId = Long.valueOf(1);
+    Long commandId = Long.valueOf(1);
     LocalDateTime slotTimeRequest = LocalDateTime.now();
 
     CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
@@ -66,10 +65,10 @@ NewCommandServiceImp commandService;
      */
     // Fake CommandEntity
     CommandEntity command = getFakeCommandEntity(storeId, commandId, slotTimeRequest);
-    when(commandTransactionSession.getCommand(any(BigInteger.class))).thenReturn(command);
+    when(commandTransactionSession.getCommand(any(Long.class))).thenReturn(command);
 
     // Fake List<ProductEntity>
-    when(commandProductService.getStoreProducts(any(BigInteger.class))).thenReturn(fakeStoreProductEntiy());
+    when(commandProductService.getStoreProducts(any(Long.class))).thenReturn(fakeStoreProductEntiy());
 
     StoreProductsInformationDto commandInformation = commandService.getStoreProductsForCommand(storeId, commandId);
 
@@ -78,19 +77,19 @@ NewCommandServiceImp commandService;
      */
     Assertions.assertEquals("0623274100", commandInformation.clientPhone());
     Assertions.assertEquals(fakeStoreProductEntiy().size(), commandInformation.storeProducts().size());
-    Assertions.assertEquals(1, getProductWithQuantityById(BigInteger.valueOf(1), commandInformation.storeProducts()).selectQuantity());
-    Assertions.assertEquals(2, getProductWithQuantityById(BigInteger.valueOf(2), commandInformation.storeProducts()).selectQuantity());
-    Assertions.assertEquals(3, getProductWithQuantityById(BigInteger.valueOf(3), commandInformation.storeProducts()).selectQuantity());
-    Assertions.assertEquals(4, getProductWithQuantityById(BigInteger.valueOf(4), commandInformation.storeProducts()).selectQuantity());
-    Assertions.assertEquals(0, getProductWithQuantityById(BigInteger.valueOf(5), commandInformation.storeProducts()).selectQuantity());
-    Assertions.assertEquals(0, getProductWithQuantityById(BigInteger.valueOf(6), commandInformation.storeProducts()).selectQuantity());
-    Assertions.assertEquals(0, getProductWithQuantityById(BigInteger.valueOf(7), commandInformation.storeProducts()).selectQuantity());
-    Assertions.assertEquals(0, getProductWithQuantityById(BigInteger.valueOf(8), commandInformation.storeProducts()).selectQuantity());
+    Assertions.assertEquals(1, getProductWithQuantityById(Long.valueOf(1), commandInformation.storeProducts()).selectQuantity());
+    Assertions.assertEquals(2, getProductWithQuantityById(Long.valueOf(2), commandInformation.storeProducts()).selectQuantity());
+    Assertions.assertEquals(3, getProductWithQuantityById(Long.valueOf(3), commandInformation.storeProducts()).selectQuantity());
+    Assertions.assertEquals(4, getProductWithQuantityById(Long.valueOf(4), commandInformation.storeProducts()).selectQuantity());
+    Assertions.assertEquals(0, getProductWithQuantityById(Long.valueOf(5), commandInformation.storeProducts()).selectQuantity());
+    Assertions.assertEquals(0, getProductWithQuantityById(Long.valueOf(6), commandInformation.storeProducts()).selectQuantity());
+    Assertions.assertEquals(0, getProductWithQuantityById(Long.valueOf(7), commandInformation.storeProducts()).selectQuantity());
+    Assertions.assertEquals(0, getProductWithQuantityById(Long.valueOf(8), commandInformation.storeProducts()).selectQuantity());
   }
   @Test
   void getStoreProductsForCommand_without_command() {
-    BigInteger storeId = BigInteger.valueOf(1);
-    BigInteger commandId = BigInteger.valueOf(1);
+    Long storeId = Long.valueOf(1);
+    Long commandId = Long.valueOf(1);
 
     CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
     CommandProductService commandProductService = mock(CommandProductService.class);
@@ -116,10 +115,10 @@ NewCommandServiceImp commandService;
      */
     // Fake CommandEntity
     CommandEntity command = null;
-    when(commandTransactionSession.getCommand(any(BigInteger.class))).thenReturn(command);
+    when(commandTransactionSession.getCommand(any(Long.class))).thenReturn(command);
 
     // Fake List<ProductEntity>
-    when(commandProductService.getStoreProducts(any(BigInteger.class))).thenReturn(fakeStoreProductEntiy());
+    when(commandProductService.getStoreProducts(any(Long.class))).thenReturn(fakeStoreProductEntiy());
 
     StoreProductsInformationDto commandInformation = commandService.getStoreProductsForCommand(storeId, commandId);
 
@@ -128,19 +127,19 @@ NewCommandServiceImp commandService;
      */
     Assertions.assertEquals(null, commandInformation.clientPhone());
     Assertions.assertEquals(fakeStoreProductEntiy().size(), commandInformation.storeProducts().size());
-    Assertions.assertEquals(0, getProductWithQuantityById(BigInteger.valueOf(1), commandInformation.storeProducts()).selectQuantity());
-    Assertions.assertEquals(0, getProductWithQuantityById(BigInteger.valueOf(2), commandInformation.storeProducts()).selectQuantity());
-    Assertions.assertEquals(0, getProductWithQuantityById(BigInteger.valueOf(3), commandInformation.storeProducts()).selectQuantity());
-    Assertions.assertEquals(0, getProductWithQuantityById(BigInteger.valueOf(4), commandInformation.storeProducts()).selectQuantity());
-    Assertions.assertEquals(0, getProductWithQuantityById(BigInteger.valueOf(5), commandInformation.storeProducts()).selectQuantity());
-    Assertions.assertEquals(0, getProductWithQuantityById(BigInteger.valueOf(6), commandInformation.storeProducts()).selectQuantity());
-    Assertions.assertEquals(0, getProductWithQuantityById(BigInteger.valueOf(7), commandInformation.storeProducts()).selectQuantity());
-    Assertions.assertEquals(0, getProductWithQuantityById(BigInteger.valueOf(8), commandInformation.storeProducts()).selectQuantity());
+    Assertions.assertEquals(0, getProductWithQuantityById(Long.valueOf(1), commandInformation.storeProducts()).selectQuantity());
+    Assertions.assertEquals(0, getProductWithQuantityById(Long.valueOf(2), commandInformation.storeProducts()).selectQuantity());
+    Assertions.assertEquals(0, getProductWithQuantityById(Long.valueOf(3), commandInformation.storeProducts()).selectQuantity());
+    Assertions.assertEquals(0, getProductWithQuantityById(Long.valueOf(4), commandInformation.storeProducts()).selectQuantity());
+    Assertions.assertEquals(0, getProductWithQuantityById(Long.valueOf(5), commandInformation.storeProducts()).selectQuantity());
+    Assertions.assertEquals(0, getProductWithQuantityById(Long.valueOf(6), commandInformation.storeProducts()).selectQuantity());
+    Assertions.assertEquals(0, getProductWithQuantityById(Long.valueOf(7), commandInformation.storeProducts()).selectQuantity());
+    Assertions.assertEquals(0, getProductWithQuantityById(Long.valueOf(8), commandInformation.storeProducts()).selectQuantity());
   }
   @Test
   void getStoreProductsForCommand_with_command_not_belong_to_store() {
-    BigInteger storeId = BigInteger.valueOf(1);
-    BigInteger commandId = BigInteger.valueOf(1);
+    Long storeId = Long.valueOf(1);
+    Long commandId = Long.valueOf(1);
     LocalDateTime slotTimeRequest = LocalDateTime.now();
 
     CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
@@ -166,11 +165,11 @@ NewCommandServiceImp commandService;
      * When
      */
     // Fake CommandEntity
-    CommandEntity command = getFakeCommandEntity(BigInteger.valueOf(2), commandId, slotTimeRequest);
-    when(commandTransactionSession.getCommand(any(BigInteger.class))).thenReturn(command);
+    CommandEntity command = getFakeCommandEntity(Long.valueOf(2), commandId, slotTimeRequest);
+    when(commandTransactionSession.getCommand(any(Long.class))).thenReturn(command);
 
     // Fake List<ProductEntity>
-    when(commandProductService.getStoreProducts(any(BigInteger.class))).thenReturn(fakeStoreProductEntiy());
+    when(commandProductService.getStoreProducts(any(Long.class))).thenReturn(fakeStoreProductEntiy());
 
     /**
      * Then
@@ -187,8 +186,8 @@ NewCommandServiceImp commandService;
     /**
      * Given
      */
-    BigInteger commandId = BigInteger.valueOf(1);
-    BigInteger storeId = BigInteger.valueOf(1);
+    Long commandId = Long.valueOf(1);
+    Long storeId = Long.valueOf(1);
     LocalDateTime slotTimeRequest = LocalDateTime.now();
 
     ProductQuantityMapper productQuantityMapper = new ProductQuantityMapper();
@@ -198,7 +197,7 @@ NewCommandServiceImp commandService;
 
     // Mock CommandTransactionSession
     CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
-    when(commandTransactionSession.getCommand(any(BigInteger.class))).thenReturn(getFakeCommandEntity(storeId, commandId, slotTimeRequest));
+    when(commandTransactionSession.getCommand(any(Long.class))).thenReturn(getFakeCommandEntity(storeId, commandId, slotTimeRequest));
 
     // Mock CommandProductService
     CommandProductService commandProductService = mock(CommandProductService.class);
@@ -257,8 +256,8 @@ NewCommandServiceImp commandService;
     /**
      * Given
      */
-    BigInteger commandId = BigInteger.valueOf(1);
-    BigInteger storeId = BigInteger.valueOf(1);
+    Long commandId = Long.valueOf(1);
+    Long storeId = Long.valueOf(1);
 
     ProductQuantityMapper productQuantityMapper = new ProductQuantityMapper();
     ProductService productService = mock(ProductService.class);
@@ -267,7 +266,7 @@ NewCommandServiceImp commandService;
 
     // Mock CommandTransactionSession
     CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
-    when(commandTransactionSession.getCommand(any(BigInteger.class))).thenReturn(null);
+    when(commandTransactionSession.getCommand(any(Long.class))).thenReturn(null);
 
     // Mock CommandProductService
     CommandProductService commandProductService = mock(CommandProductService.class);
@@ -295,8 +294,8 @@ NewCommandServiceImp commandService;
   }
   @Test
   void validateProductsSelection_() {
-    BigInteger storeId = BigInteger.valueOf(1);
-    BigInteger commandId = BigInteger.valueOf(1);
+    Long storeId = Long.valueOf(1);
+    Long commandId = Long.valueOf(1);
     String clientPhone = "06402101";
     List<ProductWithQuantity> productsSelect = getFakeProductWithQuantityList();
 
@@ -320,7 +319,7 @@ NewCommandServiceImp commandService;
 
     // Mock ProductService
     ProductService productService = mock(ProductService.class);
-    when(productService.findProduct(any(BigInteger.class))).thenReturn(getFakeProduct(storeId, BigInteger.valueOf(1)));
+    when(productService.findProduct(any(Long.class))).thenReturn(getFakeProduct(storeId, Long.valueOf(1)));
 
     // Mock NewSlotHelper
     NewSlotHelper slotHelper = mock(NewSlotHelper.class);
@@ -339,8 +338,8 @@ NewCommandServiceImp commandService;
   }
   @Test
   void validateProductsSelection_without_command_id() {
-    BigInteger storeId = BigInteger.valueOf(1);
-    BigInteger commandId = null;
+    Long storeId = Long.valueOf(1);
+    Long commandId = null;
     String clientPhone = "0623471";
     List<ProductWithQuantity> productsSelect = getFakeProductWithQuantityList();
 
@@ -360,7 +359,7 @@ NewCommandServiceImp commandService;
 
     // Mock ProductService
     ProductService productService = mock(ProductService.class);
-    when(productService.findProduct(any(BigInteger.class))).thenReturn(getFakeProduct(storeId, BigInteger.valueOf(1)));
+    when(productService.findProduct(any(Long.class))).thenReturn(getFakeProduct(storeId, Long.valueOf(1)));
 
     // Mock NewSlotHelper
     NewSlotHelper slotHelper = mock(NewSlotHelper.class);
@@ -378,8 +377,8 @@ NewCommandServiceImp commandService;
   }
   @Test
   void validateProductsSelection_with_command_not_belong_to_store() {
-    BigInteger storeId = BigInteger.valueOf(1);
-    BigInteger commandId = BigInteger.valueOf(1);
+    Long storeId = Long.valueOf(1);
+    Long commandId = Long.valueOf(1);
     String clientPhone = "0623471";
     List<ProductWithQuantity> productsSelect = getFakeProductWithQuantityList();
 
@@ -394,7 +393,7 @@ NewCommandServiceImp commandService;
     // Mock CommandTransactionSession
     CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
     when(commandTransactionSession.getCommand(commandId)).thenReturn(getFakeCommandEntity(
-            BigInteger.valueOf(2),
+            Long.valueOf(2),
             commandId,
             LocalDateTime.now()));
 
@@ -403,7 +402,7 @@ NewCommandServiceImp commandService;
 
     // Mock ProductService
     ProductService productService = mock(ProductService.class);
-    when(productService.findProduct(any(BigInteger.class))).thenReturn(getFakeProduct(storeId, BigInteger.valueOf(1)));
+    when(productService.findProduct(any(Long.class))).thenReturn(getFakeProduct(storeId, Long.valueOf(1)));
 
     // Mock NewSlotHelper
     NewSlotHelper slotHelper = mock(NewSlotHelper.class);
@@ -426,8 +425,8 @@ NewCommandServiceImp commandService;
   }
   @Test
   void validateProductsSelection_without_phone() {
-    BigInteger storeId = BigInteger.valueOf(1);
-    BigInteger commandId = BigInteger.valueOf(1);
+    Long storeId = Long.valueOf(1);
+    Long commandId = Long.valueOf(1);
     String clientPhone = "";
     List<ProductWithQuantity> productsSelect = getFakeProductWithQuantityList();
 
@@ -450,7 +449,7 @@ NewCommandServiceImp commandService;
 
     // Mock ProductService
     ProductService productService = mock(ProductService.class);
-    when(productService.findProduct(any(BigInteger.class))).thenReturn(getFakeProduct(storeId, BigInteger.valueOf(1)));
+    when(productService.findProduct(any(Long.class))).thenReturn(getFakeProduct(storeId, Long.valueOf(1)));
 
     // Mock NewSlotHelper
     NewSlotHelper slotHelper = mock(NewSlotHelper.class);
@@ -469,8 +468,8 @@ NewCommandServiceImp commandService;
   }
   @Test
   void validateProductsSelection_with_empty_command() {
-    BigInteger storeId = BigInteger.valueOf(1);
-    BigInteger commandId = BigInteger.valueOf(1);
+    Long storeId = Long.valueOf(1);
+    Long commandId = Long.valueOf(1);
     String clientPhone = "062357";
     List<ProductWithQuantity> productsSelect = Arrays.asList();
 
@@ -494,7 +493,7 @@ NewCommandServiceImp commandService;
 
     // Mock ProductService
     ProductService productService = mock(ProductService.class);
-    when(productService.findProduct(any(BigInteger.class))).thenReturn(getFakeProduct(storeId, BigInteger.valueOf(1)));
+    when(productService.findProduct(any(Long.class))).thenReturn(getFakeProduct(storeId, Long.valueOf(1)));
 
     // Mock NewSlotHelper
     NewSlotHelper slotHelper = mock(NewSlotHelper.class);
@@ -513,8 +512,8 @@ NewCommandServiceImp commandService;
   }
   @Test
   void validateProductsSelection_with_null_command() {
-    BigInteger storeId = BigInteger.valueOf(1);
-    BigInteger commandId = BigInteger.valueOf(1);
+    Long storeId = Long.valueOf(1);
+    Long commandId = Long.valueOf(1);
     String clientPhone = "062357";
     List<ProductWithQuantity> productsSelect = null;
 
@@ -538,7 +537,7 @@ NewCommandServiceImp commandService;
 
     // Mock ProductService
     ProductService productService = mock(ProductService.class);
-    when(productService.findProduct(any(BigInteger.class))).thenReturn(getFakeProduct(storeId, BigInteger.valueOf(1)));
+    when(productService.findProduct(any(Long.class))).thenReturn(getFakeProduct(storeId, Long.valueOf(1)));
 
     // Mock NewSlotHelper
     NewSlotHelper slotHelper = mock(NewSlotHelper.class);
@@ -557,8 +556,8 @@ NewCommandServiceImp commandService;
   }
   @Test
   void validateProductsSelection_with_product_not_belong_to_store() {
-    BigInteger storeId = BigInteger.valueOf(1);
-    BigInteger commandId = BigInteger.valueOf(1);
+    Long storeId = Long.valueOf(1);
+    Long commandId = Long.valueOf(1);
     String clientPhone = "062357";
     List<ProductWithQuantity> productsSelect = getFakeProductWithQuantityList();
 
@@ -582,13 +581,13 @@ NewCommandServiceImp commandService;
 
     // Mock ProductService ProdutcId1
     ProductService productService = mock(ProductService.class);
-    when(productService.findProduct(BigInteger.valueOf(1))).thenReturn(getFakeProductNotBelongToStore(BigInteger.valueOf(1)));
+    when(productService.findProduct(Long.valueOf(1))).thenReturn(getFakeProductNotBelongToStore(Long.valueOf(1)));
 
-    when(productService.findProduct(BigInteger.valueOf(2))).thenReturn(getFakeProductNotBelongToStore(BigInteger.valueOf(2)));
+    when(productService.findProduct(Long.valueOf(2))).thenReturn(getFakeProductNotBelongToStore(Long.valueOf(2)));
 
-    when(productService.findProduct(BigInteger.valueOf(3))).thenReturn(getFakeProductNotBelongToStore(BigInteger.valueOf(3)));
+    when(productService.findProduct(Long.valueOf(3))).thenReturn(getFakeProductNotBelongToStore(Long.valueOf(3)));
 
-    when(productService.findProduct(BigInteger.valueOf(4))).thenReturn(getFakeProductNotBelongToStore(BigInteger.valueOf(4)));
+    when(productService.findProduct(Long.valueOf(4))).thenReturn(getFakeProductNotBelongToStore(Long.valueOf(4)));
 
 
     // Mock NewSlotHelper
@@ -608,8 +607,8 @@ NewCommandServiceImp commandService;
   }
   @Test
   void validateProductsSelection_with_product_not_available() {
-    BigInteger storeId = BigInteger.valueOf(1);
-    BigInteger commandId = BigInteger.valueOf(1);
+    Long storeId = Long.valueOf(1);
+    Long commandId = Long.valueOf(1);
     String clientPhone = "062357";
     List<ProductWithQuantity> productsSelect = getFakeProductWithQuantityList();
 
@@ -633,13 +632,13 @@ NewCommandServiceImp commandService;
 
     // Mock ProductService ProdutcId1
     ProductService productService = mock(ProductService.class);
-    when(productService.findProduct(BigInteger.valueOf(1))).thenReturn(getFakeProductNotAvailable(BigInteger.valueOf(1)));
+    when(productService.findProduct(Long.valueOf(1))).thenReturn(getFakeProductNotAvailable(Long.valueOf(1)));
 
-    when(productService.findProduct(BigInteger.valueOf(2))).thenReturn(getFakeProductNotAvailable(BigInteger.valueOf(2)));
+    when(productService.findProduct(Long.valueOf(2))).thenReturn(getFakeProductNotAvailable(Long.valueOf(2)));
 
-    when(productService.findProduct(BigInteger.valueOf(3))).thenReturn(getFakeProductNotAvailable(BigInteger.valueOf(3)));
+    when(productService.findProduct(Long.valueOf(3))).thenReturn(getFakeProductNotAvailable(Long.valueOf(3)));
 
-    when(productService.findProduct(BigInteger.valueOf(4))).thenReturn(getFakeProductNotAvailable(BigInteger.valueOf(4)));
+    when(productService.findProduct(Long.valueOf(4))).thenReturn(getFakeProductNotAvailable(Long.valueOf(4)));
 
 
     // Mock NewSlotHelper
@@ -659,8 +658,8 @@ NewCommandServiceImp commandService;
   }
   @Test
   void validateProductsSelection_without_product_quantity() {
-    BigInteger storeId = BigInteger.valueOf(1);
-    BigInteger commandId = BigInteger.valueOf(1);
+    Long storeId = Long.valueOf(1);
+    Long commandId = Long.valueOf(1);
     String clientPhone = "062357";
     List<ProductWithQuantity> productsSelect = getFakeProductWithoutQuantityList();
 
@@ -684,7 +683,7 @@ NewCommandServiceImp commandService;
 
     // Mock ProductService ProdutcId1
     ProductService productService = mock(ProductService.class);
-    when(productService.findProduct(BigInteger.valueOf(1))).thenReturn(getFakeProduct(storeId, BigInteger.valueOf(1)));
+    when(productService.findProduct(Long.valueOf(1))).thenReturn(getFakeProduct(storeId, Long.valueOf(1)));
 
     // Mock NewSlotHelper
     NewSlotHelper slotHelper = mock(NewSlotHelper.class);
@@ -704,8 +703,8 @@ NewCommandServiceImp commandService;
   @Test
   void getStoreSlotAvailibility_without_commands_in_store() {
 
-    BigInteger storeId = BigInteger.valueOf(1);
-    BigInteger commandId = BigInteger.valueOf(1);
+    Long storeId = Long.valueOf(1);
+    Long commandId = Long.valueOf(1);
     WeekDayEntity weekDay = new WeekDayEntity(1);
     LocalDate commandDate = getNextRequestDate(weekDay.getId());
     LocalDateTime consulationDate = commandDate.atTime(8,30,0);
@@ -721,7 +720,7 @@ NewCommandServiceImp commandService;
 
     // Mock StoreService
     StoreService storeService = mock(StoreService.class);
-    when(storeService.findStoreById(any(BigInteger.class))).thenReturn(getFakeStore(storeId));
+    when(storeService.findStoreById(any(Long.class))).thenReturn(getFakeStore(storeId));
     when(storeService.findStoreSchedulesByDay(any(StoreEntity.class), any(WeekDayEntity.class)))
             .thenReturn(getFakeDoubleStoreSchedule(weekDay, getFakeStore(storeId)));
     when(storeService.findStorSlotsWithoutConstraintByDay(any(LocalDateTime.class), any(Integer.class)))
@@ -739,7 +738,7 @@ NewCommandServiceImp commandService;
     when(commandRepository.findCommandsByStoreIdDate(
             any(LocalDateTime.class),
             any(LocalDateTime.class),
-            any(BigInteger.class))
+            any(Long.class))
     ).thenReturn(Arrays.asList());
 
     // Mock ProductService
@@ -763,8 +762,8 @@ NewCommandServiceImp commandService;
   @Test
   void getStoreSlotAvailibility_with_commands_in_store() {
 
-    BigInteger storeId = BigInteger.valueOf(1);
-    BigInteger commandId = BigInteger.valueOf(1);
+    Long storeId = Long.valueOf(1);
+    Long commandId = Long.valueOf(1);
     WeekDayEntity weekDay = new WeekDayEntity(1);
     LocalDate commandDate = getNextRequestDate(weekDay.getId());
     LocalDateTime consulationDate = commandDate.atTime(15,30,0);
@@ -780,7 +779,7 @@ NewCommandServiceImp commandService;
 
     // Mock StoreService
     StoreService storeService = mock(StoreService.class);
-    when(storeService.findStoreById(any(BigInteger.class))).thenReturn(getFakeStore(storeId));
+    when(storeService.findStoreById(any(Long.class))).thenReturn(getFakeStore(storeId));
     when(storeService.findStoreSchedulesByDay(any(StoreEntity.class), any(WeekDayEntity.class)))
             .thenReturn(getFakeDoubleStoreSchedule(weekDay, getFakeStore(storeId)));
     when(storeService.findStorSlotsWithoutConstraintByDay(any(LocalDateTime.class), any(Integer.class)))
@@ -798,7 +797,7 @@ NewCommandServiceImp commandService;
     when(commandRepository.findCommandsByStoreIdDate(
             any(LocalDateTime.class),
             any(LocalDateTime.class),
-            any(BigInteger.class))
+            any(Long.class))
     ).thenReturn(getFakeCommands(commandDate));
 
     // Mock ProductService
@@ -829,8 +828,8 @@ NewCommandServiceImp commandService;
   @Test
   void getStoreSlotAvailibility_next_day_without_command_in_store() {
 
-    BigInteger storeId = BigInteger.valueOf(1);
-    BigInteger commandId = BigInteger.valueOf(1);
+    Long storeId = Long.valueOf(1);
+    Long commandId = Long.valueOf(1);
     WeekDayEntity weekDay = new WeekDayEntity(1);
     LocalDateTime consulationDate = getNextRequestDate(weekDay.getId()).atTime(15,0);
     LocalDate commandDate = consulationDate.plusDays(1).toLocalDate();
@@ -846,7 +845,7 @@ NewCommandServiceImp commandService;
 
     // Mock StoreService
     StoreService storeService = mock(StoreService.class);
-    when(storeService.findStoreById(any(BigInteger.class))).thenReturn(getFakeStore(storeId));
+    when(storeService.findStoreById(any(Long.class))).thenReturn(getFakeStore(storeId));
     when(storeService.findStoreSchedulesByDay(any(StoreEntity.class), any(WeekDayEntity.class)))
             .thenReturn(getFakeDoubleStoreSchedule(weekDay, getFakeStore(storeId)));
     when(storeService.findStorSlotsWithoutConstraintByDay(any(LocalDateTime.class), any(Integer.class)))
@@ -864,7 +863,7 @@ NewCommandServiceImp commandService;
     when(commandRepository.findCommandsByStoreIdDate(
             any(LocalDateTime.class),
             any(LocalDateTime.class),
-            any(BigInteger.class))
+            any(Long.class))
     ).thenReturn(Arrays.asList());
 
     // Mock ProductService
@@ -888,8 +887,8 @@ NewCommandServiceImp commandService;
   @Test
   void getStoreSlotAvailibility_next_day_with_command_in_store() {
 
-    BigInteger storeId = BigInteger.valueOf(1);
-    BigInteger commandId = BigInteger.valueOf(1);
+    Long storeId = Long.valueOf(1);
+    Long commandId = Long.valueOf(1);
     WeekDayEntity weekDay = new WeekDayEntity(1);
     LocalDateTime consulationDate = getNextRequestDate(weekDay.getId()).atTime(15,0);
     LocalDate commandDate = consulationDate.plusDays(1).toLocalDate();
@@ -905,7 +904,7 @@ NewCommandServiceImp commandService;
 
     // Mock StoreService
     StoreService storeService = mock(StoreService.class);
-    when(storeService.findStoreById(any(BigInteger.class))).thenReturn(getFakeStore(storeId));
+    when(storeService.findStoreById(any(Long.class))).thenReturn(getFakeStore(storeId));
     when(storeService.findStoreSchedulesByDay(any(StoreEntity.class), any(WeekDayEntity.class)))
             .thenReturn(getFakeDoubleStoreSchedule(weekDay, getFakeStore(storeId)));
     when(storeService.findStorSlotsWithoutConstraintByDay(any(LocalDateTime.class), any(Integer.class)))
@@ -923,7 +922,7 @@ NewCommandServiceImp commandService;
     when(commandRepository.findCommandsByStoreIdDate(
             any(LocalDateTime.class),
             any(LocalDateTime.class),
-            any(BigInteger.class))
+            any(Long.class))
     ).thenReturn(getFakeCommands(commandDate));
 
     // Mock ProductService
@@ -960,20 +959,20 @@ NewCommandServiceImp commandService;
    */
   private List<CommandProductEntity> fakeCommandProducList() {
     return Arrays.asList(
-            new CommandProductEntity(1, new ProductEntity(BigInteger.valueOf(1),"test", 1D , "description", 5,"photo", true)),
-            new CommandProductEntity(2, new ProductEntity(BigInteger.valueOf(2),"test", 1D , "description", 5,"photo", true)),
-            new CommandProductEntity(3, new ProductEntity(BigInteger.valueOf(3),"test", 1D , "description", 5,"photo", true)),
-            new CommandProductEntity(4, new ProductEntity(BigInteger.valueOf(4),"test", 1D , "description", 5,"photo", true))
+            new CommandProductEntity(1, new ProductEntity(Long.valueOf(1),"test", 1D , "description", 5,"photo", true)),
+            new CommandProductEntity(2, new ProductEntity(Long.valueOf(2),"test", 1D , "description", 5,"photo", true)),
+            new CommandProductEntity(3, new ProductEntity(Long.valueOf(3),"test", 1D , "description", 5,"photo", true)),
+            new CommandProductEntity(4, new ProductEntity(Long.valueOf(4),"test", 1D , "description", 5,"photo", true))
     );
   }
 
   /**
    * Fake productEntity
-   * @param storeId BigInteger
+   * @param storeId Long
    * @param productId storeId
    * @return ProductEntity
    */
-  private ProductEntity getFakeProduct(BigInteger storeId, BigInteger productId) {
+  private ProductEntity getFakeProduct(Long storeId, Long productId) {
     ProductEntity product = new ProductEntity(productId);
     product.setStore(new StoreEntity(storeId));
     product.setName("coco");
@@ -988,16 +987,16 @@ NewCommandServiceImp commandService;
    */
   private List<ProductWithQuantityDto> fakeProductWithQuantityForStore() {
     return Arrays.asList(
-            new ProductWithQuantityDto(BigInteger.valueOf(1), "test", "photo", 1D, 1, true),
-            new ProductWithQuantityDto(BigInteger.valueOf(2), "test", "photo", 1D, 2, true),
-            new ProductWithQuantityDto(BigInteger.valueOf(3), "test", "photo", 1D, 3, true),
-            new ProductWithQuantityDto(BigInteger.valueOf(4), "test", "photo", 1D, 4, true),
-            new ProductWithQuantityDto(BigInteger.valueOf(5), "test", "photo", 1D, 3, true),
-            new ProductWithQuantityDto(BigInteger.valueOf(6), "test", "photo", 1D, 4, true),
-            new ProductWithQuantityDto(BigInteger.valueOf(7), "test", "photo", 1D, 3, true),
-            new ProductWithQuantityDto(BigInteger.valueOf(8), "test", "photo", 1D, 4, true),
-            new ProductWithQuantityDto(BigInteger.valueOf(9), "test", "photo", 1D, 3, true),
-            new ProductWithQuantityDto(BigInteger.valueOf(10), "test", "photo", 1D, 4, true)
+            new ProductWithQuantityDto(Long.valueOf(1), "test", "photo", 1D, 1, true),
+            new ProductWithQuantityDto(Long.valueOf(2), "test", "photo", 1D, 2, true),
+            new ProductWithQuantityDto(Long.valueOf(3), "test", "photo", 1D, 3, true),
+            new ProductWithQuantityDto(Long.valueOf(4), "test", "photo", 1D, 4, true),
+            new ProductWithQuantityDto(Long.valueOf(5), "test", "photo", 1D, 3, true),
+            new ProductWithQuantityDto(Long.valueOf(6), "test", "photo", 1D, 4, true),
+            new ProductWithQuantityDto(Long.valueOf(7), "test", "photo", 1D, 3, true),
+            new ProductWithQuantityDto(Long.valueOf(8), "test", "photo", 1D, 4, true),
+            new ProductWithQuantityDto(Long.valueOf(9), "test", "photo", 1D, 3, true),
+            new ProductWithQuantityDto(Long.valueOf(10), "test", "photo", 1D, 4, true)
     );
   }
 
@@ -1007,16 +1006,16 @@ NewCommandServiceImp commandService;
    */
   private List<ProductEntity> fakeStoreProductEntiy() {
     return Arrays.asList(
-            new ProductEntity(BigInteger.valueOf(1), "test", 15D,  "photo", 10, "photo", true),
-            new ProductEntity(BigInteger.valueOf(2), "test", 15D,  "photo", 10, "photo", true),
-            new ProductEntity(BigInteger.valueOf(3), "test", 15D,  "photo", 10, "photo", true),
-            new ProductEntity(BigInteger.valueOf(4), "test", 15D,  "photo", 10, "photo", true),
-            new ProductEntity(BigInteger.valueOf(5), "test", 15D,  "photo", 10, "photo", true),
-            new ProductEntity(BigInteger.valueOf(6), "test", 15D,  "photo", 10, "photo", true),
-            new ProductEntity(BigInteger.valueOf(7), "test", 15D,  "photo", 10, "photo", true),
-            new ProductEntity(BigInteger.valueOf(8), "test", 15D,  "photo", 10, "photo", true),
-            new ProductEntity(BigInteger.valueOf(9), "test", 15D,  "photo", 10, "photo", true),
-            new ProductEntity(BigInteger.valueOf(10), "test", 15D,  "photo", 10, "photo", true)
+            new ProductEntity(Long.valueOf(1), "test", 15D,  "photo", 10, "photo", true),
+            new ProductEntity(Long.valueOf(2), "test", 15D,  "photo", 10, "photo", true),
+            new ProductEntity(Long.valueOf(3), "test", 15D,  "photo", 10, "photo", true),
+            new ProductEntity(Long.valueOf(4), "test", 15D,  "photo", 10, "photo", true),
+            new ProductEntity(Long.valueOf(5), "test", 15D,  "photo", 10, "photo", true),
+            new ProductEntity(Long.valueOf(6), "test", 15D,  "photo", 10, "photo", true),
+            new ProductEntity(Long.valueOf(7), "test", 15D,  "photo", 10, "photo", true),
+            new ProductEntity(Long.valueOf(8), "test", 15D,  "photo", 10, "photo", true),
+            new ProductEntity(Long.valueOf(9), "test", 15D,  "photo", 10, "photo", true),
+            new ProductEntity(Long.valueOf(10), "test", 15D,  "photo", 10, "photo", true)
     );
   }
 
@@ -1026,10 +1025,10 @@ NewCommandServiceImp commandService;
    */
   private List<ProductWithQuantityDto> fakeProductWithQuantityForProductInCommand() {
     return Arrays.asList(
-            new ProductWithQuantityDto(BigInteger.valueOf(1), "test", "photo", 1D, 1, true),
-            new ProductWithQuantityDto(BigInteger.valueOf(2), "test", "photo", 1D, 2, true),
-            new ProductWithQuantityDto(BigInteger.valueOf(3), "test", "photo", 1D, 3, true),
-            new ProductWithQuantityDto(BigInteger.valueOf(4), "test", "photo", 1D, 4, true)
+            new ProductWithQuantityDto(Long.valueOf(1), "test", "photo", 1D, 1, true),
+            new ProductWithQuantityDto(Long.valueOf(2), "test", "photo", 1D, 2, true),
+            new ProductWithQuantityDto(Long.valueOf(3), "test", "photo", 1D, 3, true),
+            new ProductWithQuantityDto(Long.valueOf(4), "test", "photo", 1D, 4, true)
     );
   }
 
@@ -1040,7 +1039,7 @@ NewCommandServiceImp commandService;
    * @param slotTimeRequest LocalDateTime - Créneau de réseau
    * @return  CommandEntity
    */
-  private CommandEntity getFakeCommandEntity(BigInteger storeId, BigInteger commandId, LocalDateTime slotTimeRequest) {
+  private CommandEntity getFakeCommandEntity(Long storeId, Long commandId, LocalDateTime slotTimeRequest) {
     // Fake liste d eproduit avec quantité
     CommandEntity command = new CommandEntity();
 
@@ -1067,7 +1066,7 @@ NewCommandServiceImp commandService;
    * @param command CommandEntity  - Fake d'une commande
    * @return RegisterCommandDto
    */
-  private RegisterCommandDto getFakeRegisterCommand(BigInteger storeId, CommandEntity command) {
+  private RegisterCommandDto getFakeRegisterCommand(Long storeId, CommandEntity command) {
     // Fake liste d eproduit avec quantité
     ManualCommandInformation manualCommandInformation = new ManualCommandInformation();
     manualCommandInformation.setSelectProducts(fakeProductWithQuantityForProductInCommand());
@@ -1095,7 +1094,7 @@ NewCommandServiceImp commandService;
    * @param storeProducts  List<ProductWithQuantityDto> - Liste des ProductWithQuantityDto
    * @return ProductWithQuantityDto
    */
-  private ProductWithQuantityDto getProductWithQuantityById(BigInteger id, List<ProductWithQuantityDto> storeProducts) {
+  private ProductWithQuantityDto getProductWithQuantityById(Long id, List<ProductWithQuantityDto> storeProducts) {
     return storeProducts.stream().filter(product->id.equals(product.productId())).findFirst().orElse(null);
   }
 
@@ -1118,7 +1117,7 @@ NewCommandServiceImp commandService;
    * @param storeId BigInteger - Identitifant commerce
    * @return StoreEntity
    */
-  StoreEntity getFakeStore(BigInteger storeId) {
+  StoreEntity getFakeStore(Long storeId) {
     StoreEntity store = new StoreEntity();
     store.setId(storeId);
     store.setFrequenceSlotTime(10);
@@ -1222,9 +1221,9 @@ NewCommandServiceImp commandService;
    * @return List<ProductWithQuantity>
    */
   private List<ProductWithQuantity> getFakeProductWithQuantityList() {
-    ProductWithQuantity productWithQuantity1 = new ProductWithQuantity(BigInteger.valueOf(1), 2);
-    ProductWithQuantity productWithQuantity2 = new ProductWithQuantity(BigInteger.valueOf(2),2);
-    ProductWithQuantity productWithQuantity3 = new ProductWithQuantity(BigInteger.valueOf(3),1);
+    ProductWithQuantity productWithQuantity1 = new ProductWithQuantity(Long.valueOf(1), 2);
+    ProductWithQuantity productWithQuantity2 = new ProductWithQuantity(Long.valueOf(2),2);
+    ProductWithQuantity productWithQuantity3 = new ProductWithQuantity(Long.valueOf(3),1);
 
     return Arrays.asList(productWithQuantity1, productWithQuantity2, productWithQuantity3);
 
@@ -1236,9 +1235,9 @@ NewCommandServiceImp commandService;
    * @return List<ProductWithQuantity>
    */
   private List<ProductWithQuantity> getFakeProductWithoutQuantityList() {
-    ProductWithQuantity productWithQuantity1 = new ProductWithQuantity(BigInteger.valueOf(1), 0);
-    ProductWithQuantity productWithQuantity2 = new ProductWithQuantity(BigInteger.valueOf(2),2);
-    ProductWithQuantity productWithQuantity3 = new ProductWithQuantity(BigInteger.valueOf(3),1);
+    ProductWithQuantity productWithQuantity1 = new ProductWithQuantity(Long.valueOf(1), 0);
+    ProductWithQuantity productWithQuantity2 = new ProductWithQuantity(Long.valueOf(2),2);
+    ProductWithQuantity productWithQuantity3 = new ProductWithQuantity(Long.valueOf(3),1);
 
     return Arrays.asList(productWithQuantity1, productWithQuantity2, productWithQuantity3);
 
@@ -1250,22 +1249,22 @@ NewCommandServiceImp commandService;
    * @param productId BigInteger - Identifiant Produit
    * @return ProductEntity
    */
-  private ProductEntity getFakeProductNotBelongToStore(BigInteger productId) {
+  private ProductEntity getFakeProductNotBelongToStore(Long productId) {
     ProductEntity product1 = new ProductEntity(productId);
-    product1.setStore(new StoreEntity(BigInteger.valueOf(10)));
+    product1.setStore(new StoreEntity(Long.valueOf(10)));
     product1.setName("coco");
     product1.setIsAvail(true);
 
     ProductEntity product2 = new ProductEntity(productId);
-    product2.setStore(new StoreEntity(BigInteger.valueOf(10)));
+    product2.setStore(new StoreEntity(Long.valueOf(10)));
     product2.setIsAvail(true);
 
     ProductEntity product3 = new ProductEntity(productId);
-    product3.setStore(new StoreEntity(BigInteger.valueOf(10)));
+    product3.setStore(new StoreEntity(Long.valueOf(10)));
     product3.setIsAvail(true);
 
     ProductEntity product4 = new ProductEntity(productId);
-    product4.setStore(new StoreEntity(BigInteger.valueOf(10)));
+    product4.setStore(new StoreEntity(Long.valueOf(10)));
     product4.setIsAvail(true);
 
 
@@ -1281,22 +1280,22 @@ NewCommandServiceImp commandService;
    * @param productId BigInteger - Identifiant Produit
    * @return ProductEntity
    */
-  private ProductEntity getFakeProductNotAvailable(BigInteger productId) {
+  private ProductEntity getFakeProductNotAvailable(Long productId) {
     ProductEntity product1 = new ProductEntity(productId);
-    product1.setStore(new StoreEntity(BigInteger.valueOf(1)));
+    product1.setStore(new StoreEntity(Long.valueOf(1)));
     product1.setName("coco");
     product1.setIsAvail(false);
 
     ProductEntity product2 = new ProductEntity(productId);
-    product2.setStore(new StoreEntity(BigInteger.valueOf(10)));
+    product2.setStore(new StoreEntity(Long.valueOf(10)));
     product2.setIsAvail(true);
 
     ProductEntity product3 = new ProductEntity(productId);
-    product3.setStore(new StoreEntity(BigInteger.valueOf(10)));
+    product3.setStore(new StoreEntity(Long.valueOf(10)));
     product3.setIsAvail(true);
 
     ProductEntity product4 = new ProductEntity(productId);
-    product4.setStore(new StoreEntity(BigInteger.valueOf(10)));
+    product4.setStore(new StoreEntity(Long.valueOf(10)));
     product4.setIsAvail(true);
 
 

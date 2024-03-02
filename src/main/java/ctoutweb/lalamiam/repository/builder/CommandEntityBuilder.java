@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 public final class CommandEntityBuilder {
-  private BigInteger id;
+  private Long id;
   private String clientPhone;
   private Integer preparationTime;
   private Double orderPrice;
@@ -29,7 +29,7 @@ public final class CommandEntityBuilder {
     return new CommandEntityBuilder();
   }
 
-  public CommandEntityBuilder withId(BigInteger id) {
+  public CommandEntityBuilder withId(Long id) {
     this.id = id;
     return this;
   }

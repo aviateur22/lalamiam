@@ -13,7 +13,6 @@ import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -26,12 +25,12 @@ public class CommandTransactionSessionTest {
   @Test
   void updateCommand_with_valid_update_data() {
     // Données le la commande a updater
-    BigInteger storeId = BigInteger.valueOf(1);
-    BigInteger commandId = BigInteger.valueOf(1);
+    Long storeId = Long.valueOf(1);
+    Long commandId = Long.valueOf(1);
     String clientPhone = "06232741";
     List<ProductWithQuantity> selectProducts = Arrays.asList(
-            new ProductWithQuantity(BigInteger.valueOf(1),2),
-            new ProductWithQuantity(BigInteger.valueOf(2),2)
+            new ProductWithQuantity(Long.valueOf(1),2),
+            new ProductWithQuantity(Long.valueOf(2),2)
     );
     LocalDateTime slotTime = LocalDateTime.now();
     Integer preparationTime = 5;
@@ -86,7 +85,7 @@ public class CommandTransactionSessionTest {
    * @param storeId BigInteger
    * @return CommandEntity
    */
-  private CommandEntity fakeFindRegistedCommand(BigInteger commandId, BigInteger storeId) {
+  private CommandEntity fakeFindRegistedCommand(Long commandId, Long storeId) {
     CommandEntity fakeCommand = new CommandEntity();
     fakeCommand.setId(commandId);
     fakeCommand.setStore(Factory.getStore(storeId));
@@ -95,8 +94,8 @@ public class CommandTransactionSessionTest {
     fakeCommand.setCommandPrice(10D);
     fakeCommand.setCommandCode("dsdsd");
     fakeCommand.setCommandProducts(Arrays.asList(
-            new CommandProductEntity(1, new ProductEntity(BigInteger.valueOf(1))),
-            new CommandProductEntity(1, new ProductEntity(BigInteger.valueOf(2)))
+            new CommandProductEntity(1, new ProductEntity(Long.valueOf(1))),
+            new CommandProductEntity(1, new ProductEntity(Long.valueOf(2)))
     ));
 
     return fakeCommand;
@@ -108,7 +107,7 @@ public class CommandTransactionSessionTest {
    * @param commandId
    * @return List<CommandProductEntity>
    */
-  private List<CommandProductEntity> getCommandProduct(List<ProductWithQuantity> productWithQuantityList, BigInteger commandId) {
+  private List<CommandProductEntity> getCommandProduct(List<ProductWithQuantity> productWithQuantityList, Long commandId) {
     return productWithQuantityList
             .stream()
             .map(productWithQuantity->Factory.getCommandProduct(

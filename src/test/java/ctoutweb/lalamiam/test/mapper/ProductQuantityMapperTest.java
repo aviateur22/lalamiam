@@ -36,12 +36,12 @@ public class ProductQuantityMapperTest {
   }
 
   private ProductWithQuantity fakeProductWithQuantity() {
-    return new ProductWithQuantity(BigInteger.valueOf(1), 2);
+    return new ProductWithQuantity(Long.valueOf(1), 2);
   }
 
   private CommandProductEntity fakeCommandProduct() {
     return new CommandProductEntity(
-        2, new ProductEntity(BigInteger.valueOf(1),"test", 10D , "description", 5,"photo", true)
+        2, new ProductEntity(Long.valueOf(1),"test", 10D , "description", 5,"photo", true)
     );
   }
 }

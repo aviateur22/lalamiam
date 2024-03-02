@@ -22,7 +22,7 @@ public interface StoreService {
    * @param storeId  BigInteger - Identifiant commerce
    * @return StoreEntity
    */
-  public StoreEntity findStoreById(BigInteger storeId);
+  public StoreEntity findStoreById(Long storeId);
 
   /**
    * Recherche la liste des creneaux d'ouverture d'un commerce sur une journée

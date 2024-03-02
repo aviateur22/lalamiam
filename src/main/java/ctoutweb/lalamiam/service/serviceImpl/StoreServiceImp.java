@@ -11,7 +11,6 @@ import ctoutweb.lalamiam.service.StoreService;
 import ctoutweb.lalamiam.util.CommonFunction;
 import org.springframework.stereotype.Service;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
@@ -34,7 +33,7 @@ public class StoreServiceImp implements StoreService {
     String adress = addStore.adress();
     String city = addStore.city();
     String cp = addStore.cp();
-    BigInteger proId = addStore.proId();
+    Long proId = addStore.proId();
 
     if(CommonFunction.isNullOrEmpty(name)||
             CommonFunction.isNullOrEmpty(adress) ||
@@ -42,13 +41,13 @@ public class StoreServiceImp implements StoreService {
             CommonFunction.isNullOrEmpty(cp) ||
             proId == null) throw new RuntimeException("données manquantes");
 
-    BigInteger storeId = storeTransaction.SaveStore(addStore);
+    Long storeId = storeTransaction.SaveStore(addStore);
     StoreEntity store = storeTransaction.getCompleteStoreInformation(storeId);
     return store;
   }
 
   @Override
-  public StoreEntity findStoreById(BigInteger storeId) {
+  public StoreEntity findStoreById(Long storeId) {
     return storeRepository.findById(storeId).orElseThrow(()->new RuntimeException("Le Commerce n'existe pas"));
   }
 

@@ -7,8 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigInteger;
-
 @RestController
 @RequestMapping("api/lalamiam/v1/pro")
 public class ProController {
@@ -26,7 +24,7 @@ public class ProController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<ProInformationDto> getProfessionalInformation(@PathVariable("id")BigInteger id) {
+  public ResponseEntity<ProInformationDto> getProfessionalInformation(@PathVariable("id")Long id) {
     ProInformationDto proInformationDto = proService.getProfessionalInformation(id);
     return new ResponseEntity<>(proInformationDto, HttpStatus.OK);
   }
