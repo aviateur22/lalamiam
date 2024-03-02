@@ -23,7 +23,12 @@ jobs:
         run: mvn -B package --file pom.xml
 
       - name: Run unit tests
-        run: mvn test
+        run: mvn -B clean verify
 
-      - name: Coveralls
-        uses: coverallsapp/github-action@v2
+      - name: Convert JaCoCo report to Coveralls format
+        run: bash <(curl -s https://codecov.io/bash) -f target/site/jacoco/jacoco.xml -X coveragepy -X gcov -X fix -X javancss -X coveragepy
+
+      - name: Upload to Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
