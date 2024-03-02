@@ -35,7 +35,7 @@ jobs:
           generate-summary: true
 
       - name: Add coverage to PR
-        id: jacoco
+        id: jacocoBadge
         uses: madrapps/jacoco-report@v1.6.1
         with:
           paths: |
