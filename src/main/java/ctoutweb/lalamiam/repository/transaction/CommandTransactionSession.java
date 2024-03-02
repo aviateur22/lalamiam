@@ -1,6 +1,7 @@
 package ctoutweb.lalamiam.repository.transaction;
 
 import ctoutweb.lalamiam.factory.Factory;
+import ctoutweb.lalamiam.mapper.CommandProductListMapper;
 import ctoutweb.lalamiam.model.*;
 import ctoutweb.lalamiam.repository.CommandProductRepository;
 import ctoutweb.lalamiam.repository.CommandRepository;
@@ -23,40 +24,39 @@ public class CommandTransactionSession  {
   private final EntityManagerFactory entityManagerFactory;
   private final CommandProductRepository commandProductRepository;
   private final CommandRepository commandRepository;
+  private final CommandProductListMapper commandProductListMapper;
 
   public CommandTransactionSession(
           CommandProductRepository commandProductRepository,
           CommandRepository commandRepository,
-          EntityManagerFactory entityManagerFactory
-  ) {
+          EntityManagerFactory entityManagerFactory,
+          CommandProductListMapper commandProductListMapper) {
     this.commandProductRepository = commandProductRepository;
     this.commandRepository = commandRepository;
     this.entityManagerFactory = entityManagerFactory;
+    this.commandProductListMapper = commandProductListMapper;
   }
 
   @Transactional
   public CommandEntity updateCommand(CommandInformationToUpdate commandInformationToUpdate) {
-    // Todo faire test uintaire
+
     CommandEntity findCommand = getCommand(commandInformationToUpdate.commandId());
 
     if(findCommand == null)
-      throw new RuntimeException(String.format("La commande N° %s n'existe pas", findCommand.getCommandCode()));
+      throw new RuntimeException(String.format("La commande N° %s n'existe pas", commandInformationToUpdate.commandId()));
 
     if(!findCommand.getStore().getId().equals(commandInformationToUpdate.storeId()))
-      throw new RuntimeException(String.format("La commande N° %s n'appartient pas rattaché au commerce", findCommand.getCommandCode()));
+      throw new RuntimeException(String.format("La commande N° %s n'est pas rattaché au commerce", findCommand.getId()));
 
     // Suppression des anciens produits
     commandProductRepository.deleteProductByCommandId(commandInformationToUpdate.commandId());
 
-    // Sauvegarde des nouveaux produits
-    List<CommandProductEntity> selectCommandProducts = commandInformationToUpdate.selectProducts()
-      .stream()
-      .map(productWithQuantity->Factory.getCommandProduct(
-              commandInformationToUpdate.commandId(),
-              productWithQuantity.getProductId(),
-              productWithQuantity.getProductQuantity()
-      )).collect(Collectors.toList());
+    // Convertion de la liste des produits
+    List<CommandProductEntity> selectCommandProducts = commandProductListMapper.apply(
+            commandInformationToUpdate.selectProducts(),
+            findCommand.getId());
 
+    // Sauvegarde relation produits-commande
     commandProductRepository.saveAllAndFlush(selectCommandProducts);
 
     // Mise a jour des données de la cmmmande
@@ -73,25 +73,24 @@ public class CommandTransactionSession  {
     return findCommand;
   }
 
-  public CommandEntity saveCommand(CommandInformationToSave commandInformationToSave) {
+  @Transactional
+  public CommandEntity saveCommand(CommandInformationToSave commandInformation) {
     // Todo faire test uintaire
-    CommandEntity commandToSave = Factory.getCommand(commandInformationToSave);
+    CommandEntity commandInformationToSave = Factory.getCommand(commandInformation);
 
     // Mise a jour des info de la commande
-    commandRepository.save(commandToSave);
+    CommandEntity commandSaved = commandRepository.save(commandInformationToSave);
 
-    // Sauvegarde des nouveaux produits
-    List<CommandProductEntity> selectCommandProducts = commandInformationToSave.selectProducts()
-            .stream()
-            .map(productWithQuantity->Factory.getCommandProduct(
-                    commandToSave.getId(),
-                    productWithQuantity.getProductId(),
-                    productWithQuantity.getProductQuantity()
-            )).collect(Collectors.toList());
+    // Convertion de la liste des produits
+    List<CommandProductEntity> selectCommandProducts = commandProductListMapper.apply(
+            commandInformation.selectProducts(),
+            commandSaved.getId());
 
-    commandProductRepository.saveAllAndFlush(selectCommandProducts);
-    commandToSave.setCommandProducts(selectCommandProducts);
-    return commandToSave;
+    // Sauvegarde relation produits-commande
+    commandProductRepository.saveAllAndFlush(commandSaved.getCommandProducts());
+
+    commandInformationToSave.setCommandProducts(selectCommandProducts);
+    return commandInformationToSave;
   }
 
   /**
@@ -117,6 +116,4 @@ public class CommandTransactionSession  {
       return command;
     }
   }
-
-
 }
