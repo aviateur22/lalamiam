@@ -104,6 +104,7 @@ public class CommandTransactionSession  {
     Transaction transaction = session.beginTransaction();
     try {
       command = session.get(CommandEntity.class, commandId);
+
       // Si pas de commande
       if(command == null) return null;
 

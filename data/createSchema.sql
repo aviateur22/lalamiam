@@ -2,7 +2,7 @@ BEGIN;
 DROP TABLE IF EXISTS sc_lalamiam."store_day_schedule",sc_lalamiam."week_day", sc_lalamiam."command_product", sc_lalamiam."product",  sc_lalamiam."command", sc_lalamiam."store", sc_lalamiam."pro";
 
 create table IF NOT EXISTS sc_lalamiam.pro(
-    "id" INTEGER PRIMARY KEY,
+    "id" BIGINT PRIMARY KEY,
     "email" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
     "password" TEXT NOT NULL,
@@ -11,7 +11,7 @@ create table IF NOT EXISTS sc_lalamiam.pro(
 );
 
 create table IF NOT EXISTS sc_lalamiam.store(
-     "id" INTEGER PRIMARY KEY,
+     "id" BIGINT PRIMARY KEY,
      "pro_id" INTEGER NOT NULL REFERENCES sc_lalamiam."pro"("id") on delete cascade,
      "name" TEXT NOT NULL,
      "adress" TEXT NOT NULL,
@@ -26,7 +26,7 @@ create table IF NOT EXISTS sc_lalamiam.store(
 );
 
 create table IF NOT EXISTS sc_lalamiam.command(
-    "id" INTEGER PRIMARY KEY,
+    "id" BIGINT PRIMARY KEY,
     "store_id" INTEGER NOT NULL REFERENCES sc_lalamiam."store"("id") on delete cascade,
     "command_code" TEXT NOT NULL,
     "slot_time" TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -40,7 +40,7 @@ create table IF NOT EXISTS sc_lalamiam.command(
 );
 
 create table IF NOT EXISTS sc_lalamiam.product(
-    "id" INTEGER PRIMARY KEY,
+    "id" BIGINT PRIMARY KEY,
     "store_id" INTEGER NOT NULL REFERENCES sc_lalamiam."store"("id") on delete cascade,
     "name" TEXT NOT NULL,
     "price" NUMERIC NOT NULL,
@@ -53,7 +53,7 @@ create table IF NOT EXISTS sc_lalamiam.product(
 );
 
 create table IF NOT EXISTS sc_lalamiam.command_product(
-    "id" INTEGER PRIMARY KEY,
+    "id" BIGINT PRIMARY KEY,
     "command_id" INTEGER NOT NULL REFERENCES sc_lalamiam."command"("id") on delete cascade,
     "product_id" INTEGER NOT NULL REFERENCES sc_lalamiam."product"("id") on delete cascade,
     "product_quantity" INTEGER NOT NULL,
@@ -62,7 +62,7 @@ create table IF NOT EXISTS sc_lalamiam.command_product(
 );
 
 create table IF NOT EXISTS sc_lalamiam.week_day(
-    "id" INTEGER NOT NULL UNIQUE PRIMARY KEY,
+    "id" BIGINT NOT NULL UNIQUE PRIMARY KEY,
     "day_text" TEXT NOT NULL,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
     "updated_at" TIMESTAMPTZ
@@ -123,5 +123,11 @@ ALTER SEQUENCE if exists sc_lalamiam.store_week_day_pk_seq owned by sc_lalamiam.
 
 INSERT INTO sc_lalamiam.week_day ("id", "day_text") values (1, 'monday'), (2, 'tuesday'),  (3, 'wenesday'), (4, 'thrurday'),(5, 'friday'), (6, 'staurday'), (7, 'sunday');
 
+ALTER TABLE sc_lalamiam.product ALTER COLUMN id SET DEFAULT NEXTVAL('sc_lalamiam.product_pk_seq');
+ALTER TABLE sc_lalamiam.command ALTER COLUMN id SET DEFAULT NEXTVAL('sc_lalamiam.command_pk_seq');
+ALTER TABLE sc_lalamiam.pro ALTER COLUMN id SET DEFAULT NEXTVAL('sc_lalamiam.pro_pk_seq');
+ALTER TABLE sc_lalamiam.store ALTER COLUMN id SET DEFAULT NEXTVAL('sc_lalamiam.store_pk_seq');
+ALTER TABLE sc_lalamiam.store_day_schedule ALTER COLUMN id SET DEFAULT NEXTVAL('sc_lalamiam.store_week_day_pk_seq');
+ALTER TABLE sc_lalamiam.command_product ALTER COLUMN id SET DEFAULT NEXTVAL('sc_lalamiam.command_product_pk_seq');
 
 COMMIT;

@@ -1,6 +1,7 @@
 package ctoutweb.lalamiam.service;
 
 import ctoutweb.lalamiam.model.dto.*;
+import ctoutweb.lalamiam.repository.entity.CommandEntity;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -10,16 +11,16 @@ public interface Command {
   /**
    * Récupération des produits d'un commerce associant les quantités d'une commande.
    * Si commande en cours de création alors les quantité sont =0
-   * @param storeId BigInteger - identifiant du commerce
-   * @param commandId BigInteger - identifiant de la commande (null si commande en cours de création)
+   * @param storeId Long - identifiant du commerce
+   * @param commandId CommandEntity - Information commande si update d'une commande existantate)
    * @return CommandInformationDto
    */
-  StoreProductsInformationDto getStoreProductsForCommand(Long storeId, Long commandId);
+  StoreProductsInformationDto getStoreProductsForCommand(Long storeId, CommandEntity commandId);
 
   /**
    * Validation de la commande
-   * @param storeId BigInteger - identifiant du commerce
-   * @param commandId BigInteger - identifiant de la commande (null si commande en cours de création)
+   * @param storeId Long - identifiant du commerce
+   * @param commandId Long - identifiant de la commande (null si commande en cours de création)
    * @param productSelectInformation ProductSelectInformationDto - Données renseignées dans la commande
    */
   void validateProductsSelection(Long storeId, Long commandId, ProductSelectInformationDto productSelectInformation);

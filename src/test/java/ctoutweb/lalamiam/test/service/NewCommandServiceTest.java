@@ -1,17 +1,15 @@
 package ctoutweb.lalamiam.test.service;
 
+import ctoutweb.lalamiam.exception.CommandException;
 import ctoutweb.lalamiam.factory.Factory;
 import ctoutweb.lalamiam.helper.NewCommandServiceHelper;
 import ctoutweb.lalamiam.helper.NewSlotHelper;
 import ctoutweb.lalamiam.mapper.ProductQuantityMapper;
-import ctoutweb.lalamiam.model.CalculatedCommandInformation;
-import ctoutweb.lalamiam.model.ManualCommandInformation;
-import ctoutweb.lalamiam.model.ProductWithQuantity;
+import ctoutweb.lalamiam.model.*;
 import ctoutweb.lalamiam.model.dto.*;
 import ctoutweb.lalamiam.repository.CommandRepository;
 import ctoutweb.lalamiam.repository.entity.*;
 import ctoutweb.lalamiam.repository.transaction.CommandTransactionSession;
-import ctoutweb.lalamiam.service.CommandProductService;
 import ctoutweb.lalamiam.service.ProductService;
 import ctoutweb.lalamiam.service.StoreService;
 import ctoutweb.lalamiam.service.serviceImpl.NewCommandServiceImp;
@@ -31,17 +29,105 @@ import static org.mockito.Mockito.*;
 
 
 public class NewCommandServiceTest {
-
-NewCommandServiceImp commandService;
-
+  NewCommandServiceImp commandService;
   @Test
-  void getStoreProductsForCommand_with_command_and_store_produst() {
+  void updateCommand_with_valid_information() {
+    Long storeId = Long.valueOf(1);
+    Long commandId = Long.valueOf(1);
+    LocalDateTime slotTime = LocalDateTime.now();
+
+    // Mock
+    CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
+    when(commandTransactionSession.getCommand(commandId)).thenReturn(getFakeCommandEntity(storeId, commandId, slotTime));
+
+    NewCommandServiceHelper commandServiceHelper = mock(NewCommandServiceHelper.class);
+    CommandRepository commandRepository = mock(CommandRepository.class);
+    ProductService productService = mock(ProductService.class);
+    NewSlotHelper slotHelper = mock(NewSlotHelper.class);
+
+    // Spy de commandService
+    NewCommandServiceImp commandServiceImpSpy = spy(new NewCommandServiceImp(
+            commandServiceHelper,
+            commandTransactionSession,
+            commandRepository,
+            productService,
+            slotHelper));
+
+    doReturn(getFakeStoreProductsInformation()).when(commandServiceImpSpy).getStoreProductsForCommand(any(Long.class),any(CommandEntity.class));
+
+    //
+    StoreProductsInformationDto storeProductInformation = commandServiceImpSpy.updateCommand(storeId, commandId);
+
+    Assertions.assertNotNull(storeProductInformation);
+    Assertions.assertEquals("0623225100", storeProductInformation.clientPhone());
+    Assertions.assertEquals(fakeProductWithQuantityForStore(), storeProductInformation.storeProducts());
+    verify(commandServiceImpSpy, times(1)).getStoreProductsForCommand(any(Long.class),any(CommandEntity.class));
+  }
+  @Test
+  void updateCommand_when_command_is_null() {
+    Long storeId = Long.valueOf(1);
+    Long commandId = Long.valueOf(1);
+    LocalDateTime slotTime = LocalDateTime.now();
+
+
+    // Mock
+    CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
+    when(commandTransactionSession.getCommand(commandId)).thenReturn(null);
+
+    NewCommandServiceHelper commandServiceHelper = mock(NewCommandServiceHelper.class);
+    CommandRepository commandRepository = mock(CommandRepository.class);
+    ProductService productService = mock(ProductService.class);
+    NewSlotHelper slotHelper = mock(NewSlotHelper.class);
+
+    // Spy de commandService
+    NewCommandServiceImp commandServiceImpSpy = spy(new NewCommandServiceImp(
+            commandServiceHelper,
+            commandTransactionSession,
+            commandRepository,
+            productService,
+            slotHelper));
+
+    doReturn(getFakeStoreProductsInformation()).when(commandServiceImpSpy).getStoreProductsForCommand(any(Long.class),any(CommandEntity.class));
+
+    Exception exception = Assertions.assertThrows(CommandException.class, ()-> commandServiceImpSpy.updateCommand(storeId, commandId));
+    Assertions.assertEquals("La commande à mettre à jour n'existe pas", exception.getMessage());
+  }
+  @Test
+  void updateCommand_when_command_not_belong_to_store() {
+    Long storeId = Long.valueOf(1);
+    Long commandId = Long.valueOf(1);
+    LocalDateTime slotTime = LocalDateTime.now();
+
+    // Mock
+    CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
+    when(commandTransactionSession.getCommand(commandId)).thenReturn(getFakeCommandEntity(Long.valueOf(3), commandId, slotTime));
+
+    NewCommandServiceHelper commandServiceHelper = mock(NewCommandServiceHelper.class);
+    CommandRepository commandRepository = mock(CommandRepository.class);
+    ProductService productService = mock(ProductService.class);
+    NewSlotHelper slotHelper = mock(NewSlotHelper.class);
+
+    // Spy de commandService
+    NewCommandServiceImp commandServiceImpSpy = spy(new NewCommandServiceImp(
+            commandServiceHelper,
+            commandTransactionSession,
+            commandRepository,
+            productService,
+            slotHelper));
+
+    doReturn(getFakeStoreProductsInformation()).when(commandServiceImpSpy).getStoreProductsForCommand(any(Long.class),any(CommandEntity.class));
+
+    //
+    Exception exception = Assertions.assertThrows(CommandException.class, ()-> commandServiceImpSpy.updateCommand(storeId, commandId));
+    Assertions.assertEquals("Cette commande n'est pas rattaché au commerce", exception.getMessage());
+  }
+  @Test
+  void getStoreProductsForCommand_with_command_and_store_product() {
     Long storeId = Long.valueOf(1);
     Long commandId = Long.valueOf(1);
     LocalDateTime slotTimeRequest = LocalDateTime.now();
 
     CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
-    CommandProductService commandProductService = mock(CommandProductService.class);
     ProductService productService = mock(ProductService.class);
     NewSlotHelper slotHelper = mock(NewSlotHelper.class);
     CommandRepository commandRepository = mock(CommandRepository.class);
@@ -49,7 +135,6 @@ NewCommandServiceImp commandService;
     ProductQuantityMapper productQuantityMapper = new ProductQuantityMapper();
 
     NewCommandServiceHelper commandServiceHelper = new NewCommandServiceHelper(
-            commandProductService,
             productQuantityMapper, productService);
 
     commandService = new NewCommandServiceImp(
@@ -68,9 +153,9 @@ NewCommandServiceImp commandService;
     when(commandTransactionSession.getCommand(any(Long.class))).thenReturn(command);
 
     // Fake List<ProductEntity>
-    when(commandProductService.getStoreProducts(any(Long.class))).thenReturn(fakeStoreProductEntiy());
+    when(productService.getStoreProducts(any(Long.class))).thenReturn(fakeStoreProductEntiy());
 
-    StoreProductsInformationDto commandInformation = commandService.getStoreProductsForCommand(storeId, commandId);
+    StoreProductsInformationDto commandInformation = commandService.getStoreProductsForCommand(storeId, command);
 
     /**
      * Then
@@ -92,14 +177,12 @@ NewCommandServiceImp commandService;
     Long commandId = Long.valueOf(1);
 
     CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
-    CommandProductService commandProductService = mock(CommandProductService.class);
     ProductService productService = mock(ProductService.class);
     NewSlotHelper slotHelper = mock(NewSlotHelper.class);
     CommandRepository commandRepository = mock(CommandRepository.class);
     ProductQuantityMapper productQuantityMapper = new ProductQuantityMapper();
 
     NewCommandServiceHelper commandServiceHelper = new NewCommandServiceHelper(
-            commandProductService,
             productQuantityMapper, productService);
 
     commandService = new NewCommandServiceImp(
@@ -118,9 +201,9 @@ NewCommandServiceImp commandService;
     when(commandTransactionSession.getCommand(any(Long.class))).thenReturn(command);
 
     // Fake List<ProductEntity>
-    when(commandProductService.getStoreProducts(any(Long.class))).thenReturn(fakeStoreProductEntiy());
+    when(productService.getStoreProducts(any(Long.class))).thenReturn(fakeStoreProductEntiy());
 
-    StoreProductsInformationDto commandInformation = commandService.getStoreProductsForCommand(storeId, commandId);
+    StoreProductsInformationDto commandInformation = commandService.getStoreProductsForCommand(storeId, command);
 
     /**
      * Then
@@ -137,20 +220,19 @@ NewCommandServiceImp commandService;
     Assertions.assertEquals(0, getProductWithQuantityById(Long.valueOf(8), commandInformation.storeProducts()).selectQuantity());
   }
   @Test
-  void getStoreProductsForCommand_with_command_not_belong_to_store() {
+  void getStoreProductsForCommand_with_no_product_in_store() {
     Long storeId = Long.valueOf(1);
     Long commandId = Long.valueOf(1);
     LocalDateTime slotTimeRequest = LocalDateTime.now();
 
     CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
-    CommandProductService commandProductService = mock(CommandProductService.class);
+
     ProductService productService = mock(ProductService.class);
     NewSlotHelper slotHelper = mock(NewSlotHelper.class);
     CommandRepository commandRepository = mock(CommandRepository.class);
     ProductQuantityMapper productQuantityMapper = new ProductQuantityMapper();
 
     NewCommandServiceHelper commandServiceHelper = new NewCommandServiceHelper(
-            commandProductService,
             productQuantityMapper, productService);
 
     commandService = new NewCommandServiceImp(
@@ -165,21 +247,19 @@ NewCommandServiceImp commandService;
      * When
      */
     // Fake CommandEntity
-    CommandEntity command = getFakeCommandEntity(Long.valueOf(2), commandId, slotTimeRequest);
+    CommandEntity command = getFakeCommandEntity(storeId, commandId, slotTimeRequest);
     when(commandTransactionSession.getCommand(any(Long.class))).thenReturn(command);
 
     // Fake List<ProductEntity>
-    when(commandProductService.getStoreProducts(any(Long.class))).thenReturn(fakeStoreProductEntiy());
+    when(productService.getStoreProducts(any(Long.class))).thenReturn(Arrays.asList());
 
     /**
      * Then
      */
-    Exception exception = Assertions.assertThrows(
-            RuntimeException.class, ()-> commandService.getStoreProductsForCommand(storeId, commandId)
-    );
 
-    Assertions.assertThrows(RuntimeException.class, ()-> commandService.getStoreProductsForCommand(storeId, commandId));
-    Assertions.assertEquals("Cette commande n'est pas rattaché au commerce".toLowerCase(), exception.getMessage().toLowerCase());
+    StoreProductsInformationDto storeProductsInformation = commandService.getStoreProductsForCommand(storeId, command);
+
+    Assertions.assertEquals(0, storeProductsInformation.storeProducts().size());
   }
   @Test
   void getCommand_with_valid_command_and_store() {
@@ -199,11 +279,7 @@ NewCommandServiceImp commandService;
     CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
     when(commandTransactionSession.getCommand(any(Long.class))).thenReturn(getFakeCommandEntity(storeId, commandId, slotTimeRequest));
 
-    // Mock CommandProductService
-    CommandProductService commandProductService = mock(CommandProductService.class);
-
     NewCommandServiceHelper commandServiceHelper = new NewCommandServiceHelper(
-            commandProductService,
             productQuantityMapper, productService);
 
     commandService = new NewCommandServiceImp(
@@ -268,11 +344,7 @@ NewCommandServiceImp commandService;
     CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
     when(commandTransactionSession.getCommand(any(Long.class))).thenReturn(null);
 
-    // Mock CommandProductService
-    CommandProductService commandProductService = mock(CommandProductService.class);
-
     NewCommandServiceHelper commandServiceHelper = new NewCommandServiceHelper(
-            commandProductService,
             productQuantityMapper, productService);
 
     commandService = new NewCommandServiceImp(
@@ -950,9 +1022,154 @@ NewCommandServiceImp commandService;
             .toList()
             .size());
   }
+  @Test
+  void validateSlot_with_slot_avail() {
+    LocalDateTime selectSlot = LocalDate.now().atTime(10, 30);
+    CommandInformationDto commandInformation = new CommandInformationDto(
+            Long.valueOf(1),
+            Long.valueOf(1),
+            LocalDate.now(),
+            LocalDateTime.now(),
+            Arrays.asList()
+    );
+
+    CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
+    NewCommandServiceHelper commandServiceHelper = mock(NewCommandServiceHelper.class);
+    CommandRepository commandRepository = mock(CommandRepository.class);
+    ProductService productService = mock(ProductService.class);
+    NewSlotHelper slotHelper = mock(NewSlotHelper.class);
+
+    // Spy de commandService
+    NewCommandServiceImp commandServiceImpSpy = spy(new NewCommandServiceImp(
+            commandServiceHelper,
+            commandTransactionSession,
+            commandRepository,
+            productService,
+            slotHelper));
+    doReturn(getFakeSlotAvailibility(commandInformation.commandDate())).when(commandServiceImpSpy).getStoreSlotAvailibility(commandInformation);
+
+    commandServiceImpSpy.validateSlot(commandInformation, selectSlot );
+    verify(commandServiceImpSpy, times(1)).getStoreSlotAvailibility(any(CommandInformationDto.class));
+
+  }
+  @Test
+  void validateSlot_with_slot_not_avail() {
+    LocalDateTime selectSlot = LocalDate.now().atTime(11, 55);
+    CommandInformationDto commandInformation = new CommandInformationDto(
+            Long.valueOf(1),
+            Long.valueOf(1),
+            LocalDate.now(),
+            LocalDateTime.now(),
+            Arrays.asList()
+    );
+
+    CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
+    NewCommandServiceHelper commandServiceHelper = mock(NewCommandServiceHelper.class);
+    CommandRepository commandRepository = mock(CommandRepository.class);
+    ProductService productService = mock(ProductService.class);
+    NewSlotHelper slotHelper = mock(NewSlotHelper.class);
+
+    // Spy de commandService
+    NewCommandServiceImp commandServiceImpSpy = spy(new NewCommandServiceImp(
+            commandServiceHelper,
+            commandTransactionSession,
+            commandRepository,
+            productService,
+            slotHelper));
+    doReturn(getFakeSlotAvailibility(commandInformation.commandDate())).when(commandServiceImpSpy).getStoreSlotAvailibility(commandInformation);
+
+    //commandServiceImpSpy.validateSlot(commandInformation, selectSlot );
+    Exception exception = Assertions.assertThrows(CommandException.class, ()->commandServiceImpSpy.validateSlot(commandInformation, selectSlot));
+    verify(commandServiceImpSpy, times(1)).getStoreSlotAvailibility(any(CommandInformationDto.class));
+    Assertions.assertEquals("Le créneau demandé n'est plus disponible", exception.getMessage());
+  }
+  @Test
+  void persistCommand() {
+
+    Long storeId = Long.valueOf(1);
+    Long commandId = null;
+
+    PersitCommandDto persitCommandInformation = new PersitCommandDto(
+            storeId,
+            commandId,
+            LocalDate.now(),
+            LocalDate.now().atTime(8,50),
+            Arrays.asList(
+                    new ProductWithQuantity(Long.valueOf(1), 2),
+                    new ProductWithQuantity(Long.valueOf(2), 2),
+                    new ProductWithQuantity(Long.valueOf(3), 2)
+            ),
+            "0623275500",
+            LocalDate.now().atTime(10,50)
+    );
+
+    // Mock CommandeTransactionCommand
+    CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
+    when(commandTransactionSession.saveCommand(any(CommandInformationToSave.class))).thenReturn(getFakeCommandEntity(
+            persitCommandInformation.storeId(),
+            persitCommandInformation.commandId(),
+            persitCommandInformation.selectSlotTime()
+    ));
+    when(commandTransactionSession.updateCommand(any(CommandInformationToUpdate.class))).thenReturn(getFakeCommandEntity(
+            persitCommandInformation.storeId(),
+            persitCommandInformation.commandId(),
+            persitCommandInformation.selectSlotTime()
+    ));
+
+    NewCommandServiceHelper commandServiceHelper = mock(NewCommandServiceHelper.class);
+    when(commandServiceHelper.findRegisterCommandInformation(any(CommandEntity.class))).thenReturn(
+            getFakeRegisterCommand(
+                    persitCommandInformation.storeId(),
+                    getFakeCommandEntity(
+                            persitCommandInformation.storeId(),
+                            persitCommandInformation.commandId(),
+                            persitCommandInformation.selectSlotTime()
+                    )
+            )
+    );
+
+    CommandRepository commandRepository = mock(CommandRepository.class);
+
+    // Mock ProductService
+    ProductService productService = mock(ProductService.class);
+    when(productService.findProduct(any(Long.class))).thenReturn(getFakeProduct(storeId, Long.valueOf(1)));
+
+    NewSlotHelper slotHelper = mock(NewSlotHelper.class);
+
+    NewCommandServiceImp commandServiceImpSpy = spy(new NewCommandServiceImp(
+            commandServiceHelper,
+            commandTransactionSession,
+            commandRepository,
+            productService,
+            slotHelper
+    ));
+
+    doNothing().when(commandServiceImpSpy).validateProductsSelection(
+            any(Long.class),
+            any(Long.class),
+            any(ProductSelectInformationDto.class)
+    );
+
+    CommandInformationDto commandInformation = new CommandInformationDto(
+            persitCommandInformation.storeId(),
+            persitCommandInformation.commandId(),
+            persitCommandInformation.commandDate(),
+            persitCommandInformation.consultationDate(),
+            persitCommandInformation.selectProducts());
+
+    doReturn(getFakeSlotAvailibility(LocalDate.now())).when(commandServiceImpSpy).getStoreSlotAvailibility(any(CommandInformationDto.class));
+
+    RegisterCommandDto registerCommand = commandServiceImpSpy.persistCommand(persitCommandInformation);
+ //   verify(commandServiceImpSpy, times(1)).validateProductsSelection(any(Long.class), any(Long.class), any(ProductSelectInformationDto.class));
+
+    Assertions.assertNotNull(registerCommand);
+  }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+  private void test() {
+
+  }
   /**
    * Fake d'une commande
    * @return List<CommandProductEntity>
@@ -979,6 +1196,10 @@ NewCommandServiceImp commandService;
     product.setIsAvail(true);
     return product;
 
+  }
+
+  private StoreProductsInformationDto getFakeStoreProductsInformation() {
+    return  new StoreProductsInformationDto(fakeProductWithQuantityForStore(), "0623225100");
   }
 
   /**
@@ -1304,6 +1525,21 @@ NewCommandServiceImp commandService;
     );
 
     return storeProducts.stream().filter(product->productId.equals(product.getId())).findFirst().orElse(null);
+  }
+
+  /**
+   * Fake slot availibility
+   * @return List<LocalDateTime>
+   */
+  private List<LocalDateTime> getFakeSlotAvailibility(LocalDate commandDate) {
+    return Arrays.asList(
+            commandDate.atTime(10,30),
+            commandDate.atTime(10,35),
+            commandDate.atTime(10,40),
+            commandDate.atTime(10,45),
+            commandDate.atTime(10,50),
+            commandDate.atTime(10,55)
+    );
   }
 
 }

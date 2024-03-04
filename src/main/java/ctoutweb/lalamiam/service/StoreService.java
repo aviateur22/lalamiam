@@ -1,6 +1,7 @@
 package ctoutweb.lalamiam.service;
 
 import ctoutweb.lalamiam.model.dto.AddStoreDto;
+import ctoutweb.lalamiam.repository.entity.ProductEntity;
 import ctoutweb.lalamiam.repository.entity.StoreDayScheduleEntity;
 import ctoutweb.lalamiam.repository.entity.StoreEntity;
 import ctoutweb.lalamiam.repository.entity.WeekDayEntity;
@@ -40,5 +41,4 @@ public interface StoreService {
    * @throws Exception
    */
   public List<LocalDateTime> findStorSlotsWithoutConstraintByDay(LocalDateTime startOfCommandDay, Integer storeFrequenceSlotTime);
-
 }

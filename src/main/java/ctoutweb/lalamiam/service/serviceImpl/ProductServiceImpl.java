@@ -1,5 +1,6 @@
 package ctoutweb.lalamiam.service.serviceImpl;
 
+import ctoutweb.lalamiam.factory.Factory;
 import ctoutweb.lalamiam.mapper.AddProductMapper;
 import ctoutweb.lalamiam.model.dto.AddProductResponseDto;
 import ctoutweb.lalamiam.model.dto.AddProductDto;
@@ -10,6 +11,8 @@ import ctoutweb.lalamiam.repository.entity.ProductEntity;
 import ctoutweb.lalamiam.service.ProductService;
 import ctoutweb.lalamiam.util.CommonFunction;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 @Service
@@ -78,5 +81,10 @@ public class ProductServiceImpl implements ProductService {
   public void deleteProduct(Long productId) {
     findProduct(productId);
     productRepository.deleteById(productId);
+  }
+
+  @Override
+  public List<ProductEntity> getStoreProducts(Long storeId) {
+    return productRepository.findByStore(Factory.getStore(storeId));
   }
 }

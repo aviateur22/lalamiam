@@ -1,9 +1,9 @@
 package ctoutweb.lalamiam.service.serviceImpl;
 
+import ctoutweb.lalamiam.exception.CommandException;
 import ctoutweb.lalamiam.factory.Factory;
 import ctoutweb.lalamiam.helper.NewCommandServiceHelper;
 import ctoutweb.lalamiam.helper.NewSlotHelper;
-import ctoutweb.lalamiam.mapper.CommandProductListMapper;
 import ctoutweb.lalamiam.model.dto.*;
 import ctoutweb.lalamiam.repository.CommandRepository;
 import ctoutweb.lalamiam.repository.entity.CommandEntity;
@@ -11,6 +11,7 @@ import ctoutweb.lalamiam.repository.entity.ProductEntity;
 import ctoutweb.lalamiam.repository.transaction.CommandTransactionSession;
 import ctoutweb.lalamiam.service.NewCommandService;
 import ctoutweb.lalamiam.service.ProductService;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -47,7 +48,16 @@ public class NewCommandServiceImp implements NewCommandService {
 
   @Override
   public StoreProductsInformationDto updateCommand(Long storeId, Long commandId) {
-    return getStoreProductsForCommand(storeId, commandId);
+    // Récupération de la commande
+    CommandEntity command = commandTransactionSession.getCommand(commandId);
+
+    if(command == null) throw new CommandException("La commande à mettre à jour n'existe pas", HttpStatus.NOT_FOUND);
+
+    // Si commande existante alors vérification du storeId
+    if(!command.getStore().getId().equals(storeId))
+      throw new CommandException("Cette commande n'est pas rattaché au commerce", HttpStatus.BAD_REQUEST);
+
+    return getStoreProductsForCommand(storeId, command);
   }
 
   @Override
@@ -57,69 +67,27 @@ public class NewCommandServiceImp implements NewCommandService {
 
     // Si commande existante alors vérification du storeIs
     if(command == null)
-      throw new RuntimeException("Cette commande n'existe pas");
+      throw new CommandException("Cette commande n'existe pas", HttpStatus.NOT_FOUND);
 
     // Si commande existante alors vérification du storeIs
     if(command != null && !command.getStore().getId().equals(storeId))
-      throw new RuntimeException("Cette commande n'est pas rattaché au commerce");
+      throw new CommandException("Cette commande n'est pas rattaché au commerce", HttpStatus.BAD_REQUEST);
 
     // Recherche d'une commande
     return commandServiceHelper.findRegisterCommandInformation(command);
   }
 
   @Override
-  public StoreProductsInformationDto getStoreProductsForCommand(Long storeId, Long commandId) {
-
-    // Récupération de la commande
-    CommandEntity command = commandTransactionSession.getCommand(commandId);
-
-    // Si commande existante alors vérification du storeIs
-    if(command != null && !command.getStore().getId().equals(storeId))
-      throw new RuntimeException("Cette commande n'est pas rattaché au commerce");
-
-
+  public StoreProductsInformationDto getStoreProductsForCommand(Long storeId, CommandEntity command) {
     // Recherche d'une commande
     RegisterCommandDto registerCommand = commandServiceHelper.findRegisterCommandInformation(command);
 
-    // Recherche des produits du commerce avec ajout des quantité de présente dans la commande
-    List<ProductWithQuantityDto> findStoreProductsWithQuantity = commandServiceHelper.getStoreProductsWithCommandQuantity(storeId, registerCommand);
+    // Recherche des produits du commerce avec ajout des quantité deja présente dans la commande
+    List<ProductWithQuantityDto> findStoreProductsWithQuantity = commandServiceHelper.getStoreProductsWithCommandQuantity(
+            storeId,
+            registerCommand);
 
     return Factory.getCommandInformationDto(registerCommand, findStoreProductsWithQuantity);
-  }
-
-  @Override
-  public void validateProductsSelection(Long storeId, Long commandId, ProductSelectInformationDto productSelectInformation) {
-    if(storeId == null)  throw new RuntimeException("Identifiant commerce obligatoire");
-
-    // N°Tel
-    if(productSelectInformation.clientPhone() == null || productSelectInformation.clientPhone().isEmpty())
-      throw new RuntimeException("Le numéro de téléphone est obligatoire");
-
-    CommandEntity command = null;
-    if(commandId != null) command = commandTransactionSession.getCommand(commandId);
-
-    // Si commande existante alors vérification du storeId
-    if(command != null && !command.getStore().getId().equals(storeId))
-      throw new RuntimeException("Cette commande n'est pas rattaché au commerce");
-
-    // Verifier liste de produits > 0 et produit appartient au commerce
-    if(productSelectInformation.productSelectList() ==null || productSelectInformation.productSelectList().size() == 0)
-      throw new RuntimeException("La commande ne peut pas être vide");
-
-    productSelectInformation.productSelectList().forEach(productWithQuantity -> {
-      ProductEntity product = productService.findProduct(productWithQuantity.getProductId());
-      // Vérification que le produit appartienne au commerce
-      if(!product.getStore().getId().equals(storeId))
-        throw new RuntimeException(String.format("Le produit %s n'est pas référencé dans ce commerce", product.getName()));
-
-      // Vérification que le produit est disponible
-      if(!product.getIsAvail())
-        throw new RuntimeException(String.format("Le produit %s n'est plus disponible", product.getName()));
-
-      // Vérification de la quantité de chaque produit
-      if(productWithQuantity.getProductQuantity() < 1)
-        throw new RuntimeException(String.format("Merci d'indiquer la quantité pour le produit %s", product.getName()));
-    });
   }
 
   @Override
@@ -157,19 +125,6 @@ public class NewCommandServiceImp implements NewCommandService {
 
     // Renvoi une liste de slot disponible filtré par rapport aux horaires d'ouverture et les commandes déja existantes
     return  slotHelper.getStoreSlotAvailibility(commandInformation.storeId(), commandsOfTheDay);
-  }
-
-  @Override
-  public void validateSlot(CommandInformationDto commandInformation, LocalDateTime selectSlotTime) {
-    // Todo Test unitaire
-    // Récuperation des créneaux disponible
-    List<LocalDateTime> storeAvailibiltySlots = getStoreSlotAvailibility(commandInformation);
-
-    if(storeAvailibiltySlots
-            .stream()
-            .filter(storeSlot->selectSlotTime.equals(storeSlot))
-            .collect(Collectors.toList())
-            .size() == 0) throw new RuntimeException("Le créneau demandé n'est plus disponible");
   }
 
   @Override
@@ -219,7 +174,8 @@ public class NewCommandServiceImp implements NewCommandService {
           preparationTime,
           numberOfProductInCommand,
           commandPrice
-        )):
+        ))
+            :
       commandTransactionSession.updateCommand(
         Factory.getCommandInformationToUpdate(
           persitCommand,
@@ -229,8 +185,56 @@ public class NewCommandServiceImp implements NewCommandService {
         ));
 
     return commandServiceHelper.findRegisterCommandInformation(command);
-
   }
+
+  @Override
+  public void validateProductsSelection(Long storeId, Long commandId, ProductSelectInformationDto productSelectInformation) {
+    if(storeId == null)  throw new RuntimeException("Identifiant commerce obligatoire");
+
+    // N°Tel
+    if(productSelectInformation.clientPhone() == null || productSelectInformation.clientPhone().isEmpty())
+      throw new RuntimeException("Le numéro de téléphone est obligatoire");
+
+    if(commandId != null) {
+      CommandEntity command = commandTransactionSession.getCommand(commandId);
+
+      // Si commande existante alors vérification du storeId
+      if(!command.getStore().getId().equals(storeId))
+        throw new RuntimeException("Cette commande n'est pas rattaché au commerce");
+    }
+
+    // Verifier liste de produits > 0 et produit appartient au commerce
+    if(productSelectInformation.productSelectList() ==null || productSelectInformation.productSelectList().size() == 0)
+      throw new RuntimeException("La commande ne peut pas être vide");
+
+    productSelectInformation.productSelectList().forEach(productWithQuantity -> {
+      ProductEntity product = productService.findProduct(productWithQuantity.getProductId());
+      // Vérification que le produit appartienne au commerce
+      if(!product.getStore().getId().equals(storeId))
+        throw new RuntimeException(String.format("Le produit %s n'est pas référencé dans ce commerce", product.getName()));
+
+      // Vérification que le produit est disponible
+      if(!product.getIsAvail())
+        throw new RuntimeException(String.format("Le produit %s n'est plus disponible", product.getName()));
+
+      // Vérification de la quantité de chaque produit
+      if(productWithQuantity.getProductQuantity() < 1)
+        throw new RuntimeException(String.format("Merci d'indiquer la quantité pour le produit %s", product.getName()));
+    });
+  }
+
+  @Override
+  public void validateSlot(CommandInformationDto commandInformation, LocalDateTime selectSlotTime) {
+    // Récuperation des créneaux disponible
+    List<LocalDateTime> storeAvailibiltySlots = getStoreSlotAvailibility(commandInformation);
+
+    if(storeAvailibiltySlots
+            .stream()
+            .filter(storeSlot->selectSlotTime.equals(storeSlot))
+            .collect(Collectors.toList())
+            .size() == 0) throw new CommandException("Le créneau demandé n'est plus disponible", HttpStatus.BAD_REQUEST);
+  }
+
 
 
 }

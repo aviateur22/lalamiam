@@ -1,8 +1,10 @@
 package ctoutweb.lalamiam.service.serviceImpl;
 
 import ctoutweb.lalamiam.model.dto.AddStoreDto;
+import ctoutweb.lalamiam.repository.ProductRepository;
 import ctoutweb.lalamiam.repository.StoreDayScheduleRepository;
 import ctoutweb.lalamiam.repository.StoreRepository;
+import ctoutweb.lalamiam.repository.entity.ProductEntity;
 import ctoutweb.lalamiam.repository.entity.StoreDayScheduleEntity;
 import ctoutweb.lalamiam.repository.entity.StoreEntity;
 import ctoutweb.lalamiam.repository.entity.WeekDayEntity;
@@ -18,13 +20,19 @@ import java.util.stream.Stream;
 @Service
 public class StoreServiceImp implements StoreService {
  private final StoreTransaction storeTransaction;
-
  private final StoreDayScheduleRepository storeDayScheduleRepository;
  private final StoreRepository storeRepository;
-  public StoreServiceImp(StoreTransaction storeTransaction, StoreDayScheduleRepository storeDayScheduleRepository, StoreRepository storeRepository) {
+ private final ProductRepository productRepository;
+  public StoreServiceImp(
+          StoreTransaction storeTransaction,
+          StoreDayScheduleRepository storeDayScheduleRepository,
+          StoreRepository storeRepository,
+          ProductRepository productRepository
+  ) {
     this.storeTransaction = storeTransaction;
     this.storeDayScheduleRepository = storeDayScheduleRepository;
     this.storeRepository = storeRepository;
+    this.productRepository = productRepository;
   }
 
   @Override

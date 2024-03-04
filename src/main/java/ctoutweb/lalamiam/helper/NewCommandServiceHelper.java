@@ -7,27 +7,22 @@ import ctoutweb.lalamiam.model.dto.ProductWithQuantityDto;
 import ctoutweb.lalamiam.model.dto.RegisterCommandDto;
 import ctoutweb.lalamiam.repository.entity.CommandEntity;
 import ctoutweb.lalamiam.repository.entity.ProductEntity;
-import ctoutweb.lalamiam.service.CommandProductService;
 import ctoutweb.lalamiam.service.ProductService;
 import org.springframework.stereotype.Component;
 
-import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
 @Component
 public class NewCommandServiceHelper {
-
-  private final CommandProductService commandProductService;
   private final ProductQuantityMapper productQuantityMapper;
   private final ProductService productService;
 
   public NewCommandServiceHelper(
-          CommandProductService commandProductService,
           ProductQuantityMapper productQuantityMapper,
           ProductService productService) {
-    this.commandProductService = commandProductService;
     this.productQuantityMapper = productQuantityMapper;
     this.productService = productService;
   }
@@ -52,7 +47,7 @@ public class NewCommandServiceHelper {
   /**
    * Renvoie les produits d'un commerce mapper avec les quantité d'une commande
    * (quantité est = 0 si création d'une commande ou produit absent de la commande)
-   * @param storeId BigInteger - Identitifiant commerce
+   * @param storeId Long - Identitifiant commerce
    * @param registerCommand RegisterCommandDto - données sur la commande
    * @return List<ProductWithQuantityDto>
    */
@@ -62,16 +57,48 @@ public class NewCommandServiceHelper {
   ) {
     final int CREATE_COMMAND_QUANTITY = 0;
 
+    // Récupération des produits du commerce
+    List<ProductEntity> storeProducts = productService.getStoreProducts(storeId);
+
+    if(storeProducts.size() == 0) return Arrays.asList();
+
     // Si commande en cours de création
-    if(registerCommand == null) return commandProductService.getStoreProducts(storeId)
+    if(registerCommand == null || registerCommand.getCommandId() == null)
+      return storeProductWithQuantity(storeProducts, CREATE_COMMAND_QUANTITY);
+
+    return storeProductWithQuantity(storeProducts, registerCommand, CREATE_COMMAND_QUANTITY);
+  }
+
+  /**
+   * Map les produits d'un commerce avec une quantité = 0
+   * @param storeProducts List<ProductEntity> - Produits du commerce
+   * @param CREATE_COMMAND_QUANTITY Integer - Quantité par default si produit non présent dans la cammande
+   * @return List<ProductWithQuantityDto>
+   */
+  public List<ProductWithQuantityDto> storeProductWithQuantity(List<ProductEntity> storeProducts, final int CREATE_COMMAND_QUANTITY ) {
+    // Todo test unitaire
+    return storeProducts
             .stream()
             .map(storeProduct -> {
               return Factory.getProductWithQuantityDto(storeProduct, CREATE_COMMAND_QUANTITY);
             })
             .toList();
+  }
 
-
-    return commandProductService.getStoreProducts(storeId)
+  /**
+   * Map les produits d'un commerce avec une quantité des produits d'une commande
+   * @param storeProducts List<ProductEntity> - Produits du commerce
+   * @param registerCommand RegisterCommandDto - Données sur la commande existante
+   * @param CREATE_COMMAND_QUANTITY Integer - Quantité par default si produit non présent dans la cammande
+   * @return List<ProductWithQuantityDto>
+   */
+  public List<ProductWithQuantityDto> storeProductWithQuantity(
+          List<ProductEntity> storeProducts,
+          RegisterCommandDto registerCommand,
+          final int CREATE_COMMAND_QUANTITY
+  ) {
+    // Todo test unitaire
+    return storeProducts
             .stream()
             .map(storeProduct->{
               return registerCommand.getManualCommandInformation().getSelectProducts()
@@ -83,6 +110,8 @@ public class NewCommandServiceHelper {
             })
             .toList();
   }
+
+
 
   /**
    * Calcul du temps de préparation d'une commande

@@ -12,7 +12,6 @@ import ctoutweb.lalamiam.repository.entity.CommandEntity;
 import ctoutweb.lalamiam.repository.entity.CommandProductEntity;
 import ctoutweb.lalamiam.repository.entity.ProductEntity;
 import ctoutweb.lalamiam.repository.transaction.CommandTransactionSession;
-import ctoutweb.lalamiam.service.CommandProductService;
 import ctoutweb.lalamiam.service.ProductService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,17 +30,15 @@ public class NewCommandServiceHelperTest {
   void getStoreProductsWithCommandQuantity_without_existing_command() {
     Long storeId = Long.valueOf(1);
 
-    CommandProductService commandProductService = mock(CommandProductService.class);
     ProductQuantityMapper productQuantityMapper = mock(ProductQuantityMapper.class);
     ProductService productService = mock(ProductService.class);
 
     NewCommandServiceHelper commandServiceHelper = new NewCommandServiceHelper(
-            commandProductService,
             productQuantityMapper,
             productService);
 
     // Mock CommandProduct
-    when(commandProductService.getStoreProducts(any())).thenReturn(fakeProductList());
+    when(productService.getStoreProducts(any())).thenReturn(fakeProductList());
 
     RegisterCommandDto registerCommand = null;
 
@@ -54,7 +51,6 @@ public class NewCommandServiceHelperTest {
     Assertions.assertEquals(0, storeProducts.get(2).selectQuantity());
     Assertions.assertEquals(0, storeProducts.get(3).selectQuantity());
   }
-
   @Test
   void getStoreProductsWithCommandQuantity_with_existing_command() {
 
@@ -65,18 +61,16 @@ public class NewCommandServiceHelperTest {
     Long storeId = Long.valueOf(1);
     Long commandId = Long.valueOf(1);
 
-    CommandProductService commandProductService = mock(CommandProductService.class);
     CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
     ProductQuantityMapper productQuantityMapper = mock(ProductQuantityMapper.class);
     ProductService productService = mock(ProductService.class);
 
     NewCommandServiceHelper commandServiceHelper = new NewCommandServiceHelper(
-            commandProductService,
             productQuantityMapper,
             productService);
 
     // Mock CommandProduct
-    when(commandProductService.getStoreProducts(any())).thenReturn(fakeProductList());
+    when(productService.getStoreProducts(any())).thenReturn(fakeProductList());
 
 
     /**
@@ -96,17 +90,84 @@ public class NewCommandServiceHelperTest {
     Assertions.assertEquals(3, getProductWithQuantityById(Long.valueOf(3), storeProducts).selectQuantity());
     Assertions.assertEquals(4, getProductWithQuantityById(Long.valueOf(4), storeProducts).selectQuantity());
   }
-
   @Test
-  void findRegisterCommandInformation_without_existing_command() {
+  void getStoreProductsWithCommandQuantity_when_no_product_in_store_command_not_exist() {
 
-    CommandProductService commandProductService = mock(CommandProductService.class);
+    /**
+     * Given
+     */
+    // Données pour ManualCommandInformation
+    Long storeId = Long.valueOf(1);
+
     CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
     ProductQuantityMapper productQuantityMapper = mock(ProductQuantityMapper.class);
     ProductService productService = mock(ProductService.class);
 
     NewCommandServiceHelper commandServiceHelper = new NewCommandServiceHelper(
-            commandProductService,
+            productQuantityMapper,
+            productService);
+
+    // Mock CommandProduct
+    when(productService.getStoreProducts(any())).thenReturn(Arrays.asList());
+
+
+    /**
+     * When
+     */
+    List<ProductWithQuantityDto> storeProducts = commandServiceHelper.getStoreProductsWithCommandQuantity(
+            storeId,
+            null
+    );
+
+    /**
+     * Then
+     */
+    Assertions.assertEquals(0, storeProducts.size());
+
+  }
+  @Test
+  void getStoreProductsWithCommandQuantity_when_no_product_in_store_existing_command() {
+
+    /**
+     * Given
+     */
+    // Données pour ManualCommandInformation
+    Long storeId = Long.valueOf(1);
+    Long commandId = Long.valueOf(1);
+
+    CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
+    ProductQuantityMapper productQuantityMapper = mock(ProductQuantityMapper.class);
+    ProductService productService = mock(ProductService.class);
+
+    NewCommandServiceHelper commandServiceHelper = new NewCommandServiceHelper(
+            productQuantityMapper,
+            productService);
+
+    // Mock CommandProduct
+    when(productService.getStoreProducts(any())).thenReturn(Arrays.asList());
+
+
+    /**
+     * When
+     */
+    List<ProductWithQuantityDto> storeProducts = commandServiceHelper.getStoreProductsWithCommandQuantity(
+            storeId,
+            getFakeRegisterCommand(storeId, null)
+    );
+
+    /**
+     * Then
+     */
+    Assertions.assertEquals(0, storeProducts.size());
+
+  }
+  @Test
+  void findRegisterCommandInformation_without_existing_command() {
+    CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
+    ProductQuantityMapper productQuantityMapper = mock(ProductQuantityMapper.class);
+    ProductService productService = mock(ProductService.class);
+
+    NewCommandServiceHelper commandServiceHelper = new NewCommandServiceHelper(
             productQuantityMapper,
             productService);
 
@@ -116,7 +177,6 @@ public class NewCommandServiceHelperTest {
 
     Assertions.assertNull(registerCommand);
   }
-
   @Test
   void findRegisterCommandInformation_with_existing_command() {
     /**
@@ -125,7 +185,6 @@ public class NewCommandServiceHelperTest {
     Long storeId = Long.valueOf(1);
     Long commandId = Long.valueOf(1);
 
-    CommandProductService commandProductService = mock(CommandProductService.class);
     CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
     ProductService productService = mock(ProductService.class);
 
@@ -139,7 +198,6 @@ public class NewCommandServiceHelperTest {
      * When
      */
     NewCommandServiceHelper commandServiceHelper = new NewCommandServiceHelper(
-            commandProductService,
             productQuantityMapper,
             productService);
 
@@ -157,9 +215,6 @@ public class NewCommandServiceHelperTest {
   @Test
   void calculateCommandPreparationTime_with_products() {
 
-    // Mock CommandProductService
-    CommandProductService commandProductService = mock(CommandProductService.class);
-
     // ProductQuantityMapper
     ProductQuantityMapper productQuantityMapper = new ProductQuantityMapper();
 
@@ -190,7 +245,6 @@ public class NewCommandServiceHelperTest {
                     .orElseThrow(()->new RuntimeException("")));
 
     NewCommandServiceHelper commandServiceHelper = new NewCommandServiceHelper(
-            commandProductService,
             productQuantityMapper,
             productService
     );
@@ -199,12 +253,8 @@ public class NewCommandServiceHelperTest {
 
     Assertions.assertEquals(27, commandPreparationTime);
   }
-
   @Test
   void calculateCommandPreparationTime_without_products() {
-
-    // Mock CommandProductService
-    CommandProductService commandProductService = mock(CommandProductService.class);
 
     // ProductQuantityMapper
     ProductQuantityMapper productQuantityMapper = new ProductQuantityMapper();
@@ -213,7 +263,6 @@ public class NewCommandServiceHelperTest {
     ProductService productService = mock(ProductService.class);
 
     NewCommandServiceHelper commandServiceHelper = new NewCommandServiceHelper(
-            commandProductService,
             productQuantityMapper,
             productService
     );
@@ -225,9 +274,6 @@ public class NewCommandServiceHelperTest {
   @Test
   void calculateCommandPrice_with_products() {
 
-    // Mock CommandProductService
-    CommandProductService commandProductService = mock(CommandProductService.class);
-
     // ProductQuantityMapper
     ProductQuantityMapper productQuantityMapper = new ProductQuantityMapper();
 
@@ -258,7 +304,6 @@ public class NewCommandServiceHelperTest {
                     .orElseThrow(()->new RuntimeException("")));
 
     NewCommandServiceHelper commandServiceHelper = new NewCommandServiceHelper(
-            commandProductService,
             productQuantityMapper,
             productService
     );
@@ -270,9 +315,6 @@ public class NewCommandServiceHelperTest {
   @Test
   void calculateCommandPrice_without_products() {
 
-    // Mock CommandProductService
-    CommandProductService commandProductService = mock(CommandProductService.class);
-
     // ProductQuantityMapper
     ProductQuantityMapper productQuantityMapper = new ProductQuantityMapper();
 
@@ -280,7 +322,6 @@ public class NewCommandServiceHelperTest {
     ProductService productService = mock(ProductService.class);
 
     NewCommandServiceHelper commandServiceHelper = new NewCommandServiceHelper(
-            commandProductService,
             productQuantityMapper,
             productService
     );
@@ -291,10 +332,6 @@ public class NewCommandServiceHelperTest {
   }
   @Test
   void calculateNumberOfProductInCommand_with_products() {
-
-    // Mock CommandProductService
-    CommandProductService commandProductService = mock(CommandProductService.class);
-
     // ProductQuantityMapper
     ProductQuantityMapper productQuantityMapper = new ProductQuantityMapper();
 
@@ -325,7 +362,6 @@ public class NewCommandServiceHelperTest {
                     .orElseThrow(()->new RuntimeException("")));
 
     NewCommandServiceHelper commandServiceHelper = new NewCommandServiceHelper(
-            commandProductService,
             productQuantityMapper,
             productService
     );
@@ -336,10 +372,6 @@ public class NewCommandServiceHelperTest {
   }
   @Test
   void calculateNumberOfProductInCommand_without_products() {
-
-    // Mock CommandProductService
-    CommandProductService commandProductService = mock(CommandProductService.class);
-
     // ProductQuantityMapper
     ProductQuantityMapper productQuantityMapper = new ProductQuantityMapper();
 
@@ -347,7 +379,6 @@ public class NewCommandServiceHelperTest {
     ProductService productService = mock(ProductService.class);
 
     NewCommandServiceHelper commandServiceHelper = new NewCommandServiceHelper(
-            commandProductService,
             productQuantityMapper,
             productService
     );
@@ -356,12 +387,8 @@ public class NewCommandServiceHelperTest {
 
     Assertions.assertNull(numberOfProductInCommand);
   }
-
   @Test
   void generateCode() {
-    // Mock CommandProductService
-    CommandProductService commandProductService = mock(CommandProductService.class);
-
     // ProductQuantityMapper
     ProductQuantityMapper productQuantityMapper = new ProductQuantityMapper();
 
@@ -369,7 +396,6 @@ public class NewCommandServiceHelperTest {
     ProductService productService = mock(ProductService.class);
 
     NewCommandServiceHelper commandServiceHelper = new NewCommandServiceHelper(
-            commandProductService,
             productQuantityMapper,
             productService
     );

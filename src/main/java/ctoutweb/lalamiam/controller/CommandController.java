@@ -7,8 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigInteger;
-
 @RestController
 @RequestMapping("api/lalamiam/v1/command")
 public class CommandController {
@@ -18,18 +16,22 @@ public class CommandController {
     this.commandService = commandService;
   }
 
-  @GetMapping("/create/{storeId}")
-  ResponseEntity<StoreProductsInformationDto> createCommand(@RequestParam Long storeId) {
+  @GetMapping("/create/store/{storeId}")
+  ResponseEntity<StoreProductsInformationDto> createCommand(@PathVariable Long storeId) {
     StoreProductsInformationDto addCommand = commandService.createCommand(storeId);
     return new ResponseEntity<>(addCommand, HttpStatus.OK);
   }
-  @GetMapping("/update/{storeId}/command/{commandId}")
-  ResponseEntity<StoreProductsInformationDto> updateCommand(@RequestParam Long storeId, Long commandId) {
+  @GetMapping("/update/store/{storeId}/command/{commandId}")
+  ResponseEntity<StoreProductsInformationDto> updateCommand(@PathVariable Long storeId, @PathVariable Long commandId) {
     return new ResponseEntity<>(commandService.updateCommand(storeId, commandId), HttpStatus.OK);
   }
-  @GetMapping("/get/{storeId}/command/{commandId}")
-  ResponseEntity<RegisterCommandDto> getCommand(@RequestParam Long storeId, Long commandId) {
+  @GetMapping("/store/{storeId}/command/{commandId}")
+  ResponseEntity<RegisterCommandDto> getCommand(@PathVariable Long storeId, @PathVariable Long commandId) {
     return new ResponseEntity<>(commandService.getCommand(storeId, commandId), HttpStatus.OK);
   }
 
+  @PostMapping("/persist-command")
+  ResponseEntity<RegisterCommandDto> persistCommand(@RequestBody PersitCommandDto persitCommandInformation) {
+    return new ResponseEntity<>(commandService.persistCommand(persitCommandInformation), HttpStatus.OK);
+  }
 }
