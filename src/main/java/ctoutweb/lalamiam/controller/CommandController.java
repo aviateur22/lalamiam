@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/lalamiam/v1/command")
+@RequestMapping("api/v1/command")
 public class CommandController {
   private final NewCommandService commandService;
 

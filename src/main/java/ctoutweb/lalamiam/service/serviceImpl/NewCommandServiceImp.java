@@ -71,7 +71,7 @@ public class NewCommandServiceImp implements NewCommandService {
 
     // Si commande existante alors vérification du storeIs
     if(command != null && !command.getStore().getId().equals(storeId))
-      throw new CommandException("Cette commande n'est pas rattaché au commerce", HttpStatus.BAD_REQUEST);
+      throw new CommandException("Cette commande n'est pas rattaché au commerce", HttpStatus.NOT_FOUND);
 
     // Recherche d'une commande
     return commandServiceHelper.findRegisterCommandInformation(command);

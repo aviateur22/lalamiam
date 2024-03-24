@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/lalamiam/v1/store")
+@RequestMapping("api/v1/store")
 public class StoreController {
 
   private final StoreService storeService;
