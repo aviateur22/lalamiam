@@ -4,12 +4,18 @@ import ctoutweb.lalamiam.model.*;
 import ctoutweb.lalamiam.model.dto.*;
 import ctoutweb.lalamiam.repository.builder.CommandProductEntityBuilder;
 import ctoutweb.lalamiam.repository.entity.*;
+import ctoutweb.lalamiam.repository.entity.builder.JwtUserEntityBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class Factory {
+
+  public static UserEntity getUSer(Long userId) {
+    // Todo faire test
+    return new UserEntity(userId);
+  }
   public  static ProductEntity getProduct(Long productId) {
     return new ProductEntity(productId);
   }
@@ -191,5 +197,38 @@ public class Factory {
             preparationtime,
             numberOfProductInCommand,
             commandPrice);
+  }
+
+  /**
+   * Renvoie un JwtUserEntity pour recherche en base de données
+   * @param user UserEntity - Utilisateur
+   * @param jwt String - Jwt token
+   * @return JwtUserEntity
+   */
+  public static JwtUserEntity getJwtUserToFind(UserEntity user, String jwt) {
+    // Todo Faire Test
+    return JwtUserEntityBuilder.aJwtUserEntity()
+            .withJwt(jwt)
+            .withUser(user)
+            .build();
+  }
+
+  /**
+   * Renvoie un JwtUserEntity pour persistance en base de données
+   * @param user UserEntity - Utilisateur
+   * @param jwt JwtIssue - JWT surchargé des infos de création
+   * @return  JwtUserEntity
+   */
+  public static JwtUserEntity createJwtUserToSave(UserEntity user, JwtIssue jwt) {
+    // Todo Faire Test
+    LocalDateTime createdAt = LocalDateTime.now();
+
+    return JwtUserEntityBuilder.aJwtUserEntity()
+            .withJwt(jwt.getJwtToken())
+            .withUser(user)
+            .withIsValid(true)
+            .withExpiredAt(jwt.getExpiredAt())
+            .withCreatedAt(createdAt)
+            .build();
   }
 }

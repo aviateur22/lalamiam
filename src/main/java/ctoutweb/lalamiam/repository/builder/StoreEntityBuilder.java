@@ -1,11 +1,10 @@
 package ctoutweb.lalamiam.repository.builder;
 
 import ctoutweb.lalamiam.repository.entity.CommandEntity;
-import ctoutweb.lalamiam.repository.entity.ProEntity;
+import ctoutweb.lalamiam.repository.entity.UserEntity;
 import ctoutweb.lalamiam.repository.entity.ProductEntity;
 import ctoutweb.lalamiam.repository.entity.StoreEntity;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -20,7 +19,7 @@ public final class StoreEntityBuilder {
   private String photo;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
-  private ProEntity pro;
+  private UserEntity pro;
   private List<ProductEntity> products;
   private List<CommandEntity> commands;
 
@@ -81,7 +80,7 @@ public final class StoreEntityBuilder {
     return this;
   }
 
-  public StoreEntityBuilder withPro(ProEntity pro) {
+  public StoreEntityBuilder withPro(UserEntity pro) {
     this.pro = pro;
     return this;
   }

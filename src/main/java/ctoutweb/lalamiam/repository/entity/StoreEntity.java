@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -50,7 +49,7 @@ public class StoreEntity {
 
   @ManyToOne
   @JoinColumn(name="pro_id", nullable=false)
-  private ProEntity pro;
+  private UserEntity pro;
 
   @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
   private List<StoreDayScheduleEntity> storeWeekDaySchedules;
@@ -72,7 +71,7 @@ public class StoreEntity {
   }
 
   public StoreEntity(AddStoreDto addStoreDto) {
-    this.pro = new ProEntity(addStoreDto.proId());
+    this.pro = new UserEntity(addStoreDto.proId());
     this.adress = addStoreDto.adress();
     this.city = addStoreDto.city();
     this.name = addStoreDto.name();
@@ -161,11 +160,11 @@ public class StoreEntity {
     this.updatedAt = updatedAt;
   }
 
-  public ProEntity getPro() {
+  public UserEntity getPro() {
     return pro;
   }
 
-  public void setPro(ProEntity pro) {
+  public void setPro(UserEntity pro) {
     this.pro = pro;
   }
 

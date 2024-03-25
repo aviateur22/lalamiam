@@ -13,17 +13,13 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.springframework.stereotype.Component;
 
-import java.math.BigInteger;
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Component
 public class StoreTransaction {
 
   private final EntityManagerFactory entityManagerFactory;
   private final StoreDayScheduleRepository storeDayScheduleRepository;
   private final StoreRepository storeRepository;
-  private final ProRepository proRepository;
+  private final UserRepository proRepository;
 
   public StoreTransaction(
           CommandRepository commandRepository,
@@ -31,7 +27,7 @@ public class StoreTransaction {
           EntityManagerFactory entityManagerFactory,
           StoreDayScheduleRepository scheduleRepository,
           StoreRepository storeRepository,
-          ProRepository proRepository
+          UserRepository proRepository
   ) {
     this.entityManagerFactory = entityManagerFactory;
     this.storeDayScheduleRepository = scheduleRepository;

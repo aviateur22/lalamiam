@@ -1,18 +1,44 @@
 BEGIN;
-DROP TABLE IF EXISTS sc_lalamiam."store_day_schedule",sc_lalamiam."week_day", sc_lalamiam."command_product", sc_lalamiam."product",  sc_lalamiam."command", sc_lalamiam."store", sc_lalamiam."pro";
+DROP TABLE IF EXISTS
+sc_lalamiam."jwt_user",
+sc_lalamiam."store_day_schedule",
+sc_lalamiam."week_day",
+sc_lalamiam."command_product",
+sc_lalamiam."product",
+sc_lalamiam."command",
+sc_lalamiam."store",
+sc_lalamiam."role_user",
+sc_lalamiam."role",
+sc_lalamiam."users";
 
-create table IF NOT EXISTS sc_lalamiam.pro(
+
+create table IF NOT EXISTS sc_lalamiam.users(
     "id" BIGINT PRIMARY KEY,
     "email" TEXT NOT NULL,
-    "phone" TEXT NOT NULL,
+    "phone" TEXT,
     "password" TEXT NOT NULL,
+    "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    "updated_at" TIMESTAMPTZ
+);
+
+create table IF NOT EXISTS sc_lalamiam.role(
+    "id" INT PRIMARY KEY,
+    "name" TEXT NOT NULL,
+    "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    "updated_at" TIMESTAMPTZ
+);
+
+create table IF NOT EXISTS sc_lalamiam.role_user(
+    "id" BIGINT PRIMARY KEY,
+    "user_id" BIGINT NOT NULL REFERENCES sc_lalamiam."users"("id") on delete cascade,
+    "role_id" BIGINT NOT NULL REFERENCES sc_lalamiam."role"("id") on delete cascade,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
     "updated_at" TIMESTAMPTZ
 );
 
 create table IF NOT EXISTS sc_lalamiam.store(
      "id" BIGINT PRIMARY KEY,
-     "pro_id" INTEGER NOT NULL REFERENCES sc_lalamiam."pro"("id") on delete cascade,
+     "pro_id" BIGINT NOT NULL REFERENCES sc_lalamiam."users"("id") on delete cascade,
      "name" TEXT NOT NULL,
      "adress" TEXT NOT NULL,
      "city" TEXT NOT NULL,
@@ -27,7 +53,7 @@ create table IF NOT EXISTS sc_lalamiam.store(
 
 create table IF NOT EXISTS sc_lalamiam.command(
     "id" BIGINT PRIMARY KEY,
-    "store_id" INTEGER NOT NULL REFERENCES sc_lalamiam."store"("id") on delete cascade,
+    "store_id" BIGINT NOT NULL REFERENCES sc_lalamiam."store"("id") on delete cascade,
     "command_code" TEXT NOT NULL,
     "slot_time" TIMESTAMPTZ NOT NULL DEFAULT now(),
     "client_phone" TEXT NOT NULL,
@@ -54,8 +80,8 @@ create table IF NOT EXISTS sc_lalamiam.product(
 
 create table IF NOT EXISTS sc_lalamiam.command_product(
     "id" BIGINT PRIMARY KEY,
-    "command_id" INTEGER NOT NULL REFERENCES sc_lalamiam."command"("id") on delete cascade,
-    "product_id" INTEGER NOT NULL REFERENCES sc_lalamiam."product"("id") on delete cascade,
+    "command_id" BIGINT NOT NULL REFERENCES sc_lalamiam."command"("id") on delete cascade,
+    "product_id" BIGINT NOT NULL REFERENCES sc_lalamiam."product"("id") on delete cascade,
     "product_quantity" INTEGER NOT NULL,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
     "updated_at" TIMESTAMPTZ
@@ -68,38 +94,58 @@ create table IF NOT EXISTS sc_lalamiam.week_day(
     "updated_at" TIMESTAMPTZ
 );
 
-create table IF NOT EXISTS sc_lalamiam.store_day_schedule(
+create table IF NOT EXISTS sc_lalamiam.store_day_schedule (
     "id" INTEGER PRIMARY KEY,
     "opening_time" TIME NOT NULL,
     "closing_time" TIME NOT NULL,
-    "store_id" INTEGER NOT NULL REFERENCES sc_lalamiam."store"("id") on delete cascade,
+    "store_id" BIGINT NOT NULL REFERENCES sc_lalamiam."store"("id") on delete cascade,
     "week_day_id" INTEGER NOT NULL REFERENCES sc_lalamiam."week_day"("id") on delete cascade,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
     "updated_at" TIMESTAMPTZ
 );
 
+CREATE TABLE sc_lalamiam.jwt_user (
+"id" BIGINT NOT NULL UNIQUE PRIMARY KEY,
+"user_id" BIGINT NOT NULL REFERENCES sc_lalamiam."users"("id") ON DELETE CASCADE,
+"jwt" TEXT NOT NULL,
+"is_valid" BOOLEAN NOT NULL DEFAULT FALSE,
+"expired_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
+"created_at"TIMESTAMPTZ NOT NULL DEFAULT now(),
+"updated_at" TIMESTAMPTZ
+);
+
 
 ALTER table IF EXISTS sc_lalamiam.command_product OWNER TO lalamiam;
+ALTER table IF EXISTS sc_lalamiam.role OWNER TO lalamiam;
+ALTER table IF EXISTS sc_lalamiam.role_user OWNER TO lalamiam;
 ALTER table IF EXISTS sc_lalamiam.product OWNER TO lalamiam;
 ALTER table IF EXISTS sc_lalamiam.command OWNER TO lalamiam;
 ALTER table IF EXISTS sc_lalamiam.store OWNER TO lalamiam;
-ALTER table IF EXISTS sc_lalamiam.pro OWNER TO lalamiam;
+ALTER table IF EXISTS sc_lalamiam.users OWNER TO lalamiam;
 ALTER table IF EXISTS sc_lalamiam.week_day OWNER TO lalamiam;
 ALTER table IF EXISTS sc_lalamiam.store_day_schedule OWNER TO lalamiam;
+ALTER table IF EXISTS sc_lalamiam.jwt_user OWNER TO lalamiam;
 ALTER SCHEMA sc_lalamiam OWNER TO lalamiam;
 
 GRANT ALL ON TABLE sc_lalamiam.command_product TO lalamiam;
+GRANT ALL ON TABLE sc_lalamiam.role TO lalamiam;
+GRANT ALL ON TABLE sc_lalamiam.role_user TO lalamiam;
 GRANT ALL ON TABLE sc_lalamiam.product TO lalamiam;
 GRANT ALL ON TABLE sc_lalamiam.command TO lalamiam;
 GRANT ALL ON TABLE sc_lalamiam.store TO lalamiam;
-GRANT ALL ON TABLE sc_lalamiam.pro TO lalamiam;
+GRANT ALL ON TABLE sc_lalamiam.users TO lalamiam;
 GRANT ALL ON TABLE sc_lalamiam.week_day TO lalamiam;
 GRANT ALL ON TABLE sc_lalamiam.store_day_schedule TO lalamiam;
+GRANT ALL ON TABLE sc_lalamiam.jwt_user TO lalamiam;
 GRANT ALL ON SCHEMA sc_lalamiam TO lalamiam;
 
-CREATE SEQUENCE if not exists sc_lalamiam.pro_pk_seq START WITH 1 INCREMENT BY 1 NO CYCLE;
-ALTER SEQUENCE if exists sc_lalamiam.pro_pk_seq OWNER TO lalamiam;
-ALTER SEQUENCE if exists sc_lalamiam.pro_pk_seq owned by sc_lalamiam.pro.id;
+CREATE SEQUENCE if not exists sc_lalamiam.users_pk_seq START WITH 1 INCREMENT BY 1 NO CYCLE;
+ALTER SEQUENCE if exists sc_lalamiam.users_pk_seq OWNER TO lalamiam;
+ALTER SEQUENCE if exists sc_lalamiam.users_pk_seq owned by sc_lalamiam.users.id;
+
+CREATE SEQUENCE if not exists sc_lalamiam.role_user_pk_seq START WITH 1 INCREMENT BY 1 NO CYCLE;
+ALTER SEQUENCE if exists sc_lalamiam.role_user_pk_seq OWNER TO lalamiam;
+ALTER SEQUENCE if exists sc_lalamiam.role_user_pk_seq owned by sc_lalamiam.role_user.id;
 
 CREATE SEQUENCE if not exists sc_lalamiam.store_pk_seq START WITH 1 INCREMENT BY 1 NO CYCLE;
 ALTER SEQUENCE if exists sc_lalamiam.store_pk_seq OWNER TO lalamiam;
@@ -121,13 +167,20 @@ CREATE SEQUENCE if not exists sc_lalamiam.store_week_day_pk_seq START WITH 1 INC
 ALTER SEQUENCE if exists sc_lalamiam.store_week_day_pk_seq OWNER TO lalamiam;
 ALTER SEQUENCE if exists sc_lalamiam.store_week_day_pk_seq owned by sc_lalamiam.store_day_schedule.id;
 
+CREATE SEQUENCE if not exists sc_lalamiam.jwt_user_pk_seq START WITH 1 INCREMENT BY 1 NO CYCLE;
+ALTER SEQUENCE if exists sc_lalamiam.jwt_user_pk_seq OWNER TO lalamiam;
+ALTER SEQUENCE if exists sc_lalamiam.jwt_user_pk_seq owned by sc_lalamiam.jwt_user.id;
+
 INSERT INTO sc_lalamiam.week_day ("id", "day_text") values (1, 'monday'), (2, 'tuesday'),  (3, 'wenesday'), (4, 'thrurday'),(5, 'friday'), (6, 'staurday'), (7, 'sunday');
+INSERT INTO sc_lalamiam.role ("id", "name") values (1, 'ROLE_USER'), (2, 'ROLE_PRO'),  (3, 'ROLE_ADMIN');
 
 ALTER TABLE sc_lalamiam.product ALTER COLUMN id SET DEFAULT NEXTVAL('sc_lalamiam.product_pk_seq');
+ALTER TABLE sc_lalamiam.role_user ALTER COLUMN id SET DEFAULT NEXTVAL('sc_lalamiam.role_user_pk_seq');
 ALTER TABLE sc_lalamiam.command ALTER COLUMN id SET DEFAULT NEXTVAL('sc_lalamiam.command_pk_seq');
-ALTER TABLE sc_lalamiam.pro ALTER COLUMN id SET DEFAULT NEXTVAL('sc_lalamiam.pro_pk_seq');
+ALTER TABLE sc_lalamiam.users ALTER COLUMN id SET DEFAULT NEXTVAL('sc_lalamiam.users_pk_seq');
 ALTER TABLE sc_lalamiam.store ALTER COLUMN id SET DEFAULT NEXTVAL('sc_lalamiam.store_pk_seq');
 ALTER TABLE sc_lalamiam.store_day_schedule ALTER COLUMN id SET DEFAULT NEXTVAL('sc_lalamiam.store_week_day_pk_seq');
 ALTER TABLE sc_lalamiam.command_product ALTER COLUMN id SET DEFAULT NEXTVAL('sc_lalamiam.command_product_pk_seq');
+ALTER TABLE sc_lalamiam.jwt_user ALTER COLUMN id SET DEFAULT NEXTVAL('sc_lalamiam.jwt_user_pk_seq');
 
 COMMIT;

@@ -13,8 +13,7 @@ import java.util.Objects;
 @Table(name = "command_product")
 public class CommandProductEntity {
   @Id
-  @SequenceGenerator(name="command_product_pk_seq", sequenceName="command_product_pk_seq", allocationSize=1, initialValue = 1)
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "command_product_pk_seq")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   @Column(name = "product_quantity")
