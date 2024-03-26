@@ -3,14 +3,10 @@ package ctoutweb.lalamiam.security.authentication;
 import ctoutweb.lalamiam.mapper.SimpleGrantedAuthorityMapper;
 import ctoutweb.lalamiam.repository.entity.UserEntity;
 import ctoutweb.lalamiam.repository.transaction.UserTransactionSession;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.Collection;
-import java.util.stream.Collectors;
 
 @Service
 public class UserPrincipalDetailService implements UserDetailsService {

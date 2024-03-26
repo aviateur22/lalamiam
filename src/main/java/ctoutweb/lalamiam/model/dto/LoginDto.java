@@ -1,4 +1,4 @@
 package ctoutweb.lalamiam.model.dto;
 
-public class LoginDto {
+public record LoginDto(String email, String password){
 }

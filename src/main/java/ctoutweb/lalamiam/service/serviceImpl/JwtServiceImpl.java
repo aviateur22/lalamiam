@@ -7,9 +7,11 @@ import ctoutweb.lalamiam.repository.entity.JwtUserEntity;
 import ctoutweb.lalamiam.repository.entity.UserEntity;
 import ctoutweb.lalamiam.service.JwtService;
 import io.micrometer.common.util.StringUtils;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+@Service
 public class JwtServiceImpl implements JwtService {
 
   private final JwtUserRepository jwtUserRepository;

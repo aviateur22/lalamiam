@@ -2,7 +2,6 @@ package ctoutweb.lalamiam.repository.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -13,6 +12,14 @@ public class RoleEntity {
   private String name;
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+  public RoleEntity() {
+  }
+
+  public RoleEntity(Integer id) {
+    this.id = id;
+  }
 
   public Integer getId() {
     return id;

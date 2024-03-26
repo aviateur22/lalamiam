@@ -69,6 +69,11 @@ public class UserEntity {
     this.id = userId;
   }
 
+  public UserEntity(String email, String password) {
+    this.email = email;
+    this.password = password;
+  }
+
   public Long getId() {
     return id;
   }

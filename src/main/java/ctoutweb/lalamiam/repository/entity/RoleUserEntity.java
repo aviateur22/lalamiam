@@ -35,6 +35,14 @@ public class RoleUserEntity {
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+  public RoleUserEntity() {
+  }
+
+  public RoleUserEntity(UserEntity user, RoleEntity role) {
+    this.user = user;
+    this.role = role;
+  }
+
   public Long getId() {
     return id;
   }

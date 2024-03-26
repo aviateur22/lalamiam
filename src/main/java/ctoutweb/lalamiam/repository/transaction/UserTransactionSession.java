@@ -1,9 +1,11 @@
 package ctoutweb.lalamiam.repository.transaction;
 
+import ctoutweb.lalamiam.factory.Factory;
 import ctoutweb.lalamiam.repository.UserRepository;
 import ctoutweb.lalamiam.repository.entity.UserEntity;
 import jakarta.persistence.EntityManagerFactory;
 
+import jakarta.transaction.Transactional;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -18,10 +20,16 @@ import org.springframework.stereotype.Component;
 public class UserTransactionSession {
   private final EntityManagerFactory entityManagerFactory;
   private final UserRepository userRepository;
+  private final RoleUserRepository roleUserRepository;
 
-  public UserTransactionSession(EntityManagerFactory entityManagerFactory, UserRepository userRepository) {
+  public UserTransactionSession(
+          EntityManagerFactory entityManagerFactory,
+          UserRepository userRepository,
+          RoleUserRepository roleUserRepository
+  ) {
     this.entityManagerFactory = entityManagerFactory;
     this.userRepository = userRepository;
+    this.roleUserRepository = roleUserRepository;
   }
 
   public UserEntity getUserInformationById(Long userId) {
@@ -65,5 +73,23 @@ public class UserTransactionSession {
       session.close();
       return user;
     }
+  }
+
+  @Transactional
+  public UserEntity registerUser(String email, String password) {
+    // Role USer
+    final int USER_ROLE = 1;
+
+    // Données a sauvgarder
+    UserEntity userToSave = Factory.getUSerWithEmailPassword(email, password);
+
+    // Sauvegarde utilisateur
+    UserEntity saveUser = userRepository.save(userToSave);
+
+    // Sauvegarde du ROLE
+    roleUserRepository.save(Factory.createRoleUser(USER_ROLE, saveUser.getId()));
+
+    // Renvoie les données utilisateurs
+    return getUserInformationById(saveUser.getId());
   }
 }

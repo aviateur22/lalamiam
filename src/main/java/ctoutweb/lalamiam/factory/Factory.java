@@ -16,6 +16,10 @@ public class Factory {
     // Todo faire test
     return new UserEntity(userId);
   }
+  public static UserEntity getUSerWithEmailPassword(String email, String password) {
+    // Todo faire test
+    return new UserEntity(email, password);
+  }
   public  static ProductEntity getProduct(Long productId) {
     return new ProductEntity(productId);
   }
@@ -230,5 +234,26 @@ public class Factory {
             .withExpiredAt(jwt.getExpiredAt())
             .withCreatedAt(createdAt)
             .build();
+  }
+
+  /***
+   * Renvoie un RoleEntity
+   * @param roleId int
+   * @return RoleEntity
+   */
+  public static RoleEntity getRoleEntity(int roleId) {
+    return new RoleEntity(roleId);
+  }
+
+  /**
+   * Renvoie un RoleUserEntity
+   * @param roleId int
+   * @param userId Long
+   * @return RoleUserEntity
+   */
+  public static RoleUserEntity createRoleUser(int roleId, Long userId) {
+    UserEntity user = Factory.getUSer(userId);
+    RoleEntity role = Factory.getRoleEntity(roleId);
+    return new RoleUserEntity(user, role);
   }
 }
