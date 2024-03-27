@@ -59,6 +59,7 @@ public final class JwtUserEntityBuilder {
   public JwtUserEntity build() {
     JwtUserEntity jwtUserEntity = new JwtUserEntity();
     jwtUserEntity.setId(id);
+    jwtUserEntity.setIsValid(isValid);
     jwtUserEntity.setJwt(jwt);
     jwtUserEntity.setExpiredAt(expiredAt);
     jwtUserEntity.setCreatedAt(createdAt);

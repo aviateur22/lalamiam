@@ -20,6 +20,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.stream.Collectors;
+
 @Service
 public class AuthServiceImpl implements AuthService {
   private final PasswordEncoder passwordEncoder;
@@ -56,7 +58,13 @@ public class AuthServiceImpl implements AuthService {
     JwtIssue jwtIssue = jwtIssuer.issue(userPrincipal);
     jwtService.saveJwt(userPrincipal.getId(), jwtIssue);
 
-    return null;
+    return new LoginResponse(
+            userPrincipal.getId(),
+            jwtIssue.getJwtToken(),
+            userPrincipal.getAuthorities()
+                    .stream()
+                    .map(x->x.getAuthority())
+                    .collect(Collectors.toList()));
   }
 
   @Override

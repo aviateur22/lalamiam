@@ -27,7 +27,7 @@ public class JwtServiceImpl implements JwtService {
     JwtUserEntity jwtUserToSave = Factory.createJwtUserToSave(user, jwt);
 
     // Verification existance
-    jwtUserRepository.findOneByUserAndJwt(user, jwt.getJwtToken())
+    jwtUserRepository.findOneByUser(user)
             .ifPresentOrElse((jwtToken)->{
               jwtUserRepository.delete(jwtToken);
               jwtUserRepository.save(jwtUserToSave);

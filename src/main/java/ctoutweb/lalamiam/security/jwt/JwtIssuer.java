@@ -12,6 +12,7 @@ import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -27,7 +28,7 @@ public class JwtIssuer {
   }
 
   public JwtIssue issue(UserPrincipal user) {
-    LocalDateTime expiredAt = LocalDateTime.now().plusHours(6);
+    Instant expiredAt = Instant.now().plus(Duration.ofHours(6));
     byte[] timeNow = ("time now" +" " + System.currentTimeMillis()).getBytes();
 
     List<String> authorities = user.getAuthorities()
@@ -39,10 +40,10 @@ public class JwtIssuer {
             .withSubject(user.getUsername())
             .withJWTId(UUID.nameUUIDFromBytes(timeNow).toString())
             .withIssuer(environment.getProperty("jwt.issuer"))
-            .withExpiresAt(Instant.from(expiredAt))
+            .withExpiresAt(expiredAt)
             .withClaim("id", user.getId())
             .withClaim("authorities", authorities)
             .sign(Algorithm.HMAC256(environment.getProperty("jwt.secret.key")));
-    return new JwtIssue(Token, expiredAt);
+    return new JwtIssue(Token, LocalDateTime.ofInstant(expiredAt, ZoneId.of( "Europe/Paris" )));
   }
 }

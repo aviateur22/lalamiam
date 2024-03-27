@@ -33,7 +33,9 @@ public class WebSecurity {
       .cors(cors-> cors.configurationSource(corsConfiguration()))
       .csrf(csrf->csrf.disable())
       .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-      .formLogin(formLogin->formLogin.disable());
+      .formLogin(formLogin->formLogin.disable())
+      .authorizeHttpRequests(httpRequest->httpRequest
+        .requestMatchers("/api/v1/auth/**").permitAll());
     return http.build();
   }
 

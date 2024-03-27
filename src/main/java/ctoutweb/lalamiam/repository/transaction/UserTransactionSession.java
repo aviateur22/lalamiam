@@ -6,6 +6,8 @@ import ctoutweb.lalamiam.repository.entity.UserEntity;
 import jakarta.persistence.EntityManagerFactory;
 
 import jakarta.transaction.Transactional;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class UserTransactionSession {
+  private static final Logger LOGGER = LogManager.getLogger();
   private final EntityManagerFactory entityManagerFactory;
   private final UserRepository userRepository;
   private final RoleUserRepository roleUserRepository;
@@ -58,7 +61,7 @@ public class UserTransactionSession {
     Session session = entityManagerFactory.unwrap(SessionFactory.class).openSession();
     Transaction transaction = session.beginTransaction();
     try {
-      Query<UserEntity> query = session.createQuery("FROM UserEntity u WHERE u.email = :email", UserEntity.class);
+      Query<UserEntity> query = session.createQuery("FROM UserEntity u WHERE LOWER(u.email) = :email", UserEntity.class);
       query.setParameter("email", email);
       user = query.uniqueResult();
 
@@ -68,7 +71,7 @@ public class UserTransactionSession {
       Hibernate.initialize(user.getRoles());
       transaction.commit();
     } catch (Exception ex) {
-
+      LOGGER.error(ex.getMessage());
     } finally {
       session.close();
       return user;
