@@ -8,7 +8,9 @@ import ctoutweb.lalamiam.repository.entity.builder.JwtUserEntityBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Factory {
 
@@ -255,5 +257,31 @@ public class Factory {
     UserEntity user = Factory.getUSer(userId);
     RoleEntity role = Factory.getRoleEntity(roleId);
     return new RoleUserEntity(user, role);
+  }
+
+  /**
+   * Renvoie une liste de RoleEntity à partir d'uneListe RoleUserEntity
+   * @param roleUserEntities List<RoleEntity>
+   * @return List<RoleEntity>
+   */
+  public static List<RoleEntity> getRoles(List<RoleUserEntity> roleUserEntities) {
+    if(roleUserEntities.isEmpty() || roleUserEntities == null)
+      return Arrays.asList();
+
+    // Todo test
+    return roleUserEntities.stream().map(roleUser-> new RoleEntity(
+            roleUser.getRole().getId(),
+            roleUser.getRole().getName())
+    ).collect(Collectors.toList());
+  }
+
+  /**
+   * Renvoie un RegisterUSerDto
+   * @param user UserEntiy
+   * @return RegisterUSerDto
+   */
+  public static RegisterUserDto createRegisterUser(UserEntity user) {
+    // Todo Teste
+    return new RegisterUserDto(user.getId(), user.getEmail(), getRoles(user.getRoles()));
   }
 }

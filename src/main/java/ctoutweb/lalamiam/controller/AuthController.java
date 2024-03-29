@@ -1,9 +1,9 @@
 package ctoutweb.lalamiam.controller;
 
 import ctoutweb.lalamiam.model.LoginResponse;
-import ctoutweb.lalamiam.model.RegisterResponse;
 import ctoutweb.lalamiam.model.dto.LoginDto;
 import ctoutweb.lalamiam.model.dto.RegisterDto;
+import ctoutweb.lalamiam.model.dto.RegisterUserDto;
 import ctoutweb.lalamiam.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,8 +28,8 @@ public class AuthController {
   }
 
   @PostMapping("/register")
-  ResponseEntity<RegisterResponse> register(@RequestBody RegisterDto registerDto) {
-    RegisterResponse registerResponse = authService.register(registerDto);
+  ResponseEntity<RegisterUserDto> register(@RequestBody RegisterDto registerDto) {
+    RegisterUserDto registerResponse = authService.register(registerDto);
     return new ResponseEntity<>(registerResponse, HttpStatus.CREATED);
   }
 }

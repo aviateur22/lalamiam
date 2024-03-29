@@ -1,9 +1,9 @@
 package ctoutweb.lalamiam.service;
 
 import ctoutweb.lalamiam.model.LoginResponse;
-import ctoutweb.lalamiam.model.RegisterResponse;
 import ctoutweb.lalamiam.model.dto.LoginDto;
 import ctoutweb.lalamiam.model.dto.RegisterDto;
+import ctoutweb.lalamiam.model.dto.RegisterUserDto;
 
 public interface AuthService {
   /**
@@ -18,5 +18,5 @@ public interface AuthService {
    * @param registerDto RegisterDto
    * @return RegisterResponse
    */
-  public RegisterResponse register(RegisterDto registerDto);
+  public RegisterUserDto register(RegisterDto registerDto);
 }

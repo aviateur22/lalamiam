@@ -13,13 +13,17 @@ public class RoleEntity {
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
   public RoleEntity() {
   }
 
   public RoleEntity(Integer id) {
     this.id = id;
   }
+  public RoleEntity(Integer id, String name) {
+    this.id = id;
+    this.name = name;
+  }
+
 
   public Integer getId() {
     return id;

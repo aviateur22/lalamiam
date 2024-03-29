@@ -1,11 +1,12 @@
 package ctoutweb.lalamiam.service.serviceImpl;
 
 import ctoutweb.lalamiam.exception.AuthException;
+import ctoutweb.lalamiam.factory.Factory;
 import ctoutweb.lalamiam.model.JwtIssue;
 import ctoutweb.lalamiam.model.LoginResponse;
-import ctoutweb.lalamiam.model.RegisterResponse;
 import ctoutweb.lalamiam.model.dto.LoginDto;
 import ctoutweb.lalamiam.model.dto.RegisterDto;
+import ctoutweb.lalamiam.model.dto.RegisterUserDto;
 import ctoutweb.lalamiam.repository.entity.UserEntity;
 import ctoutweb.lalamiam.repository.transaction.UserTransactionSession;
 import ctoutweb.lalamiam.security.authentication.UserPrincipal;
@@ -68,7 +69,7 @@ public class AuthServiceImpl implements AuthService {
   }
 
   @Override
-  public RegisterResponse register(RegisterDto registerDto) {
+  public RegisterUserDto register(RegisterDto registerDto) {
     // Todo test
     // Verification existance Email
     UserEntity findUser = userTransactionSession.getUserInformationByEmail(registerDto.email());
@@ -80,6 +81,6 @@ public class AuthServiceImpl implements AuthService {
     // Sauvegarde Utilisateur
     UserEntity registerUser = userTransactionSession.registerUser(registerDto.email(), passwordHash);
 
-    return null;
+    return Factory.createRegisterUser(registerUser);
   }
 }

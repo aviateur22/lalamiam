@@ -1,7 +1,11 @@
 package ctoutweb.lalamiam.repository.transaction;
 
+import ctoutweb.lalamiam.exception.AuthException;
 import ctoutweb.lalamiam.factory.Factory;
+import ctoutweb.lalamiam.repository.RoleRepository;
 import ctoutweb.lalamiam.repository.UserRepository;
+import ctoutweb.lalamiam.repository.entity.RoleEntity;
+import ctoutweb.lalamiam.repository.entity.RoleUserEntity;
 import ctoutweb.lalamiam.repository.entity.UserEntity;
 import jakarta.persistence.EntityManagerFactory;
 
@@ -13,7 +17,10 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
 
 /**
  *
@@ -23,15 +30,17 @@ public class UserTransactionSession {
   private static final Logger LOGGER = LogManager.getLogger();
   private final EntityManagerFactory entityManagerFactory;
   private final UserRepository userRepository;
+  private final RoleRepository roleRepository;
   private final RoleUserRepository roleUserRepository;
 
   public UserTransactionSession(
           EntityManagerFactory entityManagerFactory,
           UserRepository userRepository,
-          RoleUserRepository roleUserRepository
-  ) {
+          RoleRepository roleRepository,
+          RoleUserRepository roleUserRepository) {
     this.entityManagerFactory = entityManagerFactory;
     this.userRepository = userRepository;
+    this.roleRepository = roleRepository;
     this.roleUserRepository = roleUserRepository;
   }
 
@@ -89,10 +98,16 @@ public class UserTransactionSession {
     // Sauvegarde utilisateur
     UserEntity saveUser = userRepository.save(userToSave);
 
-    // Sauvegarde du ROLE
-    roleUserRepository.save(Factory.createRoleUser(USER_ROLE, saveUser.getId()));
+    RoleEntity findRegisterRole = roleRepository.findById(USER_ROLE).orElseThrow(()->new AuthException("Role utilisateur absent", HttpStatus.NOT_FOUND));
 
+    // Sauvegarde du ROLE
+    RoleUserEntity addUserRole =  roleUserRepository.save(Factory.createRoleUser(USER_ROLE, saveUser.getId()));
+
+    // Ajout des infos sur le role utilisateur
+    addUserRole.setRole(findRegisterRole);
+
+    saveUser.setRoles(Arrays.asList(addUserRole));
     // Renvoie les données utilisateurs
-    return getUserInformationById(saveUser.getId());
+    return saveUser;
   }
 }
