@@ -30,6 +30,7 @@ public class JwtIssuer {
   public JwtIssue issue(UserPrincipal user) {
     Instant expiredAt = Instant.now().plus(Duration.ofHours(6));
     byte[] timeNow = ("time now" +" " + System.currentTimeMillis()).getBytes();
+    String jwtId = UUID.nameUUIDFromBytes(timeNow).toString();
 
     List<String> authorities = user.getAuthorities()
             .stream()
@@ -38,12 +39,12 @@ public class JwtIssuer {
 
     String Token = JWT.create()
             .withSubject(user.getUsername())
-            .withJWTId(UUID.nameUUIDFromBytes(timeNow).toString())
+            .withJWTId(jwtId)
             .withIssuer(environment.getProperty("jwt.issuer"))
             .withExpiresAt(expiredAt)
             .withClaim("id", user.getId())
             .withClaim("authorities", authorities)
             .sign(Algorithm.HMAC256(environment.getProperty("jwt.secret.key")));
-    return new JwtIssue(Token, LocalDateTime.ofInstant(expiredAt, ZoneId.of( "Europe/Paris" )));
+    return new JwtIssue(Token, LocalDateTime.ofInstant(expiredAt, ZoneId.of( "Europe/Paris" )), jwtId);
   }
 }

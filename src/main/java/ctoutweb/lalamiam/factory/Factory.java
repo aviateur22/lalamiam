@@ -5,6 +5,8 @@ import ctoutweb.lalamiam.model.dto.*;
 import ctoutweb.lalamiam.repository.builder.CommandProductEntityBuilder;
 import ctoutweb.lalamiam.repository.entity.*;
 import ctoutweb.lalamiam.repository.entity.builder.JwtUserEntityBuilder;
+import ctoutweb.lalamiam.security.authentication.UserPrincipal;
+import ctoutweb.lalamiam.security.authentication.UserPrincipalAuthenticationToken;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -208,13 +210,15 @@ public class Factory {
   /**
    * Renvoie un JwtUserEntity pour recherche en base de données
    * @param user UserEntity - Utilisateur
-   * @param jwt String - Jwt token
+   * @param jwtToken String - Jwt token
+   * @param jwtId String - Jwt Id
    * @return JwtUserEntity
    */
-  public static JwtUserEntity getJwtUserToFind(UserEntity user, String jwt) {
+  public static JwtUserEntity getJwtUserToFind(UserEntity user, String jwtToken, String jwtId) {
     // Todo Faire Test
     return JwtUserEntityBuilder.aJwtUserEntity()
-            .withJwt(jwt)
+            .withJwtId(jwtId)
+            .withJwtToken(jwtToken)
             .withUser(user)
             .build();
   }
@@ -230,7 +234,8 @@ public class Factory {
     LocalDateTime createdAt = LocalDateTime.now();
 
     return JwtUserEntityBuilder.aJwtUserEntity()
-            .withJwt(jwt.getJwtToken())
+            .withJwtToken(jwt.getJwtToken())
+            .withJwtId(jwt.getJwtId())
             .withUser(user)
             .withIsValid(true)
             .withExpiredAt(jwt.getExpiredAt())
@@ -283,5 +288,15 @@ public class Factory {
   public static RegisterUserDto createRegisterUser(UserEntity user) {
     // Todo Teste
     return new RegisterUserDto(user.getId(), user.getEmail(), getRoles(user.getRoles()));
+  }
+
+  /**
+   * Renvoie un UserPrincipalAuthenticationToken
+   * @param user UserPrincipal
+   * @return UserPrincipalAuthenticationToken
+   */
+  public static UserPrincipalAuthenticationToken getUserPrincipalFromUserAuthToken(UserPrincipal user) {
+    // Todo test
+    return new UserPrincipalAuthenticationToken(user);
   }
 }

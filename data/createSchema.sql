@@ -107,7 +107,8 @@ create table IF NOT EXISTS sc_lalamiam.store_day_schedule (
 CREATE TABLE sc_lalamiam.jwt_user (
 "id" BIGINT NOT NULL UNIQUE PRIMARY KEY,
 "user_id" BIGINT NOT NULL REFERENCES sc_lalamiam."users"("id") ON DELETE CASCADE,
-"jwt" TEXT NOT NULL,
+"jwt_token" TEXT NOT NULL,
+"jwt_id" TEXT NOT NULL,
 "is_valid" BOOLEAN NOT NULL DEFAULT FALSE,
 "expired_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
 "created_at"TIMESTAMPTZ NOT NULL DEFAULT now(),

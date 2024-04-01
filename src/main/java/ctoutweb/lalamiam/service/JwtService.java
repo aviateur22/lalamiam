@@ -17,7 +17,7 @@ public interface JwtService {
    * @param userId Long - Identitifiant utilisateur
    * @return Boolean
    */
-  public Boolean isJwtValid(Long userId, String jwt);
+  public Boolean isJwtValid(Long userId, String jwt, String jwtId);
 
   /**
    * Suppression d'un JWT

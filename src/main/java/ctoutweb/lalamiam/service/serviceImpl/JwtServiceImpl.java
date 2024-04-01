@@ -7,15 +7,17 @@ import ctoutweb.lalamiam.repository.entity.JwtUserEntity;
 import ctoutweb.lalamiam.repository.entity.UserEntity;
 import ctoutweb.lalamiam.service.JwtService;
 import io.micrometer.common.util.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 public class JwtServiceImpl implements JwtService {
-
+  private static final Logger LOGGER = LogManager.getLogger();
   private final JwtUserRepository jwtUserRepository;
-
   public JwtServiceImpl(JwtUserRepository jwtUserRepository) {
     this.jwtUserRepository = jwtUserRepository;
   }
@@ -35,21 +37,31 @@ public class JwtServiceImpl implements JwtService {
   }
 
   @Override
-  public Boolean isJwtValid(Long userId, String jwtToken) {
+  public Boolean isJwtValid(Long userId, String jwtToken, String jwtId) {
     // Todo Faire Test
-    if(!StringUtils.isNotBlank(jwtToken) || userId < 0) return false;
+    if(!StringUtils.isNotBlank(jwtId) || userId < 0) return false;
 
-    UserEntity user = Factory.getUSer(userId);
-    JwtUserEntity jwtUserEntity = Factory.getJwtUserToFind(user, jwtToken);
-    return jwtUserRepository.findOneByUserAndJwt(user, jwtUserEntity.getJwt())
-      .map(findJwtUser -> findJwtUser.getExpiredAt().isBefore(LocalDateTime.now()) && findJwtUser.getIsValid())
+    return this.findUserJwt(userId)
+      .map(findJwtUser -> findJwtUser.getIsValid() && findJwtUser.getJwtId().equalsIgnoreCase(jwtId))
       .orElse(false);
   }
 
   @Override
   public void deleteJwt(Long userId) {
     UserEntity user = Factory.getUSer(userId);
-
     jwtUserRepository.findOneByUser(user).ifPresent((jwtToken)->jwtUserRepository.delete(jwtToken));
+  }
+
+  /**
+   * Renvoie un JwtUserEntity
+   * @param userId Long
+   * @return JwtUserEntity
+   */
+  public Optional<JwtUserEntity> findUserJwt(Long userId) {
+    //Todo test
+    UserEntity user = Factory.getUSer(userId);
+    Optional<JwtUserEntity> jwtUser = jwtUserRepository.findOneByUser(user);
+    return jwtUser;
+
   }
 }

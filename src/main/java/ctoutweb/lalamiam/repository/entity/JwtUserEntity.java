@@ -12,7 +12,12 @@ public class JwtUserEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-  private String jwt;
+
+  @Column(name = "jwt_id")
+  private String jwtId;
+
+  @Column(name = "jwt_token")
+  private String jwtToken;
   @Column(name = "is_valid")
   private Boolean isValid;
 
@@ -42,12 +47,12 @@ public class JwtUserEntity {
     this.id = id;
   }
 
-  public String getJwt() {
-    return jwt;
+  public String getJwtToken() {
+    return jwtToken;
   }
 
-  public void setJwt(String jwt) {
-    this.jwt = jwt;
+  public void setJwtToken(String jwt) {
+    this.jwtToken = jwt;
   }
 
   public Boolean getIsValid() {
@@ -90,5 +95,25 @@ public class JwtUserEntity {
     this.user = user;
   }
 
+  public String getJwtId() {
+    return jwtId;
+  }
 
+  public void setJwtId(String jwtId) {
+    this.jwtId = jwtId;
+  }
+
+  @Override
+  public String toString() {
+    return "JwtUserEntity{" +
+            "id=" + id +
+            "jwtId='" + jwtId + '\'' +
+            ", jwt='" + jwtToken + '\'' +
+            ", isValid=" + isValid +
+            ", expiredAt=" + expiredAt +
+            ", createdAt=" + createdAt +
+            ", updatedAt=" + updatedAt +
+            ", user=" + user +
+            '}';
+  }
 }

@@ -7,7 +7,9 @@ import java.time.LocalDateTime;
 
 public final class JwtUserEntityBuilder {
   private Long id;
-  private String jwt;
+
+  private String jwtId;
+  private String jwtToken;
   private Boolean isValid;
   private LocalDateTime expiredAt;
   private LocalDateTime createdAt;
@@ -30,9 +32,14 @@ public final class JwtUserEntityBuilder {
     this.isValid = isValid;
     return this;
   }
+  public JwtUserEntityBuilder withJwtId(String jwtId) {
+    this.jwtId = jwtId;
+    return this;
+  }
 
-  public JwtUserEntityBuilder withJwt(String jwt) {
-    this.jwt = jwt;
+
+  public JwtUserEntityBuilder withJwtToken(String jwt) {
+    this.jwtToken = jwt;
     return this;
   }
 
@@ -60,7 +67,8 @@ public final class JwtUserEntityBuilder {
     JwtUserEntity jwtUserEntity = new JwtUserEntity();
     jwtUserEntity.setId(id);
     jwtUserEntity.setIsValid(isValid);
-    jwtUserEntity.setJwt(jwt);
+    jwtUserEntity.setJwtId(jwtId);
+    jwtUserEntity.setJwtToken(jwtToken);
     jwtUserEntity.setExpiredAt(expiredAt);
     jwtUserEntity.setCreatedAt(createdAt);
     jwtUserEntity.setUpdatedAt(updatedAt);

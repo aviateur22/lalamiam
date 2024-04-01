@@ -1,8 +1,10 @@
 package ctoutweb.lalamiam.security.authentication;
 
+import ctoutweb.lalamiam.exception.AuthException;
 import ctoutweb.lalamiam.mapper.SimpleGrantedAuthorityMapper;
 import ctoutweb.lalamiam.repository.entity.UserEntity;
 import ctoutweb.lalamiam.repository.transaction.UserTransactionSession;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,10 +25,10 @@ public class UserPrincipalDetailService implements UserDetailsService {
   }
 
   @Override
-  public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+  public UserDetails loadUserByUsername(String email) throws AuthException {
     UserEntity user = userTransactionSession.getUserInformationByEmail(email);
 
-    if(user == null) throw new UsernameNotFoundException("email ou mot de passe invalide");
+    if(user == null) throw new AuthException("email ou mot de passe invalide", HttpStatus.UNAUTHORIZED);
 
     return UserPrincipal.builder()
             .withId(user.getId())
