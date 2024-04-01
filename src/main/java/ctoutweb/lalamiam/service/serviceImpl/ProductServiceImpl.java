@@ -1,5 +1,6 @@
 package ctoutweb.lalamiam.service.serviceImpl;
 
+import ctoutweb.lalamiam.exception.ProductException;
 import ctoutweb.lalamiam.factory.Factory;
 import ctoutweb.lalamiam.mapper.AddProductMapper;
 import ctoutweb.lalamiam.model.dto.AddProductResponseDto;
@@ -10,6 +11,7 @@ import ctoutweb.lalamiam.repository.StoreRepository;
 import ctoutweb.lalamiam.repository.entity.ProductEntity;
 import ctoutweb.lalamiam.service.ProductService;
 import ctoutweb.lalamiam.util.CommonFunction;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,15 +36,16 @@ public class ProductServiceImpl implements ProductService {
   @Override
   public AddProductResponseDto addProduct(AddProductDto addProductSchema) {
     if(CommonFunction.isNullOrEmpty(addProductSchema.description())
-            ||CommonFunction.isNullOrEmpty(addProductSchema.name())
-            ||CommonFunction.isNullOrEmpty(addProductSchema.photo())
+            || addProductSchema.proId() == null
+            || CommonFunction.isNullOrEmpty(addProductSchema.name())
+            || CommonFunction.isNullOrEmpty(addProductSchema.photo())
             || addProductSchema.storeId() == null
             || addProductSchema.price().isNaN()
-            || !CommonFunction.isNumber(String.valueOf(addProductSchema.preparationTime()))) throw new RuntimeException("Données sur le produit incorrecte");
+            || !CommonFunction.isNumber(String.valueOf(addProductSchema.preparationTime()))) throw new ProductException("Données sur le produit incorrecte", HttpStatus.BAD_REQUEST);
 
 
     // Verification existence Store
-    storeRepository.findById(addProductSchema.storeId()).orElseThrow(()->new RuntimeException("Le store n'existe pas"));
+    storeRepository.findById(addProductSchema.storeId()).orElseThrow(()->new ProductException("Le store n'existe pas", HttpStatus.BAD_REQUEST));
 
     //Ajourt du produit
     ProductEntity product = productRepository.save(new ProductEntity(addProductSchema));
@@ -52,14 +55,14 @@ public class ProductServiceImpl implements ProductService {
   @Override
   public ProductEntity updateProduct(UpdateProductDto updateProductSchema) {
 
-    ProductEntity product = productRepository.findById(updateProductSchema.productId()).orElseThrow(()->new RuntimeException("le produit n'existe pas"));
+    ProductEntity product = productRepository.findById(updateProductSchema.productId()).orElseThrow(()->new ProductException("le produit n'existe pas", HttpStatus.BAD_REQUEST));
 
     if(CommonFunction.isNullOrEmpty(updateProductSchema.description())
             ||CommonFunction.isNullOrEmpty(updateProductSchema.name())
             ||CommonFunction.isNullOrEmpty(updateProductSchema.photo())
             || updateProductSchema.storeId() == null
             || updateProductSchema.price().isNaN()
-            || !CommonFunction.isNumber(String.valueOf(updateProductSchema.preparationTime()))) throw new RuntimeException("Données sur le produit incorrecte");
+            || !CommonFunction.isNumber(String.valueOf(updateProductSchema.preparationTime()))) throw new ProductException("Données sur le produit incorrecte", HttpStatus.BAD_REQUEST);
 
     product.setName(updateProductSchema.name());
     product.setDescription(updateProductSchema.description());
@@ -74,7 +77,7 @@ public class ProductServiceImpl implements ProductService {
 
   @Override
   public ProductEntity findProduct(Long productId) {
-    return productRepository.findById(productId).orElseThrow(()->new RuntimeException("Le produit n'exsite pas"));
+    return productRepository.findById(productId).orElseThrow(()->new ProductException("Le produit n'exsite pas", HttpStatus.BAD_REQUEST));
   }
 
   @Override

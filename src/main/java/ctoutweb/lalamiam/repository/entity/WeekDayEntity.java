@@ -1,5 +1,6 @@
 package ctoutweb.lalamiam.repository.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -24,6 +25,7 @@ public class WeekDayEntity {
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
 
+  @JsonIgnore
   @OneToMany(mappedBy = "weekDay", fetch = FetchType.LAZY)
   private List<StoreDayScheduleEntity> StoreWeekDays;
 

@@ -2,7 +2,9 @@ package ctoutweb.lalamiam.repository.transaction;
 
 import ctoutweb.lalamiam.factory.Factory;
 import ctoutweb.lalamiam.model.dto.AddStoreDto;
+import ctoutweb.lalamiam.model.dto.CreateStoreDto;
 import ctoutweb.lalamiam.repository.*;
+import ctoutweb.lalamiam.repository.entity.StoreDayScheduleEntity;
 import ctoutweb.lalamiam.repository.entity.StoreEntity;
 import ctoutweb.lalamiam.repository.entity.WeekDayEntity;
 import jakarta.persistence.EntityManagerFactory;
@@ -13,9 +15,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.springframework.stereotype.Component;
 
-import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class StoreTransaction {
@@ -23,7 +24,7 @@ public class StoreTransaction {
   private final EntityManagerFactory entityManagerFactory;
   private final StoreDayScheduleRepository storeDayScheduleRepository;
   private final StoreRepository storeRepository;
-  private final ProRepository proRepository;
+  private final UserRepository proRepository;
 
   public StoreTransaction(
           CommandRepository commandRepository,
@@ -31,7 +32,7 @@ public class StoreTransaction {
           EntityManagerFactory entityManagerFactory,
           StoreDayScheduleRepository scheduleRepository,
           StoreRepository storeRepository,
-          ProRepository proRepository
+          UserRepository proRepository
   ) {
     this.entityManagerFactory = entityManagerFactory;
     this.storeDayScheduleRepository = scheduleRepository;
@@ -73,22 +74,19 @@ public class StoreTransaction {
    * @param storeId - BigInteger
    * @return StoreEntity
    */
-  public StoreEntity getCompleteStoreInformation(Long storeId) {
-    StoreEntity store = null;
-    Session session = entityManagerFactory.unwrap(SessionFactory.class).openSession();
-    Transaction transaction = session.beginTransaction();
-    try {
-      store = session.get(StoreEntity.class, storeId);
-      Hibernate.initialize(store.getCommands());
-      Hibernate.initialize(store.getProducts());
-      Hibernate.initialize(store.getStoreWeekDaySchedules());
-      transaction.commit();
-    } catch (Exception ex) {
+  public CreateStoreDto getCompleteStoreInformation(Long storeId) {
 
-    } finally {
-      session.close();
-      return store;
-    }
+    // Recherche store
+    StoreEntity store = storeRepository.findById(storeId)
+      .orElse(null);
+
+    if(store == null) return null;
+
+    // Schedules
+    List<StoreDayScheduleEntity> schedules = storeDayScheduleRepository.findAllByStore(store);
+    store.setStoreWeekDaySchedules(schedules);
+
+    return Factory.createStoreDto(store);
   }
 
 }

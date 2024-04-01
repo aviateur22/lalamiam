@@ -1,8 +1,7 @@
 package ctoutweb.lalamiam.repository.builder;
 
-import ctoutweb.lalamiam.repository.entity.ProEntity;
+import ctoutweb.lalamiam.repository.entity.UserEntity;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 public final class ProEntityBuilder {
@@ -50,8 +49,8 @@ public final class ProEntityBuilder {
     return this;
   }
 
-  public ProEntity build() {
-    ProEntity proEntity = new ProEntity();
+  public UserEntity build() {
+    UserEntity proEntity = new UserEntity();
     proEntity.setId(id);
     proEntity.setEmail(email);
     proEntity.setPhone(phone);

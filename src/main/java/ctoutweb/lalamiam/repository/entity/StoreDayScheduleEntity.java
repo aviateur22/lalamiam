@@ -1,5 +1,6 @@
 package ctoutweb.lalamiam.repository.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import ctoutweb.lalamiam.model.DailyStoreSchedule;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -30,6 +31,7 @@ public class StoreDayScheduleEntity {
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
 
+  @JsonIgnore
   @ManyToOne
   @JoinColumn(name="store_id", nullable=false)
   private StoreEntity store;

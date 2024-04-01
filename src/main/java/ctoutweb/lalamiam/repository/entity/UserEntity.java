@@ -6,17 +6,16 @@ import jakarta.persistence.*;
 import jakarta.persistence.Table;
 import org.hibernate.annotations.*;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "pro")
-public class ProEntity {
+@Table(name = "users")
+public class UserEntity {
   @Id
-  @SequenceGenerator(name="proPkSeq", sequenceName="PRO_PK_SEQ", allocationSize=1, initialValue = 1)
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "proPkSeq")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   @Column(name = "email")
@@ -39,13 +38,19 @@ public class ProEntity {
   @OneToMany(mappedBy = "pro")
   private Set<StoreEntity> stores;
 
+  @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+  private List<RoleUserEntity> roles;
+
+  @OneToOne(mappedBy = "user")
+  private JwtUserEntity jwt;
+
   /**
    *
    */
-  public ProEntity() {
+  public UserEntity() {
   }
 
-  public ProEntity(Long id, String email, String phone, String password, LocalDateTime createdAt, LocalDateTime updatedAt) {
+  public UserEntity(Long id, String email, String phone, String password, LocalDateTime createdAt, LocalDateTime updatedAt) {
     this.id = id;
     this.email = email;
     this.phone = phone;
@@ -54,14 +59,19 @@ public class ProEntity {
     this.updatedAt = updatedAt;
   }
 
-  public ProEntity(AddProfessionalDto addProfessionalSchema) {
+  public UserEntity(AddProfessionalDto addProfessionalSchema) {
     this.email = addProfessionalSchema.email();
     this.phone = addProfessionalSchema.phone();
     this.password = addProfessionalSchema.password();
   }
 
-  public ProEntity(Long proId) {
-    this.id = proId;
+  public UserEntity(Long userId) {
+    this.id = userId;
+  }
+
+  public UserEntity(String email, String password) {
+    this.email = email;
+    this.password = password;
   }
 
   public Long getId() {
@@ -112,6 +122,14 @@ public class ProEntity {
     this.password = password;
   }
 
+  public List<RoleUserEntity> getRoles() {
+    return roles;
+  }
+
+  public void setRoles(List<RoleUserEntity> roles) {
+    this.roles = roles;
+  }
+
   @JsonManagedReference
   public Set<StoreEntity> getStores() {
     return stores;
@@ -121,11 +139,19 @@ public class ProEntity {
     this.stores = stores;
   }
 
+  public JwtUserEntity getJwt() {
+    return jwt;
+  }
+
+  public void setJwt(JwtUserEntity jwt) {
+    this.jwt = jwt;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    ProEntity proEntity = (ProEntity) o;
+    UserEntity proEntity = (UserEntity) o;
     return Objects.equals(id, proEntity.id) && Objects.equals(email, proEntity.email) && Objects.equals(phone, proEntity.phone) && Objects.equals(password, proEntity.password) && Objects.equals(createdAt, proEntity.createdAt) && Objects.equals(updatedAt, proEntity.updatedAt) && Objects.equals(stores, proEntity.stores);
   }
 

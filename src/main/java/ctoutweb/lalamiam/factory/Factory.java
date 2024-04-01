@@ -4,12 +4,26 @@ import ctoutweb.lalamiam.model.*;
 import ctoutweb.lalamiam.model.dto.*;
 import ctoutweb.lalamiam.repository.builder.CommandProductEntityBuilder;
 import ctoutweb.lalamiam.repository.entity.*;
+import ctoutweb.lalamiam.repository.entity.builder.JwtUserEntityBuilder;
+import ctoutweb.lalamiam.security.authentication.UserPrincipal;
+import ctoutweb.lalamiam.security.authentication.UserPrincipalAuthenticationToken;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Factory {
+
+  public static UserEntity getUSer(Long userId) {
+    // Todo faire test
+    return new UserEntity(userId);
+  }
+  public static UserEntity getUSerWithEmailPassword(String email, String password) {
+    // Todo faire test
+    return new UserEntity(email, password);
+  }
   public  static ProductEntity getProduct(Long productId) {
     return new ProductEntity(productId);
   }
@@ -191,5 +205,130 @@ public class Factory {
             preparationtime,
             numberOfProductInCommand,
             commandPrice);
+  }
+
+  /**
+   * Renvoie un JwtUserEntity pour recherche en base de données
+   * @param user UserEntity - Utilisateur
+   * @param jwtToken String - Jwt token
+   * @param jwtId String - Jwt Id
+   * @return JwtUserEntity
+   */
+  public static JwtUserEntity getJwtUserToFind(UserEntity user, String jwtToken, String jwtId) {
+    // Todo Faire Test
+    return JwtUserEntityBuilder.aJwtUserEntity()
+            .withJwtId(jwtId)
+            .withJwtToken(jwtToken)
+            .withUser(user)
+            .build();
+  }
+
+  /**
+   * Renvoie un JwtUserEntity pour persistance en base de données
+   * @param user UserEntity - Utilisateur
+   * @param jwt JwtIssue - JWT surchargé des infos de création
+   * @return  JwtUserEntity
+   */
+  public static JwtUserEntity createJwtUserToSave(UserEntity user, JwtIssue jwt) {
+    // Todo Faire Test
+    LocalDateTime createdAt = LocalDateTime.now();
+
+    return JwtUserEntityBuilder.aJwtUserEntity()
+            .withJwtToken(jwt.getJwtToken())
+            .withJwtId(jwt.getJwtId())
+            .withUser(user)
+            .withIsValid(true)
+            .withExpiredAt(jwt.getExpiredAt())
+            .withCreatedAt(createdAt)
+            .build();
+  }
+
+  /***
+   * Renvoie un RoleEntity
+   * @param roleId int
+   * @return RoleEntity
+   */
+  public static RoleEntity getRoleEntity(int roleId) {
+    return new RoleEntity(roleId);
+  }
+
+  /**
+   * Renvoie un RoleUserEntity
+   * @param roleId int
+   * @param userId Long
+   * @return RoleUserEntity
+   */
+  public static RoleUserEntity createRoleUser(int roleId, Long userId) {
+    UserEntity user = Factory.getUSer(userId);
+    RoleEntity role = Factory.getRoleEntity(roleId);
+    return new RoleUserEntity(user, role);
+  }
+
+  /**
+   * Renvoie une liste de RoleEntity à partir d'uneListe RoleUserEntity
+   * @param roleUserEntities List<RoleEntity>
+   * @return List<RoleEntity>
+   */
+  public static List<RoleEntity> getRoles(List<RoleUserEntity> roleUserEntities) {
+    if(roleUserEntities.isEmpty() || roleUserEntities == null)
+      return Arrays.asList();
+
+    // Todo test
+    return roleUserEntities.stream().map(roleUser-> new RoleEntity(
+            roleUser.getRole().getId(),
+            roleUser.getRole().getName())
+    ).collect(Collectors.toList());
+  }
+
+  /**
+   * Renvoie un RegisterUSerDto
+   * @param user UserEntiy
+   * @return RegisterUSerDto
+   */
+  public static RegisterUserDto createRegisterUser(UserEntity user) {
+    // Todo Test
+    return new RegisterUserDto(user.getId(), user.getEmail(), getRoles(user.getRoles()));
+  }
+
+  /**
+   * Renvoie un UserPrincipalAuthenticationToken
+   * @param user UserPrincipal
+   * @return UserPrincipalAuthenticationToken
+   */
+  public static UserPrincipalAuthenticationToken getUserPrincipalFromUserAuthToken(UserPrincipal user) {
+    // Todo test
+    return new UserPrincipalAuthenticationToken(user);
+  }
+
+  /**
+   * Horaire Store DTO
+   * @param schedule StoreDayScheduleEntity
+   * @return StoreScheduleDto
+   */
+  public static StoreScheduleDto createStoreDto(StoreDayScheduleEntity schedule) {
+    // Todo Test
+    return new StoreScheduleDto(schedule.getWeekDay().getId(), schedule.getOpeningTime(), schedule.getClosingTime());
+  }
+
+  /**
+   * Renvoie un CreateStoreDto
+   * @param store StoreEntity
+   * @return CreateStoreDto
+   */
+  public static CreateStoreDto createStoreDto(StoreEntity store) {
+    // Todo test
+    return new CreateStoreDto(
+            store.getPro().getId(),
+            store.getId(),
+            store.getName(),
+            store.getAdress(),
+            store.getCity(),
+            store.getCp(),
+            store.getStoreWeekDaySchedules()
+                    .stream()
+                    .map(schedule->createStoreDto(schedule))
+                    .collect(Collectors.toList()),
+            store.getFrequenceSlotTime()
+    );
   }
 }

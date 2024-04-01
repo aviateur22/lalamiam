@@ -54,6 +54,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>4.4.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>3.8.2</version>
@@ -71,6 +77,8 @@
                 <database.schema>sc_lalamiam</database.schema>
                 <database.drive.class>org.postgresql.Driver</database.drive.class>
                 <database.dialect>org.hibernate.dialect.PostgreSQLDialect</database.dialect>
+                <jwt.secret.key>jfldsjflmkdsflmdfhpidhfpdjfdsf*ôpeepîr^r454354343qdsqdqdd44254</jwt.secret.key>
+                <jwt.issuer>ctoutweb</jwt.issuer>
                 <application.log.level>info</application.log.level>
                 <spring.log.level>info</spring.log.level>
                 <hibernate.log.level>info</hibernate.log.level>
