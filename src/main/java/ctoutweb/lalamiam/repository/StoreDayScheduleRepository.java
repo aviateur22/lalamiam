@@ -12,4 +12,6 @@ import java.util.List;
 public interface StoreDayScheduleRepository extends JpaRepository<StoreDayScheduleEntity, Long> {
   //List<ScheduleEntity> findAllByStore(StoreEntity store);
   List<StoreDayScheduleEntity> findAllByStoreAndWeekDay(StoreEntity store, WeekDayEntity weekDay);
+  List<StoreDayScheduleEntity> findAllByStore(StoreEntity store);
+
 }

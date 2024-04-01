@@ -3,6 +3,7 @@ package helper;
 import ctoutweb.lalamiam.model.DailyStoreSchedule;
 import ctoutweb.lalamiam.model.WeeklyStoreSchedule;
 import ctoutweb.lalamiam.model.dto.AddStoreDto;
+import ctoutweb.lalamiam.model.dto.CreateStoreDto;
 import ctoutweb.lalamiam.model.dto.ProInformationDto;
 import ctoutweb.lalamiam.repository.entity.StoreEntity;
 import ctoutweb.lalamiam.service.StoreService;
@@ -26,7 +27,7 @@ public class StoreHelper {
    * @param createdPro - ProInformationDto
    * @return
    */
-  public StoreEntity createStore(ProInformationDto createdPro) {
+  public CreateStoreDto createStore(ProInformationDto createdPro) {
 
     List<WeeklyStoreSchedule> storeWeeklySchedules = createStoreWeeklySchedule();
 
@@ -38,7 +39,7 @@ public class StoreHelper {
             "31190",
             storeWeeklySchedules,
             10);
-    StoreEntity createdStore = storeService.createStore(addStoreSchema);
+    CreateStoreDto createdStore = storeService.createStore(addStoreSchema);
     return createdStore;
   }
 

@@ -1,5 +1,6 @@
 package ctoutweb.lalamiam.repository.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import ctoutweb.lalamiam.model.dto.AddStoreDto;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;

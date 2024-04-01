@@ -17,4 +17,8 @@ public class HandlerException {
   public ResponseEntity<String> authException(AuthException exception) {
     return new ResponseEntity<>(exception.getMessage(), exception.getStatus());
   }
+  @ExceptionHandler(value = {ProductException.class})
+  public ResponseEntity<String> productException(ProductException exception) {
+    return new ResponseEntity<>(exception.getMessage(), exception.getHttpStatus());
+  }
 }

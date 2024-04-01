@@ -286,7 +286,7 @@ public class Factory {
    * @return RegisterUSerDto
    */
   public static RegisterUserDto createRegisterUser(UserEntity user) {
-    // Todo Teste
+    // Todo Test
     return new RegisterUserDto(user.getId(), user.getEmail(), getRoles(user.getRoles()));
   }
 
@@ -298,5 +298,37 @@ public class Factory {
   public static UserPrincipalAuthenticationToken getUserPrincipalFromUserAuthToken(UserPrincipal user) {
     // Todo test
     return new UserPrincipalAuthenticationToken(user);
+  }
+
+  /**
+   * Horaire Store DTO
+   * @param schedule StoreDayScheduleEntity
+   * @return StoreScheduleDto
+   */
+  public static StoreScheduleDto createStoreDto(StoreDayScheduleEntity schedule) {
+    // Todo Test
+    return new StoreScheduleDto(schedule.getWeekDay().getId(), schedule.getOpeningTime(), schedule.getClosingTime());
+  }
+
+  /**
+   * Renvoie un CreateStoreDto
+   * @param store StoreEntity
+   * @return CreateStoreDto
+   */
+  public static CreateStoreDto createStoreDto(StoreEntity store) {
+    // Todo test
+    return new CreateStoreDto(
+            store.getPro().getId(),
+            store.getId(),
+            store.getName(),
+            store.getAdress(),
+            store.getCity(),
+            store.getCp(),
+            store.getStoreWeekDaySchedules()
+                    .stream()
+                    .map(schedule->createStoreDto(schedule))
+                    .collect(Collectors.toList()),
+            store.getFrequenceSlotTime()
+    );
   }
 }

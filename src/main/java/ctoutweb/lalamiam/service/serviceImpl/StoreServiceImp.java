@@ -1,6 +1,7 @@
 package ctoutweb.lalamiam.service.serviceImpl;
 
 import ctoutweb.lalamiam.model.dto.AddStoreDto;
+import ctoutweb.lalamiam.model.dto.CreateStoreDto;
 import ctoutweb.lalamiam.repository.ProductRepository;
 import ctoutweb.lalamiam.repository.StoreDayScheduleRepository;
 import ctoutweb.lalamiam.repository.StoreRepository;
@@ -36,7 +37,7 @@ public class StoreServiceImp implements StoreService {
   }
 
   @Override
-  public StoreEntity createStore(AddStoreDto addStore) {
+  public CreateStoreDto createStore(AddStoreDto addStore) {
     String name = addStore.name();
     String adress = addStore.adress();
     String city = addStore.city();
@@ -50,7 +51,7 @@ public class StoreServiceImp implements StoreService {
             proId == null) throw new RuntimeException("données manquantes");
 
     Long storeId = storeTransaction.SaveStore(addStore);
-    StoreEntity store = storeTransaction.getCompleteStoreInformation(storeId);
+    CreateStoreDto store = storeTransaction.getCompleteStoreInformation(storeId);
     return store;
   }
 

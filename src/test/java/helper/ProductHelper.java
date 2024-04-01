@@ -20,10 +20,10 @@ public class ProductHelper {
    * @param storeId BigInteger - Identifiant Commerce
    * @return List<AddProductResponseDto>
    */
-  public List<AddProductResponseDto> createProduct(Long storeId) {
-    AddProductDto addProductSchema1 = new AddProductDto("lait", 10D, "initial description", 5, "s", storeId);
-    AddProductDto addProductSchema2 = new AddProductDto("coco", 20D, "initial description", 10, "s", storeId);
-    AddProductDto addProductSchema3 = new AddProductDto("orange", 30D, "initial description", 20, "s", storeId);
+  public List<AddProductResponseDto> createProduct(Long storeId, Long proId) {
+    AddProductDto addProductSchema1 = new AddProductDto(proId,"lait", 10D, "initial description", 5, "s", storeId);
+    AddProductDto addProductSchema2 = new AddProductDto(proId,"coco", 20D, "initial description", 10, "s", storeId);
+    AddProductDto addProductSchema3 = new AddProductDto(proId,"orange", 30D, "initial description", 20, "s", storeId);
 
     AddProductResponseDto addProduct1 =  productService.addProduct(addProductSchema1);
     AddProductResponseDto addProduct2 =  productService.addProduct(addProductSchema2);
@@ -42,10 +42,10 @@ public class ProductHelper {
    * @param storeId Long - Identifiant
    * @return List<AddProductResponseDto>
    */
-  public List<AddProductResponseDto> createProductAfetrCommands(Long storeId) {
-    AddProductDto addProductSchema1 = new AddProductDto("pain", 10D, "initial description", 5, "s", storeId);
-    AddProductDto addProductSchema2 = new AddProductDto("beurre", 20D, "initial description", 10, "s", storeId);
-    AddProductDto addProductSchema3 = new AddProductDto("miel", 30D, "initial description", 20, "s", storeId);
+  public List<AddProductResponseDto> createProductAfetrCommands(Long storeId, Long proId) {
+    AddProductDto addProductSchema1 = new AddProductDto(proId,"pain", 10D, "initial description", 5, "s", storeId);
+    AddProductDto addProductSchema2 = new AddProductDto(proId,"beurre", 20D, "initial description", 10, "s", storeId);
+    AddProductDto addProductSchema3 = new AddProductDto(proId,"miel", 30D, "initial description", 20, "s", storeId);
 
     AddProductResponseDto addProduct1 =  productService.addProduct(addProductSchema1);
     AddProductResponseDto addProduct2 =  productService.addProduct(addProductSchema2);

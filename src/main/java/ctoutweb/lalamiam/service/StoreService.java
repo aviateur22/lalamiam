@@ -1,6 +1,7 @@
 package ctoutweb.lalamiam.service;
 
 import ctoutweb.lalamiam.model.dto.AddStoreDto;
+import ctoutweb.lalamiam.model.dto.CreateStoreDto;
 import ctoutweb.lalamiam.repository.entity.ProductEntity;
 import ctoutweb.lalamiam.repository.entity.StoreDayScheduleEntity;
 import ctoutweb.lalamiam.repository.entity.StoreEntity;
@@ -16,7 +17,7 @@ public interface StoreService {
    * @param addStoreSchema
    * @return
    */
-  public StoreEntity createStore(AddStoreDto addStoreSchema);
+  public CreateStoreDto createStore(AddStoreDto addStoreSchema);
 
   /**
    * Recherche d'un commerce
