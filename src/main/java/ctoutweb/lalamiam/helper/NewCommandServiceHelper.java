@@ -1,13 +1,18 @@
 package ctoutweb.lalamiam.helper;
 
+import ctoutweb.lalamiam.exception.ProductException;
 import ctoutweb.lalamiam.factory.Factory;
 import ctoutweb.lalamiam.mapper.ProductQuantityMapper;
 import ctoutweb.lalamiam.model.ProductWithQuantity;
 import ctoutweb.lalamiam.model.dto.ProductWithQuantityDto;
 import ctoutweb.lalamiam.model.dto.RegisterCommandDto;
 import ctoutweb.lalamiam.repository.entity.CommandEntity;
+import ctoutweb.lalamiam.repository.entity.CommandProductEntity;
 import ctoutweb.lalamiam.repository.entity.ProductEntity;
 import ctoutweb.lalamiam.service.ProductService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -17,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class NewCommandServiceHelper {
+  private static final Logger LOGGER = LogManager.getLogger();
   private final ProductQuantityMapper productQuantityMapper;
   private final ProductService productService;
 
@@ -36,12 +42,42 @@ public class NewCommandServiceHelper {
     // Si commande en cours de création
     if(command == null) return null;
 
+    // Récuperation des infos produits
+    List<ProductEntity> productsInCommand = productService.getMultipleProductsOfStore(
+            command.getCommandProducts()
+        .stream()
+        .mapToLong(commandPro->commandPro.getProduct().getId())
+        .boxed()
+        .collect(Collectors.toList()),
+      command.getStore().getId());
+    LOGGER.info(()->String.format("products: %s", productsInCommand));
+
     List<ProductWithQuantityDto> productsWithQuantityDto = command.getCommandProducts()
             .stream()
-            .map(productQuantityMapper)
+            .map(product->this.getProductWithQuantityDto(product, productsInCommand))
             .toList();
 
     return Factory.getRegisterCommand(command, productsWithQuantityDto);
+  }
+
+  /**
+   * Récupération des information sur un produit
+   * @param commandProduct CommandProductEntity - Produit à completer
+   * @param productsList List<ProductEntity> - Liste des produits de la commande avec les informations complete
+   * @return ProductWithQuantityDto
+   */
+  public ProductWithQuantityDto getProductWithQuantityDto(CommandProductEntity commandProduct, List<ProductEntity> productsList) {
+    //Todo faire test
+    ProductEntity findProduct = productsList
+            .stream()
+            .filter(product->product.getId().equals(commandProduct.getProduct().getId()))
+            .findFirst()
+            .orElse(null);
+
+    if(findProduct == null) throw new ProductException("Produit absent", HttpStatus.BAD_REQUEST);
+
+    return new ProductWithQuantityDto(findProduct.getId(), findProduct.getName(), findProduct.getPhoto(), findProduct.getPrice(), commandProduct.getProductQuantity(), findProduct.getIsAvail());
+
   }
 
   /**
@@ -68,6 +104,8 @@ public class NewCommandServiceHelper {
 
     return storeProductWithQuantity(storeProducts, registerCommand, CREATE_COMMAND_QUANTITY);
   }
+
+
 
   /**
    * Map les produits d'un commerce avec une quantité = 0

@@ -17,4 +17,12 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
    */
   public List<ProductEntity> findByStore(StoreEntity store);
 
+  /**
+   * Recherche produits par liste d'identifiant et Store
+   * @param productId List<Long> - Identifiant des produits
+   * @param store StoreEntity
+   * @return List<ProductEntity>
+   */
+  public List<ProductEntity> findAllByIdInAndStore(List<Long> productId, StoreEntity store);
+
 }

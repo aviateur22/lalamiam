@@ -7,6 +7,8 @@ import ctoutweb.lalamiam.repository.entity.StoreEntity;
 import ctoutweb.lalamiam.repository.entity.WeekDayEntity;
 import ctoutweb.lalamiam.service.StoreService;
 import ctoutweb.lalamiam.util.CommonFunction;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
  */
 @Component
 public class NewSlotHelper {
+  private static final Logger LOGGER = LogManager.getLogger();
   private final StoreService storeService;
   private LocalDateTime startOfCommandDay;
   private LocalDateTime endOfCommandDay;
@@ -38,18 +41,23 @@ public class NewSlotHelper {
 
     // Recherche Info Commerce
     StoreEntity store = storeService.findStoreById(storeId);
+    LOGGER.info(()->String.format("store: %s", store));
 
     // Rechechre des slots déja pris
     List<LocalDateTime> busySlots  = storeCommandsInDay.stream().map(CommandEntity::getSlotTime).toList();
+    LOGGER.info(()->String.format("busySlots: %s", busySlots));
 
     // Recherche du jour de la semaine
     WeekDayEntity weekDay = Factory.getWeekDay(startOfCommandDay);
+    LOGGER.info(()->String.format("weekDay: %s", weekDay));
 
     // Recherche des horaires du commerce
     List<StoreDayScheduleEntity> storeSchedules = storeService.findStoreSchedulesByDay(store, weekDay);
+    LOGGER.info(()->String.format("storeSchedules: %s", storeSchedules));
 
     // Nombre de Slots disponible sur 24h pour le commerce
     List<LocalDateTime> slotTimeAvailibilityInOneDay = storeService.findStorSlotsWithoutConstraintByDay(startOfCommandDay, store.getFrequenceSlotTime());
+    LOGGER.info(()->String.format("slotTimeAvailibilityInOneDay: %s", slotTimeAvailibilityInOneDay));
 
     // Recherhe de slot disponible
     return filterSlots(
@@ -70,25 +78,27 @@ public class NewSlotHelper {
           List<StoreDayScheduleEntity> storeSchedules,
           List<LocalDateTime> busySlots
   ) {
+    List<LocalDateTime> filterSlots = slotTimeAvailibilityInOneDay
+      .stream()
+      // Retir les slots avant REF_FILTER_TIME
+      .filter(slot->slot.isAfter(refFilterTime.plusMinutes(commandPreparationTime)))
 
-    return slotTimeAvailibilityInOneDay
-            .stream()
-            // Retir les slots avant REF_FILTER_TIME
-            .filter(slot->slot.isAfter(refFilterTime.plusMinutes(commandPreparationTime)))
+      // Retire les slots déja pris par d'autres commandes
+      .filter(slot->!busySlots.contains(slot))
 
-            // Retire les slots déja pris par d'autres commandes
-            .filter(slot->!busySlots.contains(slot))
+      // Retire tous les slots qui ne sont pas dans les horaires du commerce
+      .filter(slot->storeSchedules
+        .stream()
+        .anyMatch(schedule-> CommonFunction.isSlotInStoreSchedule(slot,
+          schedule,
+          startOfCommandDay.toLocalDate(),
+          endOfCommandDay.toLocalDate(),
+          commandPreparationTime
+        )))
+      .collect(Collectors.toList());
 
-            // Retire tous les slots qui ne sont pas dans les horaires du commerce
-            .filter(slot->storeSchedules
-                    .stream()
-                    .anyMatch(schedule-> CommonFunction.isSlotInStoreSchedule(slot,
-                            schedule,
-                            startOfCommandDay.toLocalDate(),
-                            endOfCommandDay.toLocalDate(),
-                            commandPreparationTime
-                    )))
-            .collect(Collectors.toList());
+    LOGGER.info(()->String.format("filterSlots: %s", filterSlots));
+    return filterSlots;
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

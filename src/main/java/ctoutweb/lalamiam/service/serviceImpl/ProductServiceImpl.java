@@ -90,4 +90,9 @@ public class ProductServiceImpl implements ProductService {
   public List<ProductEntity> getStoreProducts(Long storeId) {
     return productRepository.findByStore(Factory.getStore(storeId));
   }
+
+  @Override
+  public List<ProductEntity> getMultipleProductsOfStore(List<Long> productIdList, Long storeId) {
+    return productRepository.findAllByIdInAndStore(productIdList, Factory.getStore(storeId));
+  }
 }

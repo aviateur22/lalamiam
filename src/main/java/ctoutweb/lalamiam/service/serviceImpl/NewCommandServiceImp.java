@@ -11,6 +11,8 @@ import ctoutweb.lalamiam.repository.entity.ProductEntity;
 import ctoutweb.lalamiam.repository.transaction.CommandTransactionSession;
 import ctoutweb.lalamiam.service.NewCommandService;
 import ctoutweb.lalamiam.service.ProductService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class NewCommandServiceImp implements NewCommandService {
+  private static final Logger LOGGER = LogManager.getLogger();
   private final NewCommandServiceHelper commandServiceHelper;
   private final CommandTransactionSession commandTransactionSession;
   private final CommandRepository commandRepository;
@@ -96,16 +99,24 @@ public class NewCommandServiceImp implements NewCommandService {
     // Todo mettre a jour test unitaire
     // Date de la commande
     LocalDate refCommandDate = commandInformation.commandId() == null ? LocalDate.now() : commandInformation.commandDate();
+    LOGGER.info(()->String.format("Date de reference de la commande: %s", refCommandDate));
+
+    if(refCommandDate == null) throw new CommandException("Date de référence manquante dans la commande", HttpStatus.INTERNAL_SERVER_ERROR);
 
     // Début de journée jour de commande (00h01)
     LocalDateTime startOfCommandDay = refCommandDate.atStartOfDay();
 
+    LOGGER.info(()->String.format("startOfCommandDay: %s", startOfCommandDay));
+
     // Fin de journnée jour de commande
     LocalDateTime endOfCommandDay = LocalDateTime.from(startOfCommandDay).with(LocalTime.MAX);
+    LOGGER.info(()->String.format("endOfCommandDay: %s", endOfCommandDay));
 
     // Recherche de l'horaire de reference pour commencer à filtrer les créneaux
     LocalDateTime refFilterTime = commandInformation.consultationDate().toLocalDate().equals(refCommandDate) ?
             commandInformation.consultationDate(): startOfCommandDay;
+    LOGGER.info(()->String.format("refFilterTime: %s", refFilterTime));
+
 
     // Recherche des commandes du jours
     List<CommandEntity> commandsOfTheDay  = commandRepository.findCommandsByStoreIdDate(
@@ -113,9 +124,11 @@ public class NewCommandServiceImp implements NewCommandService {
             endOfCommandDay,
             commandInformation.storeId()
     );
+    LOGGER.info(()->String.format("commandsOfTheDay: %s", commandsOfTheDay));
 
     // Calcul du temps de préparation
     Integer commandPreparationTime = commandServiceHelper.calculateCommandPreparationTime(commandInformation.productsSelected());
+    LOGGER.info(()->String.format("commandPreparationTime: %s", commandPreparationTime));
 
     // Informations nécessaires pour calculer les slots disponibles
     slotHelper.setCommandPreparationTime(commandPreparationTime);
@@ -198,35 +211,43 @@ public class NewCommandServiceImp implements NewCommandService {
     if(commandId != null) {
       CommandEntity command = commandTransactionSession.getCommand(commandId);
 
+      if (command == null) throw new CommandException("La commande n'existe pas", HttpStatus.BAD_REQUEST);
+
       // Si commande existante alors vérification du storeId
       if(!command.getStore().getId().equals(storeId))
-        throw new RuntimeException("Cette commande n'est pas rattaché au commerce");
+        throw new CommandException("Cette commande n'est pas rattaché au commerce", HttpStatus.BAD_REQUEST);
     }
 
     // Verifier liste de produits > 0 et produit appartient au commerce
-    if(productSelectInformation.productSelectList() ==null || productSelectInformation.productSelectList().size() == 0)
+    if(productSelectInformation.productSelectList() == null || productSelectInformation.productSelectList().size() == 0)
       throw new RuntimeException("La commande ne peut pas être vide");
 
     productSelectInformation.productSelectList().forEach(productWithQuantity -> {
       ProductEntity product = productService.findProduct(productWithQuantity.getProductId());
       // Vérification que le produit appartienne au commerce
       if(!product.getStore().getId().equals(storeId))
-        throw new RuntimeException(String.format("Le produit %s n'est pas référencé dans ce commerce", product.getName()));
+        throw new CommandException(String.format("Le produit %s n'est pas référencé dans ce commerce", product.getName()), HttpStatus.BAD_REQUEST);
 
       // Vérification que le produit est disponible
       if(!product.getIsAvail())
-        throw new RuntimeException(String.format("Le produit %s n'est plus disponible", product.getName()));
+        throw new CommandException(String.format("Le produit %s n'est plus disponible", product.getName()), HttpStatus.BAD_REQUEST);
 
       // Vérification de la quantité de chaque produit
       if(productWithQuantity.getProductQuantity() < 1)
-        throw new RuntimeException(String.format("Merci d'indiquer la quantité pour le produit %s", product.getName()));
+        throw new CommandException(String.format("Merci d'indiquer la quantité pour le produit %s", product.getName()), HttpStatus.BAD_REQUEST);
     });
   }
 
   @Override
   public void validateSlot(CommandInformationDto commandInformation, LocalDateTime selectSlotTime) {
+
     // Récuperation des créneaux disponible
     List<LocalDateTime> storeAvailibiltySlots = getStoreSlotAvailibility(commandInformation);
+
+    LOGGER.info(()->String.format("Liste des créneaux dispo pour la commande %s", storeAvailibiltySlots));
+    LOGGER.info(()->String.format("Huere de la commande %s", selectSlotTime));
+
+
 
     if(storeAvailibiltySlots
             .stream()

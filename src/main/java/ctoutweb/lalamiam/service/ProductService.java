@@ -46,4 +46,12 @@ public interface ProductService {
    * @return List<ProductEntity>
    */
   List<ProductEntity> getStoreProducts(Long storeId);
+
+  /**
+   * Récuperation de plusieurs produits d'un store
+   * @param storeId Long - Identifiant commerce
+   * @param productIdList List<Long> - List identifiant produit
+   * @return List<ProductEntity>
+   */
+  List<ProductEntity> getMultipleProductsOfStore(List<Long> productIdList, Long storeId);
 }

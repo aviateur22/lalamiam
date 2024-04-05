@@ -24,8 +24,6 @@ public class CommandProductEntity {
   @JoinColumn(name = "command_id")
   CommandEntity command;
 
-
-  @JsonIgnore
   @ManyToOne
   @JoinColumn(name = "product_id")
   ProductEntity product;
@@ -65,7 +63,7 @@ public class CommandProductEntity {
   public void setCommand(CommandEntity command) {
     this.command = command;
   }
-  @JsonBackReference
+
   public ProductEntity getProduct() {
     return product;
   }

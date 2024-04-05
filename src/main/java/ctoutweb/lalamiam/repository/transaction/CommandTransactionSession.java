@@ -7,8 +7,12 @@ import ctoutweb.lalamiam.repository.CommandProductRepository;
 import ctoutweb.lalamiam.repository.CommandRepository;
 import ctoutweb.lalamiam.repository.entity.CommandEntity;
 import ctoutweb.lalamiam.repository.entity.CommandProductEntity;
+import ctoutweb.lalamiam.repository.entity.ProductEntity;
+import ctoutweb.lalamiam.service.ProductService;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.transaction.Transactional;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -16,9 +20,11 @@ import org.hibernate.Transaction;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
 public class CommandTransactionSession  {
-
+  private static final Logger LOGGER = LogManager.getLogger();
   private final EntityManagerFactory entityManagerFactory;
   private final CommandProductRepository commandProductRepository;
   private final CommandRepository commandRepository;
@@ -85,7 +91,7 @@ public class CommandTransactionSession  {
             commandSaved.getId());
 
     // Sauvegarde relation produits-commande
-    commandProductRepository.saveAllAndFlush(commandSaved.getCommandProducts());
+    commandProductRepository.saveAllAndFlush(selectCommandProducts);
 
     commandInformationToSave.setCommandProducts(selectCommandProducts);
     return commandInformationToSave;
@@ -115,4 +121,6 @@ public class CommandTransactionSession  {
       return command;
     }
   }
+
+
 }

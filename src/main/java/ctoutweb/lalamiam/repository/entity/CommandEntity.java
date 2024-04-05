@@ -96,6 +96,7 @@ public class CommandEntity implements Serializable {
     this.preparationTime = commandInformationToSave.preparationTime();
     this.commandPrice = commandInformationToSave.commandPrice();
     this.slotTime = commandInformationToSave.slotTime();
+    this.isReady = false;
     this.productQuantity = commandInformationToSave.numberOfProductInCommand();
   }
 

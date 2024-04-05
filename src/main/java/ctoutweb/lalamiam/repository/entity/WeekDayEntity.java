@@ -78,4 +78,15 @@ public class WeekDayEntity {
   public void setStoreWeekDays(List<StoreDayScheduleEntity> storeWeekDays) {
     StoreWeekDays = storeWeekDays;
   }
+
+  @Override
+  public String toString() {
+    return "WeekDayEntity{" +
+            "id=" + id +
+            ", dayText='" + dayText + '\'' +
+            ", createdAt=" + createdAt +
+            ", updatedAt=" + updatedAt +
+            ", StoreWeekDays=" + StoreWeekDays +
+            '}';
+  }
 }
