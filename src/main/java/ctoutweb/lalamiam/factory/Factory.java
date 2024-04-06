@@ -140,9 +140,10 @@ public class Factory {
           Long commandId,
           LocalDate commandDate,
           LocalDateTime consulationDate,
-          List<ProductWithQuantity> selectProductsWithQuantity
+          List<ProductWithQuantity> selectProductsWithQuantity,
+          LocalDateTime selectSlotTime
   ) {
-    return new CommandInformationDto(storeId, commandId, commandDate, consulationDate, selectProductsWithQuantity);
+    return new CommandInformationDto(storeId, commandId, commandDate, consulationDate, selectProductsWithQuantity, selectSlotTime);
   }
 
   /**
@@ -164,7 +165,7 @@ public class Factory {
    * @return CommandInformationToUpdate
    */
   public static CommandInformationToUpdate getCommandInformationToUpdate(
-          PersitCommandDto persistInformationToUpdate,
+          ProPersitCommandDto persistInformationToUpdate,
           Integer preparationtime,
           Integer numberOfProductInCommand,
           Double commandPrice
@@ -190,12 +191,40 @@ public class Factory {
    * @return CommandInformationToSave
    */
   public static CommandInformationToSave getCommandInformationToSave(
-          PersitCommandDto commandInformationToPersist,
+          ProPersitCommandDto commandInformationToPersist,
           String commandCode,
           Integer preparationtime,
           Integer numberOfProductInCommand,
           Double commandPrice
   ){
+    return new CommandInformationToSave(
+            commandInformationToPersist.storeId(),
+            commandInformationToPersist.clientPhone(),
+            commandInformationToPersist.selectProducts(),
+            commandInformationToPersist.selectSlotTime(),
+            commandCode,
+            preparationtime,
+            numberOfProductInCommand,
+            commandPrice);
+  }
+
+  /**
+   * Renvoie une CommandInformationToSave a partir d'un ClientPersitCommandDto
+   * @param commandInformationToPersist
+   * @param commandCode
+   * @param preparationtime
+   * @param numberOfProductInCommand
+   * @param commandPrice
+   * @return CommandInformationToSave
+   */
+  public static CommandInformationToSave getCommandInformationToSave(
+          ClientPersitCommandDto commandInformationToPersist,
+          String commandCode,
+          Integer preparationtime,
+          Integer numberOfProductInCommand,
+          Double commandPrice
+  ){
+    // Todo test
     return new CommandInformationToSave(
             commandInformationToPersist.storeId(),
             commandInformationToPersist.clientPhone(),

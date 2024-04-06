@@ -95,17 +95,16 @@ public class NewCommandServiceImp implements NewCommandService {
 
   @Override
   public List<LocalDateTime> getStoreSlotAvailibility (CommandInformationDto commandInformation) {
-    // Todo rajouter le creneau selectionné si modification d'une commande
     // Todo mettre a jour test unitaire
     // Date de la commande
     LocalDate refCommandDate = commandInformation.commandId() == null ? LocalDate.now() : commandInformation.commandDate();
     LOGGER.info(()->String.format("Date de reference de la commande: %s", refCommandDate));
 
-    if(refCommandDate == null) throw new CommandException("Date de référence manquante dans la commande", HttpStatus.INTERNAL_SERVER_ERROR);
+    if(refCommandDate == null)
+      throw new CommandException("Date de référence manquante dans la commande", HttpStatus.INTERNAL_SERVER_ERROR);
 
     // Début de journée jour de commande (00h01)
     LocalDateTime startOfCommandDay = refCommandDate.atStartOfDay();
-
     LOGGER.info(()->String.format("startOfCommandDay: %s", startOfCommandDay));
 
     // Fin de journnée jour de commande
@@ -137,11 +136,20 @@ public class NewCommandServiceImp implements NewCommandService {
     slotHelper.setRefFilterTime(refFilterTime);
 
     // Renvoi une liste de slot disponible filtré par rapport aux horaires d'ouverture et les commandes déja existantes
-    return  slotHelper.getStoreSlotAvailibility(commandInformation.storeId(), commandsOfTheDay);
+    List<LocalDateTime> storeSlotAvailibility = slotHelper.getStoreSlotAvailibility(commandInformation.storeId(), commandsOfTheDay);
+
+    // Si modification d'une commande alors rajout du slot de la commande
+    if(commandInformation.commandId() != null)
+      storeSlotAvailibility.add(commandInformation.selectSlotTime());
+
+    // Tri de la liste des creneaux
+    storeSlotAvailibility.sort(LocalDateTime::compareTo);
+
+    return storeSlotAvailibility;
   }
 
   @Override
-  public RegisterCommandDto persistCommand(PersitCommandDto persitCommand) {
+  public RegisterCommandDto proPersistCommand(ProPersitCommandDto persitCommand) {
     // Todo Implementer les tests unitaires
 
     final int COMMAND_CODE_LENGTH = 5;
@@ -153,18 +161,19 @@ public class NewCommandServiceImp implements NewCommandService {
 
 
     CommandInformationDto commandInformation = Factory.getCommandInformationDto(
-            persitCommand.storeId(),
-            persitCommand.commandId(),
-            persitCommand.commandDate(),
-            persitCommand.consultationDate(),
-            persitCommand.selectProducts()
+      persitCommand.storeId(),
+      persitCommand.commandId(),
+      persitCommand.commandDate(),
+      persitCommand.consultationDate(),
+      persitCommand.selectProducts(),
+      persitCommand.selectSlotTime()
     );
 
     // Verification validité de la commande
     validateProductsSelection(commandInformation.storeId(), commandInformation.commandId(), productSelectInformation);
 
     // Validation du creneau de la commande
-    validateSlot(commandInformation,persitCommand.selectSlotTime());
+    validateSlot(commandInformation);
 
     // Code de la commande
     String commandCode = commandServiceHelper.generateCode(COMMAND_CODE_LENGTH);
@@ -200,6 +209,62 @@ public class NewCommandServiceImp implements NewCommandService {
     return commandServiceHelper.findRegisterCommandInformation(command);
   }
 
+  @Override
+  public RegisterCommandDto clientPersistCommand(ClientPersitCommandDto persitCommand) {
+    // Todo Implementer les tests unitaires
+    // Todo verifier clientId
+    // Todo verifier existance client
+
+    final int COMMAND_CODE_LENGTH = 5;
+
+    ProductSelectInformationDto productSelectInformation = Factory.getProductSelectInformationDto(
+            persitCommand.selectProducts(),
+            persitCommand.clientPhone()
+    );
+
+
+    CommandInformationDto commandInformation = Factory.getCommandInformationDto(
+            persitCommand.storeId(),
+            persitCommand.commandId(),
+            persitCommand.commandDate(),
+            persitCommand.consultationDate(),
+            persitCommand.selectProducts(),
+            persitCommand.selectSlotTime()
+    );
+
+    // Verification client
+    if(persitCommand.clientId() == null)
+      throw new CommandException("Identifiant client inconnu", HttpStatus.BAD_REQUEST);
+
+    // Verification validité de la commande
+    validateProductsSelection(commandInformation.storeId(), commandInformation.commandId(), productSelectInformation);
+
+    // Validation du creneau de la commande
+    validateSlot(commandInformation);
+
+    // Code de la commande
+    String commandCode = commandServiceHelper.generateCode(COMMAND_CODE_LENGTH);
+
+    // Calcul du temps de preparation
+    Integer preparationTime = commandServiceHelper.calculateCommandPreparationTime(persitCommand.selectProducts());
+
+    // Calcul du prix de la commande
+    Double commandPrice = commandServiceHelper.calculateCommandPrice(persitCommand.selectProducts());
+
+    // Calcul du nombre de produit
+    Integer numberOfProductInCommand = commandServiceHelper.calculateNumberOfProductInCommand(persitCommand.selectProducts());
+
+    CommandEntity command = commandTransactionSession.saveClientCommand(
+            Factory.getCommandInformationToSave(
+                    persitCommand,
+                    commandCode,
+                    preparationTime,
+                    numberOfProductInCommand,
+                    commandPrice
+            ), persitCommand.clientId());
+
+    return commandServiceHelper.findRegisterCommandInformation(command);
+  }
   @Override
   public void validateProductsSelection(Long storeId, Long commandId, ProductSelectInformationDto productSelectInformation) {
     if(storeId == null)  throw new RuntimeException("Identifiant commerce obligatoire");
@@ -239,23 +304,20 @@ public class NewCommandServiceImp implements NewCommandService {
   }
 
   @Override
-  public void validateSlot(CommandInformationDto commandInformation, LocalDateTime selectSlotTime) {
+  public void validateSlot(CommandInformationDto commandInformation) {
 
     // Récuperation des créneaux disponible
     List<LocalDateTime> storeAvailibiltySlots = getStoreSlotAvailibility(commandInformation);
 
     LOGGER.info(()->String.format("Liste des créneaux dispo pour la commande %s", storeAvailibiltySlots));
-    LOGGER.info(()->String.format("Huere de la commande %s", selectSlotTime));
+    LOGGER.info(()->String.format("Heure de la commande %s", commandInformation.selectSlotTime()));
 
 
 
     if(storeAvailibiltySlots
             .stream()
-            .filter(storeSlot->selectSlotTime.equals(storeSlot))
+            .filter(storeSlot->commandInformation.selectSlotTime().equals(storeSlot))
             .collect(Collectors.toList())
-            .size() == 0) throw new CommandException("Le créneau demandé n'est plus disponible", HttpStatus.BAD_REQUEST);
+            .size() == 0) throw new CommandException("Le créneau demandé n'est pas disponible", HttpStatus.BAD_REQUEST);
   }
-
-
-
 }

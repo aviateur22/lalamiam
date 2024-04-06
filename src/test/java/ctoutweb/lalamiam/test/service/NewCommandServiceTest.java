@@ -787,7 +787,8 @@ public class NewCommandServiceTest {
             commandId,
             commandDate,
             consulationDate,
-            getFakeProductWithQuantityList()
+            getFakeProductWithQuantityList(),
+            null
     );
 
     // Mock StoreService
@@ -839,6 +840,7 @@ public class NewCommandServiceTest {
     WeekDayEntity weekDay = new WeekDayEntity(1);
     LocalDate commandDate = getNextRequestDate(weekDay.getId());
     LocalDateTime consulationDate = commandDate.atTime(15,30,0);
+    LocalDateTime selectSlotTime = commandDate.atTime(17,30,0);
 
     // Données pour rechercher les SLOTs
     CommandInformationDto storeSlotInformation = new CommandInformationDto(
@@ -846,7 +848,8 @@ public class NewCommandServiceTest {
             commandId,
             commandDate,
             consulationDate,
-            getFakeProductWithQuantityList()
+            getFakeProductWithQuantityList(),
+            selectSlotTime
     );
 
     // Mock StoreService
@@ -912,7 +915,8 @@ public class NewCommandServiceTest {
             commandId,
             commandDate,
             consulationDate,
-            getFakeProductWithQuantityList()
+            getFakeProductWithQuantityList(),
+            null
     );
 
     // Mock StoreService
@@ -964,6 +968,7 @@ public class NewCommandServiceTest {
     WeekDayEntity weekDay = new WeekDayEntity(1);
     LocalDateTime consulationDate = getNextRequestDate(weekDay.getId()).atTime(15,0);
     LocalDate commandDate = consulationDate.plusDays(1).toLocalDate();
+    LocalDateTime selectSlotTime = commandDate.atTime(17,30,0);
 
     // Données pour rechercher les SLOTs
     CommandInformationDto storeSlotInformation = new CommandInformationDto(
@@ -971,7 +976,8 @@ public class NewCommandServiceTest {
             commandId,
             commandDate,
             consulationDate,
-            getFakeProductWithQuantityList()
+            getFakeProductWithQuantityList(),
+            selectSlotTime
     );
 
     // Mock StoreService
@@ -1030,7 +1036,8 @@ public class NewCommandServiceTest {
             Long.valueOf(1),
             LocalDate.now(),
             LocalDateTime.now(),
-            Arrays.asList()
+            Arrays.asList(),
+            LocalDateTime.now().plusMinutes(55)
     );
 
     CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
@@ -1048,7 +1055,7 @@ public class NewCommandServiceTest {
             slotHelper));
     doReturn(getFakeSlotAvailibility(commandInformation.commandDate())).when(commandServiceImpSpy).getStoreSlotAvailibility(commandInformation);
 
-    commandServiceImpSpy.validateSlot(commandInformation, selectSlot );
+    commandServiceImpSpy.validateSlot(commandInformation);
     verify(commandServiceImpSpy, times(1)).getStoreSlotAvailibility(any(CommandInformationDto.class));
 
   }
@@ -1060,7 +1067,9 @@ public class NewCommandServiceTest {
             Long.valueOf(1),
             LocalDate.now(),
             LocalDateTime.now(),
-            Arrays.asList()
+            Arrays.asList(),
+            LocalDateTime.now().plusMinutes(55)
+
     );
 
     CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
@@ -1078,8 +1087,8 @@ public class NewCommandServiceTest {
             slotHelper));
     doReturn(getFakeSlotAvailibility(commandInformation.commandDate())).when(commandServiceImpSpy).getStoreSlotAvailibility(commandInformation);
 
-    //commandServiceImpSpy.validateSlot(commandInformation, selectSlot );
-    Exception exception = Assertions.assertThrows(CommandException.class, ()->commandServiceImpSpy.validateSlot(commandInformation, selectSlot));
+    //commandServiceImpSpy.validateSlot(commandInformation, selectSlotTime );
+    Exception exception = Assertions.assertThrows(CommandException.class, ()->commandServiceImpSpy.validateSlot(commandInformation));
     verify(commandServiceImpSpy, times(1)).getStoreSlotAvailibility(any(CommandInformationDto.class));
     Assertions.assertEquals("Le créneau demandé n'est plus disponible", exception.getMessage());
   }
@@ -1089,7 +1098,7 @@ public class NewCommandServiceTest {
     Long storeId = Long.valueOf(1);
     Long commandId = null;
 
-    PersitCommandDto persitCommandInformation = new PersitCommandDto(
+    ProPersitCommandDto persitCommandInformation = new ProPersitCommandDto(
             storeId,
             commandId,
             LocalDate.now(),
@@ -1155,11 +1164,12 @@ public class NewCommandServiceTest {
             persitCommandInformation.commandId(),
             persitCommandInformation.commandDate(),
             persitCommandInformation.consultationDate(),
-            persitCommandInformation.selectProducts());
+            persitCommandInformation.selectProducts(),
+            persitCommandInformation.selectSlotTime());
 
     doReturn(getFakeSlotAvailibility(LocalDate.now())).when(commandServiceImpSpy).getStoreSlotAvailibility(any(CommandInformationDto.class));
 
-    RegisterCommandDto registerCommand = commandServiceImpSpy.persistCommand(persitCommandInformation);
+    RegisterCommandDto registerCommand = commandServiceImpSpy.proPersistCommand(persitCommandInformation);
  //   verify(commandServiceImpSpy, times(1)).validateProductsSelection(any(Long.class), any(Long.class), any(ProductSelectInformationDto.class));
 
     Assertions.assertNotNull(registerCommand);

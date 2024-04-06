@@ -11,4 +11,5 @@ public record CommandInformationDto(
         Long commandId,
         LocalDate commandDate,
         LocalDateTime consultationDate,
-        List<ProductWithQuantity> productsSelected) {}
+        List<ProductWithQuantity> productsSelected,
+        LocalDateTime selectSlotTime) {}

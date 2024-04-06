@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Données nécessaires pour enregistrer une commande
  */
-public record PersitCommandDto(
+public record ProPersitCommandDto(
         Long storeId,
         Long commandId,
         LocalDate commandDate,

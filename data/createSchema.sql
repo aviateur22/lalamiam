@@ -1,5 +1,6 @@
 BEGIN;
 DROP TABLE IF EXISTS
+sc_lalamiam."client_command",
 sc_lalamiam."jwt_user",
 sc_lalamiam."store_day_schedule",
 sc_lalamiam."week_day",
@@ -104,7 +105,7 @@ create table IF NOT EXISTS sc_lalamiam.store_day_schedule (
     "updated_at" TIMESTAMPTZ
 );
 
-CREATE TABLE sc_lalamiam.jwt_user (
+CREATE TABLE IF NOT EXISTS sc_lalamiam.jwt_user (
 "id" BIGINT NOT NULL UNIQUE PRIMARY KEY,
 "user_id" BIGINT NOT NULL REFERENCES sc_lalamiam."users"("id") ON DELETE CASCADE,
 "jwt_token" TEXT NOT NULL,
@@ -115,6 +116,13 @@ CREATE TABLE sc_lalamiam.jwt_user (
 "updated_at" TIMESTAMPTZ
 );
 
+CREATE TABLE IF NOT EXISTS sc_lalamiam.client_command (
+"id" BIGINT NOT NULL UNIQUE PRIMARY KEY,
+"client_id" BIGINT NOT NULL REFERENCES sc_lalamiam."users"("id") ON DELETE CASCADE,
+"command_id" BIGINT NOT NULL REFERENCES sc_lalamiam."command"("id") on delete cascade,
+"created_at"TIMESTAMPTZ NOT NULL DEFAULT now(),
+"updated_at" TIMESTAMPTZ
+);
 
 ALTER table IF EXISTS sc_lalamiam.command_product OWNER TO lalamiam;
 ALTER table IF EXISTS sc_lalamiam.role OWNER TO lalamiam;
@@ -126,6 +134,7 @@ ALTER table IF EXISTS sc_lalamiam.users OWNER TO lalamiam;
 ALTER table IF EXISTS sc_lalamiam.week_day OWNER TO lalamiam;
 ALTER table IF EXISTS sc_lalamiam.store_day_schedule OWNER TO lalamiam;
 ALTER table IF EXISTS sc_lalamiam.jwt_user OWNER TO lalamiam;
+ALTER table IF EXISTS sc_lalamiam.client_command OWNER TO lalamiam;
 ALTER SCHEMA sc_lalamiam OWNER TO lalamiam;
 
 GRANT ALL ON TABLE sc_lalamiam.command_product TO lalamiam;
@@ -138,6 +147,7 @@ GRANT ALL ON TABLE sc_lalamiam.users TO lalamiam;
 GRANT ALL ON TABLE sc_lalamiam.week_day TO lalamiam;
 GRANT ALL ON TABLE sc_lalamiam.store_day_schedule TO lalamiam;
 GRANT ALL ON TABLE sc_lalamiam.jwt_user TO lalamiam;
+GRANT ALL ON TABLE sc_lalamiam.client_command TO lalamiam;
 GRANT ALL ON SCHEMA sc_lalamiam TO lalamiam;
 
 CREATE SEQUENCE if not exists sc_lalamiam.users_pk_seq START WITH 1 INCREMENT BY 1 NO CYCLE;
@@ -172,6 +182,10 @@ CREATE SEQUENCE if not exists sc_lalamiam.jwt_user_pk_seq START WITH 1 INCREMENT
 ALTER SEQUENCE if exists sc_lalamiam.jwt_user_pk_seq OWNER TO lalamiam;
 ALTER SEQUENCE if exists sc_lalamiam.jwt_user_pk_seq owned by sc_lalamiam.jwt_user.id;
 
+CREATE SEQUENCE if not exists sc_lalamiam.client_command_pk_seq START WITH 1 INCREMENT BY 1 NO CYCLE;
+ALTER SEQUENCE if exists sc_lalamiam.client_command_pk_seq OWNER TO lalamiam;
+ALTER SEQUENCE if exists sc_lalamiam.client_command_pk_seq owned by sc_lalamiam.client_command.id;
+
 INSERT INTO sc_lalamiam.week_day ("id", "day_text") values (1, 'monday'), (2, 'tuesday'),  (3, 'wenesday'), (4, 'thrurday'),(5, 'friday'), (6, 'staurday'), (7, 'sunday');
 INSERT INTO sc_lalamiam.role ("id", "name") values (1, 'ROLE_USER'), (2, 'ROLE_PRO'),  (3, 'ROLE_ADMIN');
 
@@ -183,5 +197,6 @@ ALTER TABLE sc_lalamiam.store ALTER COLUMN id SET DEFAULT NEXTVAL('sc_lalamiam.s
 ALTER TABLE sc_lalamiam.store_day_schedule ALTER COLUMN id SET DEFAULT NEXTVAL('sc_lalamiam.store_week_day_pk_seq');
 ALTER TABLE sc_lalamiam.command_product ALTER COLUMN id SET DEFAULT NEXTVAL('sc_lalamiam.command_product_pk_seq');
 ALTER TABLE sc_lalamiam.jwt_user ALTER COLUMN id SET DEFAULT NEXTVAL('sc_lalamiam.jwt_user_pk_seq');
+ALTER TABLE sc_lalamiam.client_command ALTER COLUMN id SET DEFAULT NEXTVAL('sc_lalamiam.client_command_pk_seq');
 
 COMMIT;
