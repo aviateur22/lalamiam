@@ -6,6 +6,7 @@ sc_lalamiam."store_day_schedule",
 sc_lalamiam."week_day",
 sc_lalamiam."command_product",
 sc_lalamiam."product",
+sc_lalamiam."status",
 sc_lalamiam."command",
 sc_lalamiam."store",
 sc_lalamiam."role_user",
@@ -17,6 +18,7 @@ create table IF NOT EXISTS sc_lalamiam.users(
     "id" BIGINT PRIMARY KEY,
     "email" TEXT NOT NULL,
     "phone" TEXT,
+    "name" TEXT,
     "password" TEXT NOT NULL,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
     "updated_at" TIMESTAMPTZ
@@ -52,6 +54,13 @@ create table IF NOT EXISTS sc_lalamiam.store(
      "updated_at" TIMESTAMPTZ
 );
 
+create table IF NOT EXISTS sc_lalamiam.status(
+    "id" INTEGER PRIMARY KEY,
+    "status_name" TEXT NOT NULL,
+    "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    "updated_at" TIMESTAMPTZ
+);
+
 create table IF NOT EXISTS sc_lalamiam.command(
     "id" BIGINT PRIMARY KEY,
     "store_id" BIGINT NOT NULL REFERENCES sc_lalamiam."store"("id") on delete cascade,
@@ -62,6 +71,8 @@ create table IF NOT EXISTS sc_lalamiam.command(
     "order_price" NUMERIC NOT NULL,
     "product_quantity" INTEGER NOT NULL,
     "is_ready" BOOLEAN NOT NULL DEFAULT FALSE,
+    "prepared_by" BIGINT REFERENCES sc_lalamiam."users"("id") on delete cascade,
+    "command_status" INTEGER NOT NULL DEFAULT 1 REFERENCES sc_lalamiam."status"("id") on delete cascade,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
     "updated_at" TIMESTAMPTZ
 );
@@ -135,6 +146,7 @@ ALTER table IF EXISTS sc_lalamiam.week_day OWNER TO lalamiam;
 ALTER table IF EXISTS sc_lalamiam.store_day_schedule OWNER TO lalamiam;
 ALTER table IF EXISTS sc_lalamiam.jwt_user OWNER TO lalamiam;
 ALTER table IF EXISTS sc_lalamiam.client_command OWNER TO lalamiam;
+ALTER table IF EXISTS sc_lalamiam.status OWNER TO lalamiam;
 ALTER SCHEMA sc_lalamiam OWNER TO lalamiam;
 
 GRANT ALL ON TABLE sc_lalamiam.command_product TO lalamiam;
@@ -142,6 +154,7 @@ GRANT ALL ON TABLE sc_lalamiam.role TO lalamiam;
 GRANT ALL ON TABLE sc_lalamiam.role_user TO lalamiam;
 GRANT ALL ON TABLE sc_lalamiam.product TO lalamiam;
 GRANT ALL ON TABLE sc_lalamiam.command TO lalamiam;
+GRANT ALL ON TABLE sc_lalamiam.status TO lalamiam;
 GRANT ALL ON TABLE sc_lalamiam.store TO lalamiam;
 GRANT ALL ON TABLE sc_lalamiam.users TO lalamiam;
 GRANT ALL ON TABLE sc_lalamiam.week_day TO lalamiam;
@@ -186,8 +199,9 @@ CREATE SEQUENCE if not exists sc_lalamiam.client_command_pk_seq START WITH 1 INC
 ALTER SEQUENCE if exists sc_lalamiam.client_command_pk_seq OWNER TO lalamiam;
 ALTER SEQUENCE if exists sc_lalamiam.client_command_pk_seq owned by sc_lalamiam.client_command.id;
 
-INSERT INTO sc_lalamiam.week_day ("id", "day_text") values (1, 'monday'), (2, 'tuesday'),  (3, 'wenesday'), (4, 'thrurday'),(5, 'friday'), (6, 'staurday'), (7, 'sunday');
-INSERT INTO sc_lalamiam.role ("id", "name") values (1, 'ROLE_USER'), (2, 'ROLE_PRO'),  (3, 'ROLE_ADMIN');
+CREATE SEQUENCE if not exists sc_lalamiam.status_pk_seq START WITH 1 INCREMENT BY 1 NO CYCLE;
+ALTER SEQUENCE if exists sc_lalamiam.status_pk_seq OWNER TO lalamiam;
+ALTER SEQUENCE if exists sc_lalamiam.status_pk_seq owned by sc_lalamiam.status.id;
 
 ALTER TABLE sc_lalamiam.product ALTER COLUMN id SET DEFAULT NEXTVAL('sc_lalamiam.product_pk_seq');
 ALTER TABLE sc_lalamiam.role_user ALTER COLUMN id SET DEFAULT NEXTVAL('sc_lalamiam.role_user_pk_seq');
@@ -198,5 +212,16 @@ ALTER TABLE sc_lalamiam.store_day_schedule ALTER COLUMN id SET DEFAULT NEXTVAL('
 ALTER TABLE sc_lalamiam.command_product ALTER COLUMN id SET DEFAULT NEXTVAL('sc_lalamiam.command_product_pk_seq');
 ALTER TABLE sc_lalamiam.jwt_user ALTER COLUMN id SET DEFAULT NEXTVAL('sc_lalamiam.jwt_user_pk_seq');
 ALTER TABLE sc_lalamiam.client_command ALTER COLUMN id SET DEFAULT NEXTVAL('sc_lalamiam.client_command_pk_seq');
+ALTER TABLE sc_lalamiam.status ALTER COLUMN id SET DEFAULT NEXTVAL('sc_lalamiam.status_pk_seq');
+
+
+INSERT INTO sc_lalamiam.week_day ("id", "day_text") values (1, 'monday'), (2, 'tuesday'),  (3, 'wenesday'), (4, 'thrurday'),(5, 'friday'), (6, 'staurday'), (7, 'sunday');
+INSERT INTO sc_lalamiam.role ("id", "name") values
+ (1, 'ROLE_USER'),
+ (2, 'ROLE_EMPLOYE'),
+ (3, 'ROLE_PRO'),
+ (4, 'ROLE_ADMIN');
+INSERT INTO sc_lalamiam.status("status_name") values
+('not_started'), ('in_progress'), ('paid');
 
 COMMIT;

@@ -138,9 +138,11 @@ public class NewCommandServiceImp implements NewCommandService {
     // Renvoi une liste de slot disponible filtré par rapport aux horaires d'ouverture et les commandes déja existantes
     List<LocalDateTime> storeSlotAvailibility = slotHelper.getStoreSlotAvailibility(commandInformation.storeId(), commandsOfTheDay);
 
-    // Si modification d'une commande alors rajout du slot de la commande
-    if(commandInformation.commandId() != null)
-      storeSlotAvailibility.add(commandInformation.selectSlotTime());
+    // Si modification d'une commande alors rajout du slot de la commande initiale
+    if(commandInformation.commandId() != null) {
+      RegisterCommandDto initialCommand = getCommand(commandInformation.storeId(), commandInformation.commandId());
+      storeSlotAvailibility.add(initialCommand.getManualCommandInformation().getSlotTime());
+    }
 
     // Tri de la liste des creneaux
     storeSlotAvailibility.sort(LocalDateTime::compareTo);

@@ -7,7 +7,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -38,13 +37,6 @@ public class CommandEntity implements Serializable {
   @Column(name = "product_quantity")
   private Integer productQuantity;
 
-  @OneToMany(mappedBy = "command", fetch = FetchType.LAZY)
-  private List<CommandProductEntity> commandProducts;
-
-  @ManyToOne
-  @JoinColumn(name="store_id", nullable=false)
-  private StoreEntity store;
-
   @Column(name = "is_ready")
   private Boolean isReady;
 
@@ -55,6 +47,21 @@ public class CommandEntity implements Serializable {
   @UpdateTimestamp
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
+
+  @OneToMany(mappedBy = "command", fetch = FetchType.LAZY)
+  private List<CommandProductEntity> commandProducts;
+
+  @ManyToOne
+  @JoinColumn(name="store_id", nullable=false)
+  private StoreEntity store;
+
+  @ManyToOne
+  @JoinColumn(name="prepared_by")
+  private UserEntity preparedBy;
+
+  @ManyToOne
+  @JoinColumn(name="command_status")
+  private StatusEntity commandStatus;
 
   /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -97,6 +104,7 @@ public class CommandEntity implements Serializable {
     this.commandPrice = commandInformationToSave.commandPrice();
     this.slotTime = commandInformationToSave.slotTime();
     this.isReady = false;
+    this.commandStatus = Factory.getWaitingStatus();
     this.productQuantity = commandInformationToSave.numberOfProductInCommand();
   }
 
@@ -196,6 +204,22 @@ public class CommandEntity implements Serializable {
     isReady = ready;
   }
 
+  public UserEntity getPreparedBy() {
+    return preparedBy;
+  }
+
+  public void setPreparedBy(UserEntity preparedBy) {
+    this.preparedBy = preparedBy;
+  }
+
+  public StatusEntity getCommandStatus() {
+    return commandStatus;
+  }
+
+  public void setCommandStatus(StatusEntity commandStatus) {
+    this.commandStatus = commandStatus;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -222,6 +246,8 @@ public class CommandEntity implements Serializable {
             //", store=" + store +
             ", createdAt=" + createdAt +
             ", updatedAt=" + updatedAt +
+            //", preparedBy=" + preparedBy +
+            //", status=" + commandStatus +
             '}';
   }
 }

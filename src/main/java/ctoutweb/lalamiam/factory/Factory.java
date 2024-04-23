@@ -107,6 +107,8 @@ public class Factory {
     RegisterCommandDto registerCommand = new RegisterCommandDto();
     registerCommand.setStoreId(command.getStore().getId());
     registerCommand.setCommandId(command.getId());
+    registerCommand.setCommandStatus(command.getCommandStatus().getId());
+    registerCommand.setPreparedBy(command.getPreparedBy() == null ? null : command.getPreparedBy().getName());
     registerCommand.setManualCommandInformation(manualCommandInformation);
     registerCommand.setCalculatedCommandInformation(calculatedCommandInformation);
     return registerCommand;
@@ -359,5 +361,14 @@ public class Factory {
                     .collect(Collectors.toList()),
             store.getFrequenceSlotTime()
     );
+  }
+
+  /**
+   * Renvoie un status Waiting pour les commandes
+   * @return StatusEntity
+   */
+  public static StatusEntity getWaitingStatus() {
+    final int waitingstatus = 1;
+    return new StatusEntity(waitingstatus);
   }
 }
