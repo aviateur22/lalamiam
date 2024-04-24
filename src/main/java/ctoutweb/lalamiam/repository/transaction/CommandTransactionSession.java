@@ -1,5 +1,6 @@
 package ctoutweb.lalamiam.repository.transaction;
 
+import ctoutweb.lalamiam.exception.ClientException;
 import ctoutweb.lalamiam.exception.CommandException;
 import ctoutweb.lalamiam.factory.Factory;
 import ctoutweb.lalamiam.mapper.CommandProductListMapper;
@@ -22,6 +23,7 @@ import org.hibernate.Transaction;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -86,6 +88,50 @@ public class CommandTransactionSession  {
     return findCommand;
   }
 
+  @Transactional
+  public CommandEntity updateClientCommand(CommandInformationToUpdate commandInformationToUpdate, Long clientId) {
+    // Todo faire test
+    CommandEntity findCommand = getCommand(commandInformationToUpdate.commandId());
+
+    if(findCommand == null)
+      throw new RuntimeException(String.format("La commande N° %s n'existe pas", commandInformationToUpdate.commandId()));
+
+    if(!findCommand.getStore().getId().equals(commandInformationToUpdate.storeId()))
+      throw new RuntimeException(String.format("La commande N° %s n'est pas rattaché au commerce", findCommand.getId()));
+
+    // Suppression des anciens produits
+    commandProductRepository.deleteProductByCommandId(commandInformationToUpdate.commandId());
+
+    // Convertion de la liste des produits
+    List<CommandProductEntity> selectCommandProducts = commandProductListMapper.apply(
+            commandInformationToUpdate.selectProducts(),
+            findCommand.getId());
+
+    // Sauvegarde relation produits-commande
+    commandProductRepository.saveAllAndFlush(selectCommandProducts);
+
+    // Mise a jour des données de la cmmmande
+    findCommand.setCommandProducts(selectCommandProducts);
+    findCommand.setClientPhone(commandInformationToUpdate.clientPhone());
+    findCommand.setSlotTime(commandInformationToUpdate.slotTime());
+    findCommand.setCommandPrice(commandInformationToUpdate.commandPrice());
+    findCommand.setProductQuantity(commandInformationToUpdate.numberOfProductInCommand());
+    findCommand.setPreparationTime(commandInformationToUpdate.preparationTime());
+    findCommand.setCommandProducts(selectCommandProducts);
+
+    // Mise a jour des info de la commande
+    commandRepository.save(findCommand);
+
+    // Mise à jour de la reference client
+    ClientCommandEntity clientCommand = clientCommandRepository.findOneByUserAndCommand(
+            Factory.getUSer(clientId),
+            findCommand)
+            .orElseThrow(()->new ClientException("Impossible de mettre à jour le commande", HttpStatus.BAD_REQUEST));
+
+    clientCommand.setUpdatedAt(LocalDateTime.now());
+    clientCommandRepository.save(clientCommand);
+    return findCommand;
+  }
   @Transactional
   public CommandEntity saveCommand(CommandInformationToSave commandInformation) {
     // Todo faire test uintaire

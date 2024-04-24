@@ -184,6 +184,31 @@ public class Factory {
   }
 
   /**
+   * Renvoie un CommandInformationToUpdate avec un update par un client
+   * @param persistInformationToUpdate
+   * @param preparationtime
+   * @param numberOfProductInCommand
+   * @param commandPrice
+   * @return CommandInformationToUpdate
+   */
+  public static CommandInformationToUpdate getCommandInformationToUpdate(
+          ClientPersitCommandDto persistInformationToUpdate,
+          Integer preparationtime,
+          Integer numberOfProductInCommand,
+          Double commandPrice
+  ){
+    return new CommandInformationToUpdate(
+            persistInformationToUpdate.storeId(),
+            persistInformationToUpdate.commandId(),
+            persistInformationToUpdate.clientPhone(),
+            persistInformationToUpdate.selectProducts(),
+            persistInformationToUpdate.selectSlotTime(),
+            preparationtime,
+            numberOfProductInCommand,
+            commandPrice);
+  }
+
+  /**
    * Renvoie une CommandInformationToSave
    * @param commandInformationToPersist PersitCommandDto
    * @param commandCode

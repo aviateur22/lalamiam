@@ -256,14 +256,24 @@ public class NewCommandServiceImp implements NewCommandService {
     // Calcul du nombre de produit
     Integer numberOfProductInCommand = commandServiceHelper.calculateNumberOfProductInCommand(persitCommand.selectProducts());
 
-    CommandEntity command = commandTransactionSession.saveClientCommand(
-            Factory.getCommandInformationToSave(
-                    persitCommand,
-                    commandCode,
-                    preparationTime,
-                    numberOfProductInCommand,
-                    commandPrice
-            ), persitCommand.clientId());
+    CommandEntity command = persitCommand.commandId() == null ?
+
+            commandTransactionSession.saveClientCommand(
+                    Factory.getCommandInformationToSave(
+                            persitCommand,
+                            commandCode,
+                            preparationTime,
+                            numberOfProductInCommand,
+                            commandPrice
+                    ), persitCommand.clientId())
+            :
+            commandTransactionSession.updateClientCommand(
+                    Factory.getCommandInformationToUpdate(
+                            persitCommand,
+                            preparationTime,
+                            numberOfProductInCommand,
+                            commandPrice
+                    ), persitCommand.clientId());
 
     return commandServiceHelper.findRegisterCommandInformation(command);
   }
