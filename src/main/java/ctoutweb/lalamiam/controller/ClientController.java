@@ -39,7 +39,11 @@ public class ClientController {
 
   @PostMapping("/persist-command")
   ResponseEntity<RegisterCommandDto> persistCommand(@RequestBody ClientPersitCommandDto persitCommandInformation) {
-    this.validateClient(persitCommandInformation.clientId());
+    validateClient(persitCommandInformation.clientId());
+
+    if(persitCommandInformation.commandId() != null) {
+      validateCommandUpdate(persitCommandInformation);
+    }
     return new ResponseEntity<>(commandService.clientPersistCommand(persitCommandInformation), HttpStatus.OK);
   }
 
@@ -57,7 +61,7 @@ public class ClientController {
 
   /**
    * Vérification si commande peut être mise à jour
-   * @param clientPersitCommand
+   * @param clientPersitCommand ClientPersitCommandDto
    */
   private void validateCommandUpdate(ClientPersitCommandDto clientPersitCommand) {
     // Todo faire test
@@ -75,6 +79,6 @@ public class ClientController {
 
     // Si heure de modification valide
     if(LocalDateTime.now().isAfter(updateLimitTime))
-      throw new ClientException("Vous ne pouvez pas acceder à cette commande", HttpStatus.FORBIDDEN);
+      throw new ClientException("Vous ne pouvez plus mettre à jour cette commande", HttpStatus.BAD_REQUEST);
   }
 }

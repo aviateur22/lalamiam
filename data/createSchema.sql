@@ -222,6 +222,6 @@ INSERT INTO sc_lalamiam.role ("id", "name") values
  (3, 'ROLE_PRO'),
  (4, 'ROLE_ADMIN');
 INSERT INTO sc_lalamiam.status("status_name") values
-('not_started'), ('in_progress'), ('paid');
+('new_command'),('not_started'), ('in_progress'),('ready'), ('paid');
 
 COMMIT;
