@@ -13,7 +13,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -60,7 +59,7 @@ public class NewSlotHelper {
       throw new CommandException("Pas de créneau disponible ce jour", HttpStatus.BAD_REQUEST);
 
     // Nombre de Slots disponible sur 24h pour le commerce
-    List<LocalDateTime> slotTimeAvailibilityInOneDay = storeService.findStorSlotsWithoutConstraintByDay(startOfCommandDay, store.getFrequenceSlotTime());
+    List<LocalDateTime> slotTimeAvailibilityInOneDay = storeService.findStoreSlotsWithoutConstraintByDay(startOfCommandDay, store.getFrequenceSlotTime());
     LOGGER.info(()->String.format("slotTimeAvailibilityInOneDay: %s", slotTimeAvailibilityInOneDay));
 
     // Recherhe de slot disponible

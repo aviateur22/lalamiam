@@ -1,23 +1,28 @@
 package ctoutweb.lalamiam.controller;
 
-import ctoutweb.lalamiam.exception.ClientException;
-import ctoutweb.lalamiam.model.dto.ProInformationDto;
-import ctoutweb.lalamiam.model.dto.AddProfessionalDto;
-import ctoutweb.lalamiam.security.authentication.UserPrincipal;
+import ctoutweb.lalamiam.exception.ProException;
+import ctoutweb.lalamiam.helper.ProHelper;
+import ctoutweb.lalamiam.model.dto.*;
+import ctoutweb.lalamiam.service.NewCommandService;
 import ctoutweb.lalamiam.service.ProService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/v1/pro")
 public class ProController {
-
   private final ProService proService;
+  private final NewCommandService commandService;
+  private final ProHelper proHelper;
 
-  public ProController(ProService proService) {
+  public ProController(
+          ProService proService,
+          NewCommandService commandService,
+          ProHelper proHelper) {
     this.proService = proService;
+    this.commandService = commandService;
+    this.proHelper = proHelper;
   }
 
   @PostMapping("")
@@ -32,16 +37,73 @@ public class ProController {
     return new ResponseEntity<>(proInformationDto, HttpStatus.OK);
   }
 
-  /**
-   * Valide Le client entre Id du JWT et Id present dans le controller
-   * @param clientId
-   */
-  private void validatePro(Long clientId) {
-    // Todo faire test unitaire
-    UserPrincipal userFromJwt = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+  @GetMapping("/command/pro-id/{proId}/store-id/{storeId}/get-store-product-to-create-command")
+  ResponseEntity<StoreProductsInformationDto> getStoreProductToCreateCommand(@PathVariable Long storeId, @PathVariable Long proId) {
 
-    if(!userFromJwt.getId().equals(clientId))
-      throw new ClientException("Vous ne pouvez pas acceder à cette commande", HttpStatus.FORBIDDEN);
+    // Validation professionel
+    if(!proHelper.isProfessionalValid(proId))
+      throw new ProException("Vous ne pouvez pas acceder à cette commande", HttpStatus.FORBIDDEN);
+
+    if(!proHelper.isProWorkingInStore(proId, storeId))
+      throw new ProException("Vous n'êtes pas rattaché au commerce", HttpStatus.FORBIDDEN);
+
+    StoreProductsInformationDto addCommand = commandService.getStoreProductToCreateCommand(storeId);
+    return new ResponseEntity<>(addCommand, HttpStatus.OK);
+  }
+
+  @GetMapping("/command/pro-id/{proId}/store-id/{storeId}/command-id/{commandId}/get-store-product-to-update-command")
+  ResponseEntity<StoreProductsInformationDto> getStoreProductToUpdateCommand(@PathVariable Long storeId, @PathVariable Long commandId,  @PathVariable Long proId) {
+
+    // Validation professionel
+    if(!proHelper.isProfessionalValid(proId))
+      throw new ProException("Vous ne pouvez pas acceder à cette commande", HttpStatus.FORBIDDEN);
+
+    if(!proHelper.isProWorkingInStore(proId, storeId))
+      throw new ProException("Vous n'êtes pas rattaché au commerce", HttpStatus.FORBIDDEN);
+
+    if(!proHelper.isCommandVisibleByPro(proId, commandId))
+      throw new ProException("Vous ne pouvez pas acceder à cette commande", HttpStatus.FORBIDDEN);
+
+    return new ResponseEntity<>(commandService.getStoreProductToUpdateCommand(storeId, commandId), HttpStatus.OK);
+  }
+
+  @GetMapping("/command/pro-id/{proId}/store-id/{storeId}/command-id/{commandId}")
+  ResponseEntity<RegisterCommandDto> getCommand(@PathVariable Long storeId, @PathVariable Long commandId, @PathVariable Long proId) {
+
+    // Validation professionel
+    if(!proHelper.isProfessionalValid(proId))
+      throw new ProException("Vous ne pouvez pas acceder à cette commande", HttpStatus.FORBIDDEN);
+
+    if(!proHelper.isProWorkingInStore(proId, storeId))
+      throw new ProException("Vous n'êtes pas rattaché au commerce", HttpStatus.FORBIDDEN);
+
+    if(!proHelper.isCommandVisibleByPro(proId, commandId))
+      throw new ProException("Vous ne pouvez pas acceder à cette commande", HttpStatus.FORBIDDEN);
+
+
+    return new ResponseEntity<>(commandService.getCommand(storeId, commandId), HttpStatus.OK);
+  }
+
+  @PostMapping("/command/persist-command")
+  ResponseEntity<RegisterCommandDto> persistCommand(@RequestBody ProPersitCommandDto persitCommandInformation) {
+
+    Long proId = persitCommandInformation.proId();
+    Long commandId = persitCommandInformation.commandId();
+    Long storeId = persitCommandInformation.storeId();
+
+    // Validation professionel
+    if(!proHelper.isProfessionalValid(proId))
+      throw new ProException("Vous ne pouvez pas acceder à cette commande", HttpStatus.FORBIDDEN);
+
+    if(commandId != null) {
+      if(!proHelper.isProWorkingInStore(proId, storeId))
+        throw new ProException("Vous n'êtes pas rattaché au commerce", HttpStatus.FORBIDDEN);
+
+      if(!proHelper.isCommandVisibleByPro(proId, commandId))
+        throw new ProException("Vous ne pouvez pas acceder à cette commande", HttpStatus.FORBIDDEN);
+    }
+
+    return new ResponseEntity<>(commandService.proPersistCommand(persitCommandInformation), HttpStatus.CREATED);
   }
 
 }

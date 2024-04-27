@@ -52,6 +52,7 @@ public class WebSecurity {
       .authorizeHttpRequests(httpRequest->httpRequest
         .requestMatchers("/api/v1/auth/**").permitAll()
         .requestMatchers("/api/v1/pro/**").hasRole("PRO")
+        .requestMatchers("/api/v1/client/**").hasRole("CLIENT")
         .anyRequest().authenticated());
     return http.build();
   }

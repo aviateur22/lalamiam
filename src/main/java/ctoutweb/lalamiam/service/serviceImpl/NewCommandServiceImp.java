@@ -34,7 +34,8 @@ public class NewCommandServiceImp implements NewCommandService {
   public NewCommandServiceImp(
           NewCommandServiceHelper newCommandServiceHelper,
           CommandTransactionSession commandTransactionSession,
-          CommandRepository commandRepository, ProductService productService,
+          CommandRepository commandRepository,
+          ProductService productService,
           NewSlotHelper slotHelper
   ) {
     this.commandServiceHelper = newCommandServiceHelper;
@@ -45,12 +46,12 @@ public class NewCommandServiceImp implements NewCommandService {
   }
 
   @Override
-  public StoreProductsInformationDto createCommand(Long storeId) {
+  public StoreProductsInformationDto getStoreProductToCreateCommand(Long storeId) {
     return getStoreProductsForCommand(storeId, null);
   }
 
   @Override
-  public StoreProductsInformationDto updateCommand(Long storeId, Long commandId) {
+  public StoreProductsInformationDto getStoreProductToUpdateCommand(Long storeId, Long commandId) {
     // Récupération de la commande
     CommandEntity command = commandTransactionSession.getCommand(commandId);
 

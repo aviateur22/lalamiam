@@ -56,7 +56,7 @@ public class NewCommandServiceTest {
     doReturn(getFakeStoreProductsInformation()).when(commandServiceImpSpy).getStoreProductsForCommand(any(Long.class),any(CommandEntity.class));
 
     //
-    StoreProductsInformationDto storeProductInformation = commandServiceImpSpy.updateCommand(storeId, commandId);
+    StoreProductsInformationDto storeProductInformation = commandServiceImpSpy.getStoreProductToUpdateCommand(storeId, commandId);
 
     Assertions.assertNotNull(storeProductInformation);
     Assertions.assertEquals("0623225100", storeProductInformation.clientPhone());
@@ -89,7 +89,7 @@ public class NewCommandServiceTest {
 
     doReturn(getFakeStoreProductsInformation()).when(commandServiceImpSpy).getStoreProductsForCommand(any(Long.class),any(CommandEntity.class));
 
-    Exception exception = Assertions.assertThrows(CommandException.class, ()-> commandServiceImpSpy.updateCommand(storeId, commandId));
+    Exception exception = Assertions.assertThrows(CommandException.class, ()-> commandServiceImpSpy.getStoreProductToUpdateCommand(storeId, commandId));
     Assertions.assertEquals("La commande à mettre à jour n'existe pas", exception.getMessage());
   }
   @Test
@@ -118,7 +118,7 @@ public class NewCommandServiceTest {
     doReturn(getFakeStoreProductsInformation()).when(commandServiceImpSpy).getStoreProductsForCommand(any(Long.class),any(CommandEntity.class));
 
     //
-    Exception exception = Assertions.assertThrows(CommandException.class, ()-> commandServiceImpSpy.updateCommand(storeId, commandId));
+    Exception exception = Assertions.assertThrows(CommandException.class, ()-> commandServiceImpSpy.getStoreProductToUpdateCommand(storeId, commandId));
     Assertions.assertEquals("Cette commande n'est pas rattaché au commerce", exception.getMessage());
   }
   @Test
@@ -796,7 +796,7 @@ public class NewCommandServiceTest {
     when(storeService.findStoreById(any(Long.class))).thenReturn(getFakeStore(storeId));
     when(storeService.findStoreSchedulesByDay(any(StoreEntity.class), any(WeekDayEntity.class)))
             .thenReturn(getFakeDoubleStoreSchedule(weekDay, getFakeStore(storeId)));
-    when(storeService.findStorSlotsWithoutConstraintByDay(any(LocalDateTime.class), any(Integer.class)))
+    when(storeService.findStoreSlotsWithoutConstraintByDay(any(LocalDateTime.class), any(Integer.class)))
             .thenReturn(getFakeStoreSlotsWithoutConstraintByDay(getFakeStore(storeId).getFrequenceSlotTime(), commandDate.atStartOfDay()));
 
     // Mock NewStoreServiceHelper
@@ -857,7 +857,7 @@ public class NewCommandServiceTest {
     when(storeService.findStoreById(any(Long.class))).thenReturn(getFakeStore(storeId));
     when(storeService.findStoreSchedulesByDay(any(StoreEntity.class), any(WeekDayEntity.class)))
             .thenReturn(getFakeDoubleStoreSchedule(weekDay, getFakeStore(storeId)));
-    when(storeService.findStorSlotsWithoutConstraintByDay(any(LocalDateTime.class), any(Integer.class)))
+    when(storeService.findStoreSlotsWithoutConstraintByDay(any(LocalDateTime.class), any(Integer.class)))
             .thenReturn(getFakeStoreSlotsWithoutConstraintByDay(getFakeStore(storeId).getFrequenceSlotTime(), commandDate.atStartOfDay()));
 
     // Mock NewStoreServiceHelper
@@ -924,7 +924,7 @@ public class NewCommandServiceTest {
     when(storeService.findStoreById(any(Long.class))).thenReturn(getFakeStore(storeId));
     when(storeService.findStoreSchedulesByDay(any(StoreEntity.class), any(WeekDayEntity.class)))
             .thenReturn(getFakeDoubleStoreSchedule(weekDay, getFakeStore(storeId)));
-    when(storeService.findStorSlotsWithoutConstraintByDay(any(LocalDateTime.class), any(Integer.class)))
+    when(storeService.findStoreSlotsWithoutConstraintByDay(any(LocalDateTime.class), any(Integer.class)))
             .thenReturn(getFakeStoreSlotsWithoutConstraintByDay(getFakeStore(storeId).getFrequenceSlotTime(), commandDate.atStartOfDay()));
 
     // Mock NewStoreServiceHelper
@@ -985,7 +985,7 @@ public class NewCommandServiceTest {
     when(storeService.findStoreById(any(Long.class))).thenReturn(getFakeStore(storeId));
     when(storeService.findStoreSchedulesByDay(any(StoreEntity.class), any(WeekDayEntity.class)))
             .thenReturn(getFakeDoubleStoreSchedule(weekDay, getFakeStore(storeId)));
-    when(storeService.findStorSlotsWithoutConstraintByDay(any(LocalDateTime.class), any(Integer.class)))
+    when(storeService.findStoreSlotsWithoutConstraintByDay(any(LocalDateTime.class), any(Integer.class)))
             .thenReturn(getFakeStoreSlotsWithoutConstraintByDay(getFakeStore(storeId).getFrequenceSlotTime(), commandDate.atStartOfDay()));
 
     // Mock NewStoreServiceHelper
@@ -1097,10 +1097,12 @@ public class NewCommandServiceTest {
 
     Long storeId = Long.valueOf(1);
     Long commandId = null;
+    Long prodId = Long.valueOf(1);
 
     ProPersitCommandDto persitCommandInformation = new ProPersitCommandDto(
             storeId,
             commandId,
+            prodId,
             LocalDate.now(),
             LocalDate.now().atTime(8,50),
             Arrays.asList(

@@ -2,12 +2,10 @@ package ctoutweb.lalamiam.service;
 
 import ctoutweb.lalamiam.model.dto.AddStoreDto;
 import ctoutweb.lalamiam.model.dto.CreateStoreDto;
-import ctoutweb.lalamiam.repository.entity.ProductEntity;
 import ctoutweb.lalamiam.repository.entity.StoreDayScheduleEntity;
 import ctoutweb.lalamiam.repository.entity.StoreEntity;
 import ctoutweb.lalamiam.repository.entity.WeekDayEntity;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -41,5 +39,12 @@ public interface StoreService {
    * @return
    * @throws Exception
    */
-  public List<LocalDateTime> findStorSlotsWithoutConstraintByDay(LocalDateTime startOfCommandDay, Integer storeFrequenceSlotTime);
+  public List<LocalDateTime> findStoreSlotsWithoutConstraintByDay(LocalDateTime startOfCommandDay, Integer storeFrequenceSlotTime);
+
+  /**
+   * Récuperation des identifiant des commerces d'un Pro
+   * @param proId Long - Identifiant pro
+   * @return List<Long>
+   */
+  public List<Long> getAllStoreByPro(Long proId);
 }

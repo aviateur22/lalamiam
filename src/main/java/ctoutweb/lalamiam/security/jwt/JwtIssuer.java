@@ -28,7 +28,7 @@ public class JwtIssuer {
   }
 
   public JwtIssue issue(UserPrincipal user) {
-    Instant expiredAt = Instant.now().plus(Duration.ofHours(6));
+    Instant expiredAt = Instant.now().plus(Duration.ofHours(12));
     byte[] timeNow = ("time now" +" " + System.currentTimeMillis()).getBytes();
     String jwtId = UUID.nameUUIDFromBytes(timeNow).toString();
 

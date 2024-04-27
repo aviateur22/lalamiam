@@ -12,6 +12,7 @@ import java.util.List;
 public record ProPersitCommandDto(
         Long storeId,
         Long commandId,
+        Long proId,
         LocalDate commandDate,
         LocalDateTime consultationDate,
         List<ProductWithQuantity> selectProducts,

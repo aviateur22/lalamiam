@@ -217,7 +217,7 @@ ALTER TABLE sc_lalamiam.status ALTER COLUMN id SET DEFAULT NEXTVAL('sc_lalamiam.
 
 INSERT INTO sc_lalamiam.week_day ("id", "day_text") values (1, 'monday'), (2, 'tuesday'),  (3, 'wenesday'), (4, 'thrurday'),(5, 'friday'), (6, 'staurday'), (7, 'sunday');
 INSERT INTO sc_lalamiam.role ("id", "name") values
- (1, 'ROLE_USER'),
+ (1, 'ROLE_CLIENT'),
  (2, 'ROLE_EMPLOYE'),
  (3, 'ROLE_PRO'),
  (4, 'ROLE_ADMIN');

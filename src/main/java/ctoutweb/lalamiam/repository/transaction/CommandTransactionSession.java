@@ -151,7 +151,6 @@ public class CommandTransactionSession  {
     commandInformationToSave.setCommandProducts(selectCommandProducts);
     return commandInformationToSave;
   }
-
   @Transactional
   public CommandEntity saveClientCommand(CommandInformationToSave commandInformation, Long clientId) {
 

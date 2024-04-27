@@ -1,84 +1,97 @@
 package ctoutweb.lalamiam.controller;
 
 import ctoutweb.lalamiam.exception.ClientException;
+import ctoutweb.lalamiam.helper.ClientHelper;
 import ctoutweb.lalamiam.model.dto.ClientPersitCommandDto;
 import ctoutweb.lalamiam.model.dto.RegisterCommandDto;
 import ctoutweb.lalamiam.model.dto.StoreProductsInformationDto;
 
-import ctoutweb.lalamiam.security.authentication.UserPrincipal;
 import ctoutweb.lalamiam.service.NewCommandService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
+
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-
 @RestController
-@RequestMapping("api/v1/client/command")
+@RequestMapping("api/v1/client")
 public class ClientController {
   private final NewCommandService commandService;
+  private final ClientHelper clientHelper;
 
-  public ClientController(NewCommandService commandService) {
+  public ClientController(NewCommandService commandService, ClientHelper clientHelper) {
     this.commandService = commandService;
+    this.clientHelper = clientHelper;
   }
 
-  @GetMapping("/create/store/{storeId}")
-  ResponseEntity<StoreProductsInformationDto> createCommand(@PathVariable Long storeId) {
-    StoreProductsInformationDto addCommand = commandService.createCommand(storeId);
+  @GetMapping("/command/client-id/{clientId}/store-id/{storeId}/get-store-product-to-create-command")
+  ResponseEntity<StoreProductsInformationDto> getStoreProductToCreateCommand(
+          @PathVariable Long storeId,
+          @PathVariable Long clientId
+  ) {
+    // Validation clientId Versus JWT
+    if(!clientHelper.isUserIdEqualToJwtUserId(clientId))
+      throw new ClientException("Vous ne pouvez pas créer cette commande", HttpStatus.FORBIDDEN);
+
+    StoreProductsInformationDto addCommand = commandService.getStoreProductToCreateCommand(storeId);
     return new ResponseEntity<>(addCommand, HttpStatus.OK);
   }
 
-  @GetMapping("/client-id/{clientId}/store/{storeId}/command/{commandId}")
-  ResponseEntity<RegisterCommandDto> getCommand(@PathVariable Long storeId, @PathVariable Long clientId, @PathVariable Long commandId) {
+  @GetMapping("/command/client-id/{clientId}/store-id/{storeId}/command-id/{commandId}/get-store-product-to-update-command")
+  ResponseEntity<StoreProductsInformationDto> getStoreProductToUpdateCommand(
+          @PathVariable Long clientId,
+          @PathVariable Long storeId,
+          @PathVariable Long commandId
+  ) {
+    // Validation clientId Versus JWT
+    if(!clientHelper.isUserIdEqualToJwtUserId(clientId))
+      throw new ClientException("Vous ne pouvez pas acceder à cette commande", HttpStatus.FORBIDDEN);
 
-    validateClient(clientId);
+    if(!clientHelper.isCommandBelondToUser(clientId, commandId))
+      throw new ClientException("Vous n'êtes pas rattaché à cette commande", HttpStatus.FORBIDDEN);
+
+    return new ResponseEntity<>(commandService.getStoreProductToUpdateCommand(storeId, commandId), HttpStatus.OK);
+  }
+
+  @GetMapping("/command/client-id/{clientId}/store-id/{storeId}/command-id/{commandId}")
+  ResponseEntity<RegisterCommandDto> getCommand(
+          @PathVariable Long storeId,
+          @PathVariable Long clientId,
+          @PathVariable Long commandId
+  ) {
+
+    // Validation clientId Versus JWT
+    if(!clientHelper.isUserIdEqualToJwtUserId(clientId))
+      throw new ClientException("Vous ne pouvez pas acceder à cette commande", HttpStatus.FORBIDDEN);
+
+    // Validation rattachement commande - client
+    if(!clientHelper.isCommandBelondToUser(clientId, commandId))
+      throw new ClientException("Vous n'êtes pas rattaché à cette commande", HttpStatus.FORBIDDEN);
 
     return new ResponseEntity<>(commandService.getCommand(storeId, commandId), HttpStatus.OK);
   }
 
-  @PostMapping("/persist-command")
+  @PostMapping("/command/persist-command")
   ResponseEntity<RegisterCommandDto> persistCommand(@RequestBody ClientPersitCommandDto persitCommandInformation) {
-    validateClient(persitCommandInformation.clientId());
 
-    if(persitCommandInformation.commandId() != null) {
-      validateCommandUpdate(persitCommandInformation);
+    Long clientId = persitCommandInformation.clientId();
+    Long commandId = persitCommandInformation.commandId();
+
+    // Validation clientId Versus JWT
+    if(!clientHelper.isUserIdEqualToJwtUserId(clientId))
+      throw new ClientException("Vous ne pouvez pas acceder à cette commande", HttpStatus.FORBIDDEN);
+
+    // Verification si heure de mofication valide
+    if(commandId != null) {
+      // Validation rattachement commande - client
+      if(!clientHelper.isCommandBelondToUser(clientId, commandId))
+        throw new ClientException("Vous n'êtes pas rattaché à cette commande", HttpStatus.FORBIDDEN);
+
+      // Validation heure de modification de la commande
+      if(!clientHelper.isTimeValidadBeforeUpdateCommand(persitCommandInformation))
+        throw new ClientException("Vous ne pouvez plus mettre à jour cette commande", HttpStatus.BAD_REQUEST);
     }
+
     return new ResponseEntity<>(commandService.clientPersistCommand(persitCommandInformation), HttpStatus.OK);
   }
 
-  /**
-   * Valide Le client entre Id du JWT et Id present dans le controller
-   * @param clientId Long - identifiant client
-   */
-  private void validateClient(Long clientId) {
-    // Todo faire test unitaire
-    UserPrincipal userFromJwt = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-    if(!userFromJwt.getId().equals(clientId))
-      throw new ClientException("Vous ne pouvez pas acceder à cette commande", HttpStatus.FORBIDDEN);
-  }
-
-  /**
-   * Vérification si commande peut être mise à jour
-   * @param clientPersitCommand ClientPersitCommandDto
-   */
-  private void validateCommandUpdate(ClientPersitCommandDto clientPersitCommand) {
-    // Todo faire test
-
-    // Récupération des anciennes données de la commande.
-    RegisterCommandDto oldCommandInformation = commandService.getCommand(
-            clientPersitCommand.storeId(),
-            clientPersitCommand.commandId());
-
-    int oldPreparationtime = oldCommandInformation.getCalculatedCommandInformation().getCommandPreparationTime();
-    LocalDateTime oldSelectSlotTime = oldCommandInformation.getManualCommandInformation().getSlotTime();
-
-    // Une commande ne peut plus être modifié par un client 5 min avant le debut de préparation
-    LocalDateTime updateLimitTime = oldSelectSlotTime.minusMinutes(oldPreparationtime + 5);
-
-    // Si heure de modification valide
-    if(LocalDateTime.now().isAfter(updateLimitTime))
-      throw new ClientException("Vous ne pouvez plus mettre à jour cette commande", HttpStatus.BAD_REQUEST);
-  }
 }

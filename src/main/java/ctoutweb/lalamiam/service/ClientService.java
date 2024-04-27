@@ -11,4 +11,5 @@ public interface ClientService {
    * @return Optional<UserEntity>
    */
   public Optional<UserEntity> findClient(Long clientId);
+
 }
