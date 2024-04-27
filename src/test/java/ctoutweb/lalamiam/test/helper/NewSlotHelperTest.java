@@ -9,7 +9,6 @@ import ctoutweb.lalamiam.service.StoreService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -46,7 +45,7 @@ public class NewSlotHelperTest {
     when(storeService.findStoreById(any(Long.class))).thenReturn(fakeStore);
 
     // Mock List<LocalDateTime> SlotsWithoutConstraintByDay
-    when(storeService.findStorSlotsWithoutConstraintByDay(
+    when(storeService.findStoreSlotsWithoutConstraintByDay(
             any(LocalDateTime.class),
             eq(fakeStore.getFrequenceSlotTime()))
     ).thenReturn(getFakeStoreSlotsWithoutConstraintByDay(fakeStore.getFrequenceSlotTime(),mondayDate.atStartOfDay()));
@@ -88,7 +87,7 @@ public class NewSlotHelperTest {
     when(storeService.findStoreById(any(Long.class))).thenReturn(fakeStore);
 
     // Mock List<LocalDateTime> SlotsWithoutConstraintByDay
-    when(storeService.findStorSlotsWithoutConstraintByDay(
+    when(storeService.findStoreSlotsWithoutConstraintByDay(
             any(LocalDateTime.class),
             eq(fakeStore.getFrequenceSlotTime()))
     ).thenReturn(getFakeStoreSlotsWithoutConstraintByDay(fakeStore.getFrequenceSlotTime(),mondayDate.atStartOfDay()));
@@ -137,7 +136,7 @@ public class NewSlotHelperTest {
     when(storeService.findStoreById(any(Long.class))).thenReturn(fakeStore);
 
     // Mock List<LocalDateTime> SlotsWithoutConstraintByDay
-    when(storeService.findStorSlotsWithoutConstraintByDay(
+    when(storeService.findStoreSlotsWithoutConstraintByDay(
             any(LocalDateTime.class),
             eq(fakeStore.getFrequenceSlotTime()))
     ).thenReturn(getFakeStoreSlotsWithoutConstraintByDay(fakeStore.getFrequenceSlotTime(),mondayDate.atStartOfDay()));
@@ -179,7 +178,7 @@ public class NewSlotHelperTest {
     when(storeService.findStoreById(any(Long.class))).thenReturn(fakeStore);
 
     // Mock List<LocalDateTime> SlotsWithoutConstraintByDay
-    when(storeService.findStorSlotsWithoutConstraintByDay(
+    when(storeService.findStoreSlotsWithoutConstraintByDay(
             any(LocalDateTime.class),
             eq(fakeStore.getFrequenceSlotTime()))
     ).thenReturn(getFakeStoreSlotsWithoutConstraintByDay(fakeStore.getFrequenceSlotTime(),mondayDate.atStartOfDay()));
@@ -228,7 +227,7 @@ public class NewSlotHelperTest {
     when(storeService.findStoreById(any(Long.class))).thenReturn(fakeStore);
 
     // Mock List<LocalDateTime> SlotsWithoutConstraintByDay
-    when(storeService.findStorSlotsWithoutConstraintByDay(
+    when(storeService.findStoreSlotsWithoutConstraintByDay(
             any(LocalDateTime.class),
             eq(fakeStore.getFrequenceSlotTime()))
     ).thenReturn(getFakeStoreSlotsWithoutConstraintByDay(fakeStore.getFrequenceSlotTime(),mondayDate.atStartOfDay()));
@@ -277,7 +276,7 @@ public class NewSlotHelperTest {
     when(storeService.findStoreById(any(Long.class))).thenReturn(fakeStore);
 
     // Mock List<LocalDateTime> SlotsWithoutConstraintByDay
-    when(storeService.findStorSlotsWithoutConstraintByDay(
+    when(storeService.findStoreSlotsWithoutConstraintByDay(
             any(LocalDateTime.class),
             eq(fakeStore.getFrequenceSlotTime()))
     ).thenReturn(getFakeStoreSlotsWithoutConstraintByDay(fakeStore.getFrequenceSlotTime(),mondayDate.atStartOfDay()));

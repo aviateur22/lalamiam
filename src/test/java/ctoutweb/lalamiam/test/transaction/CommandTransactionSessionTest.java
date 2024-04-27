@@ -5,13 +5,14 @@ import ctoutweb.lalamiam.mapper.CommandProductListMapper;
 import ctoutweb.lalamiam.model.CommandInformationToSave;
 import ctoutweb.lalamiam.model.CommandInformationToUpdate;
 import ctoutweb.lalamiam.model.ProductWithQuantity;
+import ctoutweb.lalamiam.repository.ClientCommandRepository;
 import ctoutweb.lalamiam.repository.CommandProductRepository;
 import ctoutweb.lalamiam.repository.CommandRepository;
 import ctoutweb.lalamiam.repository.entity.CommandEntity;
 import ctoutweb.lalamiam.repository.entity.CommandProductEntity;
 import ctoutweb.lalamiam.repository.entity.ProductEntity;
 import ctoutweb.lalamiam.repository.transaction.CommandTransactionSession;
-import ctoutweb.lalamiam.service.ProductService;
+import ctoutweb.lalamiam.service.ClientService;
 import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -58,6 +59,8 @@ public class CommandTransactionSessionTest {
     EntityManagerFactory entityManagerFactory = mock(EntityManagerFactory.class);
     CommandProductRepository commandProductRepository = mock(CommandProductRepository.class);
     CommandRepository commandRepository = mock(CommandRepository.class);
+    ClientService clientService = mock(ClientService.class);
+    ClientCommandRepository clientCommandRepository = mock(ClientCommandRepository.class);
 
     // Spy CommandTransactionSession
     CommandTransactionSession commandTransactionSessionSpy = spy( new CommandTransactionSession
@@ -65,7 +68,9 @@ public class CommandTransactionSessionTest {
         commandProductRepository,
         commandRepository,
         entityManagerFactory,
-        commandProductListMapper)
+        commandProductListMapper,
+        clientCommandRepository,
+        clientService)
     );
 
     doReturn(fakeFindCommand(commandId, storeId)).when(commandTransactionSessionSpy).getCommand(commandId);
@@ -112,6 +117,8 @@ public class CommandTransactionSessionTest {
     EntityManagerFactory entityManagerFactory = mock(EntityManagerFactory.class);
     CommandProductRepository commandProductRepository = mock(CommandProductRepository.class);
     CommandRepository commandRepository = mock(CommandRepository.class);
+    ClientService clientService = mock(ClientService.class);
+    ClientCommandRepository clientCommandRepository = mock(ClientCommandRepository.class);
 
     // Spy CommandTransactionSession
     CommandTransactionSession commandTransactionSessionSpy = spy( new CommandTransactionSession
@@ -119,7 +126,9 @@ public class CommandTransactionSessionTest {
                     commandProductRepository,
                     commandRepository,
                     entityManagerFactory,
-                    commandProductListMapper)
+                    commandProductListMapper,
+                    clientCommandRepository,
+                    clientService)
     );
 
     // Renvoir une commande qui n'existe pas
@@ -160,6 +169,8 @@ public class CommandTransactionSessionTest {
     EntityManagerFactory entityManagerFactory = mock(EntityManagerFactory.class);
     CommandProductRepository commandProductRepository = mock(CommandProductRepository.class);
     CommandRepository commandRepository = mock(CommandRepository.class);
+    ClientService clientService = mock(ClientService.class);
+    ClientCommandRepository clientCommandRepository = mock(ClientCommandRepository.class);
 
     // Spy CommandTransactionSession
     CommandTransactionSession commandTransactionSessionSpy = spy( new CommandTransactionSession
@@ -167,7 +178,9 @@ public class CommandTransactionSessionTest {
                     commandProductRepository,
                     commandRepository,
                     entityManagerFactory,
-                    commandProductListMapper)
+                    commandProductListMapper,
+                    clientCommandRepository,
+                    clientService)
     );
 
     doReturn(fakeFindCommand(commandId, Long.valueOf(2))).when(commandTransactionSessionSpy).getCommand(commandId);
@@ -213,12 +226,17 @@ public class CommandTransactionSessionTest {
     CommandRepository commandRepository = mock(CommandRepository.class);
     when(commandRepository.save(any(CommandEntity.class))).thenReturn(fakeSaveCommand(commandInformationToSave));
 
+    ClientService clientService = mock(ClientService.class);
+    ClientCommandRepository clientCommandRepository = mock(ClientCommandRepository.class);
+
     // Spy CommandTransactionSession
     CommandTransactionSession commandTransactionSessionSpy = spy( new CommandTransactionSession(
       commandProductRepository,
       commandRepository,
       entityManagerFactory,
-      commandProductListMapper));
+      commandProductListMapper,
+            clientCommandRepository,
+            clientService));
 
 
     CommandEntity savedCommand = commandTransactionSessionSpy.saveCommand(commandInformationToSave);

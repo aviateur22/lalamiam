@@ -1,11 +1,11 @@
 package ctoutweb.lalamiam.service.serviceImpl;
 
+import ctoutweb.lalamiam.factory.Factory;
 import ctoutweb.lalamiam.model.dto.AddStoreDto;
 import ctoutweb.lalamiam.model.dto.CreateStoreDto;
 import ctoutweb.lalamiam.repository.ProductRepository;
 import ctoutweb.lalamiam.repository.StoreDayScheduleRepository;
 import ctoutweb.lalamiam.repository.StoreRepository;
-import ctoutweb.lalamiam.repository.entity.ProductEntity;
 import ctoutweb.lalamiam.repository.entity.StoreDayScheduleEntity;
 import ctoutweb.lalamiam.repository.entity.StoreEntity;
 import ctoutweb.lalamiam.repository.entity.WeekDayEntity;
@@ -15,7 +15,9 @@ import ctoutweb.lalamiam.util.CommonFunction;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -66,7 +68,7 @@ public class StoreServiceImp implements StoreService {
   }
 
   @Override
-  public List<LocalDateTime> findStorSlotsWithoutConstraintByDay(LocalDateTime startOfCommandDay, Integer storeFrequenceSlot) {
+  public List<LocalDateTime> findStoreSlotsWithoutConstraintByDay(LocalDateTime startOfCommandDay, Integer storeFrequenceSlot) {
     //todo faire test unitaire
 
     // Nombre de Slots disponible sur 24h pour le commerce
@@ -78,6 +80,18 @@ public class StoreServiceImp implements StoreService {
     )
     .limit(slotAvailibilityInOneDay)
     .toList();
+  }
+
+  @Override
+  public List<Long> getAllStoreByPro(Long proId) {
+
+    // Liste des commerce
+    List<StoreEntity> stores = storeRepository.findAllByPro(Factory.getUSer(proId));
+
+    if(!stores.isEmpty())
+      return stores.stream().map(StoreEntity::getId).collect(Collectors.toList());
+
+    return Collections.emptyList();
   }
 
   /**

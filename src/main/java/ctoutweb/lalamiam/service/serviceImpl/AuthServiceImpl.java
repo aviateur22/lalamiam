@@ -13,14 +13,17 @@ import ctoutweb.lalamiam.security.authentication.UserPrincipal;
 import ctoutweb.lalamiam.security.jwt.JwtIssuer;
 import ctoutweb.lalamiam.service.AuthService;
 import ctoutweb.lalamiam.service.JwtService;
+import ctoutweb.lalamiam.service.StoreService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -55,7 +58,11 @@ public class AuthServiceImpl implements AuthService {
     SecurityContextHolder.getContext().setAuthentication(auth);
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
 
-    // JWT
+    // Vérification si Pro
+    boolean isUserPro = userPrincipal.getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority)
+            .anyMatch(authority -> authority.equals("ROLE_PRO"));
+
     JwtIssue jwtIssue = jwtIssuer.issue(userPrincipal);
     jwtService.saveJwt(userPrincipal.getId(), jwtIssue);
 

@@ -3,7 +3,6 @@ package ctoutweb.lalamiam.service;
 import ctoutweb.lalamiam.model.dto.*;
 import ctoutweb.lalamiam.repository.entity.CommandEntity;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -35,15 +34,20 @@ public interface Command {
   /**
    * Validation d'un créneaux
    * @param commandInformation CommandInformationDto - Information sur la commande
-   * @param selectSlotTime LocalDateTime - Créneau choisi pour la cammande
    */
-  void validateSlot(CommandInformationDto commandInformation, LocalDateTime selectSlotTime);
+  void validateSlot(CommandInformationDto commandInformation);
 
   /**
    * Controle et persistance de la commande
    * @param persitCommand PersitCommandDto - Données pour enregistrée une commande
    * @return RegisterCommandDto
    */
-  RegisterCommandDto persistCommand(PersitCommandDto persitCommand);
+  RegisterCommandDto proPersistCommand(ProPersitCommandDto persitCommand);
 
+  /**
+   * Controle et persistance de la commande faite par un client
+   * @param persitCommand persitCommand PersitCommandDto - Données pour enregistrée une commande
+   * @return RegisterCommandDto
+   */
+  RegisterCommandDto clientPersistCommand(ClientPersitCommandDto persitCommand);
 }

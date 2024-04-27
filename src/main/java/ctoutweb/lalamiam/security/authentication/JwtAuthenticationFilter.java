@@ -47,8 +47,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
           return decodedJWTMap.get("decodeJwt");
         })
         .map(decodeJwt-> validateJwt())
-        .map(decodeJwt-> jwtToUserPrincipal.convert(decodeJwt))
-        .map(userPrincipal-> Factory.getUserPrincipalFromUserAuthToken(userPrincipal))
+        .map(jwtToUserPrincipal::convert)
+        .map(Factory::getUserPrincipalFromUserAuthToken)
         .ifPresentOrElse(auth-> SecurityContextHolder.getContext().setAuthentication(auth), () -> {
           throw new AuthException("echec validation JWT", HttpStatus.FORBIDDEN);
         });

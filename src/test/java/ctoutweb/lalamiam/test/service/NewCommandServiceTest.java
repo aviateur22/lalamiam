@@ -56,7 +56,7 @@ public class NewCommandServiceTest {
     doReturn(getFakeStoreProductsInformation()).when(commandServiceImpSpy).getStoreProductsForCommand(any(Long.class),any(CommandEntity.class));
 
     //
-    StoreProductsInformationDto storeProductInformation = commandServiceImpSpy.updateCommand(storeId, commandId);
+    StoreProductsInformationDto storeProductInformation = commandServiceImpSpy.getStoreProductToUpdateCommand(storeId, commandId);
 
     Assertions.assertNotNull(storeProductInformation);
     Assertions.assertEquals("0623225100", storeProductInformation.clientPhone());
@@ -89,7 +89,7 @@ public class NewCommandServiceTest {
 
     doReturn(getFakeStoreProductsInformation()).when(commandServiceImpSpy).getStoreProductsForCommand(any(Long.class),any(CommandEntity.class));
 
-    Exception exception = Assertions.assertThrows(CommandException.class, ()-> commandServiceImpSpy.updateCommand(storeId, commandId));
+    Exception exception = Assertions.assertThrows(CommandException.class, ()-> commandServiceImpSpy.getStoreProductToUpdateCommand(storeId, commandId));
     Assertions.assertEquals("La commande à mettre à jour n'existe pas", exception.getMessage());
   }
   @Test
@@ -118,7 +118,7 @@ public class NewCommandServiceTest {
     doReturn(getFakeStoreProductsInformation()).when(commandServiceImpSpy).getStoreProductsForCommand(any(Long.class),any(CommandEntity.class));
 
     //
-    Exception exception = Assertions.assertThrows(CommandException.class, ()-> commandServiceImpSpy.updateCommand(storeId, commandId));
+    Exception exception = Assertions.assertThrows(CommandException.class, ()-> commandServiceImpSpy.getStoreProductToUpdateCommand(storeId, commandId));
     Assertions.assertEquals("Cette commande n'est pas rattaché au commerce", exception.getMessage());
   }
   @Test
@@ -787,7 +787,8 @@ public class NewCommandServiceTest {
             commandId,
             commandDate,
             consulationDate,
-            getFakeProductWithQuantityList()
+            getFakeProductWithQuantityList(),
+            null
     );
 
     // Mock StoreService
@@ -795,7 +796,7 @@ public class NewCommandServiceTest {
     when(storeService.findStoreById(any(Long.class))).thenReturn(getFakeStore(storeId));
     when(storeService.findStoreSchedulesByDay(any(StoreEntity.class), any(WeekDayEntity.class)))
             .thenReturn(getFakeDoubleStoreSchedule(weekDay, getFakeStore(storeId)));
-    when(storeService.findStorSlotsWithoutConstraintByDay(any(LocalDateTime.class), any(Integer.class)))
+    when(storeService.findStoreSlotsWithoutConstraintByDay(any(LocalDateTime.class), any(Integer.class)))
             .thenReturn(getFakeStoreSlotsWithoutConstraintByDay(getFakeStore(storeId).getFrequenceSlotTime(), commandDate.atStartOfDay()));
 
     // Mock NewStoreServiceHelper
@@ -839,6 +840,7 @@ public class NewCommandServiceTest {
     WeekDayEntity weekDay = new WeekDayEntity(1);
     LocalDate commandDate = getNextRequestDate(weekDay.getId());
     LocalDateTime consulationDate = commandDate.atTime(15,30,0);
+    LocalDateTime selectSlotTime = commandDate.atTime(17,30,0);
 
     // Données pour rechercher les SLOTs
     CommandInformationDto storeSlotInformation = new CommandInformationDto(
@@ -846,7 +848,8 @@ public class NewCommandServiceTest {
             commandId,
             commandDate,
             consulationDate,
-            getFakeProductWithQuantityList()
+            getFakeProductWithQuantityList(),
+            selectSlotTime
     );
 
     // Mock StoreService
@@ -854,7 +857,7 @@ public class NewCommandServiceTest {
     when(storeService.findStoreById(any(Long.class))).thenReturn(getFakeStore(storeId));
     when(storeService.findStoreSchedulesByDay(any(StoreEntity.class), any(WeekDayEntity.class)))
             .thenReturn(getFakeDoubleStoreSchedule(weekDay, getFakeStore(storeId)));
-    when(storeService.findStorSlotsWithoutConstraintByDay(any(LocalDateTime.class), any(Integer.class)))
+    when(storeService.findStoreSlotsWithoutConstraintByDay(any(LocalDateTime.class), any(Integer.class)))
             .thenReturn(getFakeStoreSlotsWithoutConstraintByDay(getFakeStore(storeId).getFrequenceSlotTime(), commandDate.atStartOfDay()));
 
     // Mock NewStoreServiceHelper
@@ -912,7 +915,8 @@ public class NewCommandServiceTest {
             commandId,
             commandDate,
             consulationDate,
-            getFakeProductWithQuantityList()
+            getFakeProductWithQuantityList(),
+            null
     );
 
     // Mock StoreService
@@ -920,7 +924,7 @@ public class NewCommandServiceTest {
     when(storeService.findStoreById(any(Long.class))).thenReturn(getFakeStore(storeId));
     when(storeService.findStoreSchedulesByDay(any(StoreEntity.class), any(WeekDayEntity.class)))
             .thenReturn(getFakeDoubleStoreSchedule(weekDay, getFakeStore(storeId)));
-    when(storeService.findStorSlotsWithoutConstraintByDay(any(LocalDateTime.class), any(Integer.class)))
+    when(storeService.findStoreSlotsWithoutConstraintByDay(any(LocalDateTime.class), any(Integer.class)))
             .thenReturn(getFakeStoreSlotsWithoutConstraintByDay(getFakeStore(storeId).getFrequenceSlotTime(), commandDate.atStartOfDay()));
 
     // Mock NewStoreServiceHelper
@@ -964,6 +968,7 @@ public class NewCommandServiceTest {
     WeekDayEntity weekDay = new WeekDayEntity(1);
     LocalDateTime consulationDate = getNextRequestDate(weekDay.getId()).atTime(15,0);
     LocalDate commandDate = consulationDate.plusDays(1).toLocalDate();
+    LocalDateTime selectSlotTime = commandDate.atTime(17,30,0);
 
     // Données pour rechercher les SLOTs
     CommandInformationDto storeSlotInformation = new CommandInformationDto(
@@ -971,7 +976,8 @@ public class NewCommandServiceTest {
             commandId,
             commandDate,
             consulationDate,
-            getFakeProductWithQuantityList()
+            getFakeProductWithQuantityList(),
+            selectSlotTime
     );
 
     // Mock StoreService
@@ -979,7 +985,7 @@ public class NewCommandServiceTest {
     when(storeService.findStoreById(any(Long.class))).thenReturn(getFakeStore(storeId));
     when(storeService.findStoreSchedulesByDay(any(StoreEntity.class), any(WeekDayEntity.class)))
             .thenReturn(getFakeDoubleStoreSchedule(weekDay, getFakeStore(storeId)));
-    when(storeService.findStorSlotsWithoutConstraintByDay(any(LocalDateTime.class), any(Integer.class)))
+    when(storeService.findStoreSlotsWithoutConstraintByDay(any(LocalDateTime.class), any(Integer.class)))
             .thenReturn(getFakeStoreSlotsWithoutConstraintByDay(getFakeStore(storeId).getFrequenceSlotTime(), commandDate.atStartOfDay()));
 
     // Mock NewStoreServiceHelper
@@ -1030,7 +1036,8 @@ public class NewCommandServiceTest {
             Long.valueOf(1),
             LocalDate.now(),
             LocalDateTime.now(),
-            Arrays.asList()
+            Arrays.asList(),
+            LocalDateTime.now().plusMinutes(55)
     );
 
     CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
@@ -1048,7 +1055,7 @@ public class NewCommandServiceTest {
             slotHelper));
     doReturn(getFakeSlotAvailibility(commandInformation.commandDate())).when(commandServiceImpSpy).getStoreSlotAvailibility(commandInformation);
 
-    commandServiceImpSpy.validateSlot(commandInformation, selectSlot );
+    commandServiceImpSpy.validateSlot(commandInformation);
     verify(commandServiceImpSpy, times(1)).getStoreSlotAvailibility(any(CommandInformationDto.class));
 
   }
@@ -1060,7 +1067,9 @@ public class NewCommandServiceTest {
             Long.valueOf(1),
             LocalDate.now(),
             LocalDateTime.now(),
-            Arrays.asList()
+            Arrays.asList(),
+            LocalDateTime.now().plusMinutes(55)
+
     );
 
     CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
@@ -1078,8 +1087,8 @@ public class NewCommandServiceTest {
             slotHelper));
     doReturn(getFakeSlotAvailibility(commandInformation.commandDate())).when(commandServiceImpSpy).getStoreSlotAvailibility(commandInformation);
 
-    //commandServiceImpSpy.validateSlot(commandInformation, selectSlot );
-    Exception exception = Assertions.assertThrows(CommandException.class, ()->commandServiceImpSpy.validateSlot(commandInformation, selectSlot));
+    //commandServiceImpSpy.validateSlot(commandInformation, selectSlotTime );
+    Exception exception = Assertions.assertThrows(CommandException.class, ()->commandServiceImpSpy.validateSlot(commandInformation));
     verify(commandServiceImpSpy, times(1)).getStoreSlotAvailibility(any(CommandInformationDto.class));
     Assertions.assertEquals("Le créneau demandé n'est plus disponible", exception.getMessage());
   }
@@ -1088,10 +1097,12 @@ public class NewCommandServiceTest {
 
     Long storeId = Long.valueOf(1);
     Long commandId = null;
+    Long prodId = Long.valueOf(1);
 
-    PersitCommandDto persitCommandInformation = new PersitCommandDto(
+    ProPersitCommandDto persitCommandInformation = new ProPersitCommandDto(
             storeId,
             commandId,
+            prodId,
             LocalDate.now(),
             LocalDate.now().atTime(8,50),
             Arrays.asList(
@@ -1155,11 +1166,12 @@ public class NewCommandServiceTest {
             persitCommandInformation.commandId(),
             persitCommandInformation.commandDate(),
             persitCommandInformation.consultationDate(),
-            persitCommandInformation.selectProducts());
+            persitCommandInformation.selectProducts(),
+            persitCommandInformation.selectSlotTime());
 
     doReturn(getFakeSlotAvailibility(LocalDate.now())).when(commandServiceImpSpy).getStoreSlotAvailibility(any(CommandInformationDto.class));
 
-    RegisterCommandDto registerCommand = commandServiceImpSpy.persistCommand(persitCommandInformation);
+    RegisterCommandDto registerCommand = commandServiceImpSpy.proPersistCommand(persitCommandInformation);
  //   verify(commandServiceImpSpy, times(1)).validateProductsSelection(any(Long.class), any(Long.class), any(ProductSelectInformationDto.class));
 
     Assertions.assertNotNull(registerCommand);

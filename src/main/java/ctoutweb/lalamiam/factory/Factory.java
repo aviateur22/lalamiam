@@ -107,6 +107,8 @@ public class Factory {
     RegisterCommandDto registerCommand = new RegisterCommandDto();
     registerCommand.setStoreId(command.getStore().getId());
     registerCommand.setCommandId(command.getId());
+    registerCommand.setCommandStatus(command.getCommandStatus().getId());
+    registerCommand.setPreparedBy(command.getPreparedBy() == null ? null : command.getPreparedBy().getName());
     registerCommand.setManualCommandInformation(manualCommandInformation);
     registerCommand.setCalculatedCommandInformation(calculatedCommandInformation);
     return registerCommand;
@@ -140,9 +142,10 @@ public class Factory {
           Long commandId,
           LocalDate commandDate,
           LocalDateTime consulationDate,
-          List<ProductWithQuantity> selectProductsWithQuantity
+          List<ProductWithQuantity> selectProductsWithQuantity,
+          LocalDateTime selectSlotTime
   ) {
-    return new CommandInformationDto(storeId, commandId, commandDate, consulationDate, selectProductsWithQuantity);
+    return new CommandInformationDto(storeId, commandId, commandDate, consulationDate, selectProductsWithQuantity, selectSlotTime);
   }
 
   /**
@@ -164,11 +167,36 @@ public class Factory {
    * @return CommandInformationToUpdate
    */
   public static CommandInformationToUpdate getCommandInformationToUpdate(
-          PersitCommandDto persistInformationToUpdate,
+          ProPersitCommandDto persistInformationToUpdate,
           Integer preparationtime,
           Integer numberOfProductInCommand,
           Double commandPrice
           ){
+    return new CommandInformationToUpdate(
+            persistInformationToUpdate.storeId(),
+            persistInformationToUpdate.commandId(),
+            persistInformationToUpdate.clientPhone(),
+            persistInformationToUpdate.selectProducts(),
+            persistInformationToUpdate.selectSlotTime(),
+            preparationtime,
+            numberOfProductInCommand,
+            commandPrice);
+  }
+
+  /**
+   * Renvoie un CommandInformationToUpdate avec un update par un client
+   * @param persistInformationToUpdate
+   * @param preparationtime
+   * @param numberOfProductInCommand
+   * @param commandPrice
+   * @return CommandInformationToUpdate
+   */
+  public static CommandInformationToUpdate getCommandInformationToUpdate(
+          ClientPersitCommandDto persistInformationToUpdate,
+          Integer preparationtime,
+          Integer numberOfProductInCommand,
+          Double commandPrice
+  ){
     return new CommandInformationToUpdate(
             persistInformationToUpdate.storeId(),
             persistInformationToUpdate.commandId(),
@@ -190,12 +218,40 @@ public class Factory {
    * @return CommandInformationToSave
    */
   public static CommandInformationToSave getCommandInformationToSave(
-          PersitCommandDto commandInformationToPersist,
+          ProPersitCommandDto commandInformationToPersist,
           String commandCode,
           Integer preparationtime,
           Integer numberOfProductInCommand,
           Double commandPrice
   ){
+    return new CommandInformationToSave(
+            commandInformationToPersist.storeId(),
+            commandInformationToPersist.clientPhone(),
+            commandInformationToPersist.selectProducts(),
+            commandInformationToPersist.selectSlotTime(),
+            commandCode,
+            preparationtime,
+            numberOfProductInCommand,
+            commandPrice);
+  }
+
+  /**
+   * Renvoie une CommandInformationToSave a partir d'un ClientPersitCommandDto
+   * @param commandInformationToPersist
+   * @param commandCode
+   * @param preparationtime
+   * @param numberOfProductInCommand
+   * @param commandPrice
+   * @return CommandInformationToSave
+   */
+  public static CommandInformationToSave getCommandInformationToSave(
+          ClientPersitCommandDto commandInformationToPersist,
+          String commandCode,
+          Integer preparationtime,
+          Integer numberOfProductInCommand,
+          Double commandPrice
+  ){
+    // Todo test
     return new CommandInformationToSave(
             commandInformationToPersist.storeId(),
             commandInformationToPersist.clientPhone(),
@@ -330,5 +386,14 @@ public class Factory {
                     .collect(Collectors.toList()),
             store.getFrequenceSlotTime()
     );
+  }
+
+  /**
+   * Renvoie un status Waiting pour les commandes
+   * @return StatusEntity
+   */
+  public static StatusEntity getWaitingStatus() {
+    final int waitingstatus = 1;
+    return new StatusEntity(waitingstatus);
   }
 }

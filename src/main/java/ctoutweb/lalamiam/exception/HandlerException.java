@@ -21,4 +21,12 @@ public class HandlerException {
   public ResponseEntity<String> productException(ProductException exception) {
     return new ResponseEntity<>(exception.getMessage(), exception.getHttpStatus());
   }
+  @ExceptionHandler(value = {ClientException.class})
+  public ResponseEntity<String> clientException(ClientException exception) {
+    return new ResponseEntity<>(exception.getMessage(), exception.getStatus());
+  }
+  @ExceptionHandler(value = {ProException.class})
+  public ResponseEntity<String> proException(ProException exception) {
+    return new ResponseEntity<>(exception.getMessage(), exception.getStatus());
+  }
 }

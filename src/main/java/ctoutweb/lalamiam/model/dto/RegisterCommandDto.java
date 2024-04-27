@@ -9,6 +9,8 @@ import ctoutweb.lalamiam.model.ManualCommandInformation;
 public class RegisterCommandDto {
   private Long storeId;
   private Long commandId;
+  private Integer commandStatus;
+  private String preparedBy;
   private ManualCommandInformation manualCommandInformation;
   private CalculatedCommandInformation calculatedCommandInformation;
 
@@ -28,6 +30,22 @@ public class RegisterCommandDto {
 
   public void setCommandId(Long commandId) {
     this.commandId = commandId;
+  }
+
+  public Integer getCommandStatus() {
+    return commandStatus;
+  }
+
+  public void setCommandStatus(Integer commandStatus) {
+    this.commandStatus = commandStatus;
+  }
+
+  public String getPreparedBy() {
+    return preparedBy;
+  }
+
+  public void setPreparedBy(String preparedBy) {
+    this.preparedBy = preparedBy;
   }
 
   public ManualCommandInformation getManualCommandInformation() {

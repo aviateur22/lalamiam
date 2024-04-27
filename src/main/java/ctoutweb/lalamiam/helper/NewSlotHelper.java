@@ -1,5 +1,6 @@
 package ctoutweb.lalamiam.helper;
 
+import ctoutweb.lalamiam.exception.CommandException;
 import ctoutweb.lalamiam.factory.Factory;
 import ctoutweb.lalamiam.repository.entity.CommandEntity;
 import ctoutweb.lalamiam.repository.entity.StoreDayScheduleEntity;
@@ -9,9 +10,9 @@ import ctoutweb.lalamiam.service.StoreService;
 import ctoutweb.lalamiam.util.CommonFunction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,9 +55,11 @@ public class NewSlotHelper {
     // Recherche des horaires du commerce
     List<StoreDayScheduleEntity> storeSchedules = storeService.findStoreSchedulesByDay(store, weekDay);
     LOGGER.info(()->String.format("storeSchedules: %s", storeSchedules));
+    if(storeSchedules == null || storeSchedules.isEmpty())
+      throw new CommandException("Pas de créneau disponible ce jour", HttpStatus.BAD_REQUEST);
 
     // Nombre de Slots disponible sur 24h pour le commerce
-    List<LocalDateTime> slotTimeAvailibilityInOneDay = storeService.findStorSlotsWithoutConstraintByDay(startOfCommandDay, store.getFrequenceSlotTime());
+    List<LocalDateTime> slotTimeAvailibilityInOneDay = storeService.findStoreSlotsWithoutConstraintByDay(startOfCommandDay, store.getFrequenceSlotTime());
     LOGGER.info(()->String.format("slotTimeAvailibilityInOneDay: %s", slotTimeAvailibilityInOneDay));
 
     // Recherhe de slot disponible
