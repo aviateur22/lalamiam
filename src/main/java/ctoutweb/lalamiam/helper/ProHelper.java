@@ -44,7 +44,7 @@ public class ProHelper {
     List<Long> storeIdList = storeService.getAllStoreByPro(proId);
 
     // verifie si la commande est rattaché à l'un des stores
-    Optional<CommandEntity> command = commandRepository.findOneCommandByStoreIn(
+    Optional<CommandEntity> command = commandRepository.findFirstCommandByStoreIn(
             storeIdList
                     .stream()
                     .map(storeId->Factory.getStore(storeId))
@@ -82,10 +82,7 @@ public class ProHelper {
       return false;
 
     // Verification Role en base de donnée
-    if(!findPro.get().getRoles().contains("ROLE_PRO"))
-      return false;
-
-    return true;
+    return !findPro.get().getRoles().stream().map(role->role.getRole()).anyMatch(role->role.equals("ROLE_PRO"));
   }
 
   /**

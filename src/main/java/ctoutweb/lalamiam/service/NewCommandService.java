@@ -1,5 +1,6 @@
 package ctoutweb.lalamiam.service;
 
+import ctoutweb.lalamiam.model.dto.ProUpdateCommandStatusDto;
 import ctoutweb.lalamiam.model.dto.StoreProductsInformationDto;
 import ctoutweb.lalamiam.model.dto.RegisterCommandDto;
 
@@ -27,4 +28,11 @@ public interface NewCommandService extends Command {
    * @return RegisterCommandDto
    */
   RegisterCommandDto getCommand(Long storeId, Long commandId);
+
+  /**
+   * Mise a jour du status d'une commande
+   * @param proUpdateCommandStatus ProUpdateCommandStatusDto
+   * @return StoreProductsInformationDto
+   */
+  RegisterCommandDto updateCommandStatus(ProUpdateCommandStatusDto proUpdateCommandStatus);
 }

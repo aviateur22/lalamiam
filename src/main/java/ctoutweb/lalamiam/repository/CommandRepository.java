@@ -24,7 +24,7 @@ public interface CommandRepository extends JpaRepository<CommandEntity, Long> {
   @Query(value = "select * from sc_lalamiam.command where slot_time between ?1 and ?2 and store_id=?3", nativeQuery = true)
   public List<CommandEntity> findCommandsByStoreIdDate(LocalDateTime startOfDay, LocalDateTime endOfDay, Long storeId);
 
-  public Optional<CommandEntity> findOneCommandByStoreIn(List<StoreEntity> stores);
+  public Optional<CommandEntity> findFirstCommandByStoreIn(List<StoreEntity> stores);
 
 
 

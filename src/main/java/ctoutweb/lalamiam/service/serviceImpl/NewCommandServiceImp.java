@@ -4,6 +4,7 @@ import ctoutweb.lalamiam.exception.CommandException;
 import ctoutweb.lalamiam.factory.Factory;
 import ctoutweb.lalamiam.helper.NewCommandServiceHelper;
 import ctoutweb.lalamiam.helper.NewSlotHelper;
+import ctoutweb.lalamiam.model.CommandStatus;
 import ctoutweb.lalamiam.model.dto.*;
 import ctoutweb.lalamiam.repository.CommandRepository;
 import ctoutweb.lalamiam.repository.entity.CommandEntity;
@@ -20,6 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -79,6 +81,28 @@ public class NewCommandServiceImp implements NewCommandService {
 
     // Recherche d'une commande
     return commandServiceHelper.findRegisterCommandInformation(command);
+  }
+
+  @Override
+  public RegisterCommandDto updateCommandStatus(ProUpdateCommandStatusDto proUpdateCommandStatus) {
+    CommandEntity findCommand = commandRepository.findById(proUpdateCommandStatus.commandId()).orElseThrow(()->
+            new CommandException("La commande à mettre à jour n'existe pas", HttpStatus.NOT_FOUND));
+
+    // Si commande existante alors vérification du storeId
+    if(!findCommand.getStore().getId().equals(proUpdateCommandStatus.storeId()))
+      throw new CommandException("Cette commande n'est pas rattaché au commerce", HttpStatus.BAD_REQUEST);
+
+    // Status valide
+    if(!CommandStatus.isStatusValid(proUpdateCommandStatus.commandStatus()))
+      throw new CommandException("Le statut de la commande n'existe pas", HttpStatus.BAD_REQUEST);
+
+    // Mise à jour de la commande
+    findCommand.setPreparedBy(Factory.getUSer(proUpdateCommandStatus.proId()));
+    findCommand.setCommandStatus(Factory.getCommandStatus(proUpdateCommandStatus.commandStatus()));
+    commandRepository.save(findCommand);
+
+    // Récuperation de la commande
+    return getCommand(proUpdateCommandStatus.storeId(), proUpdateCommandStatus.commandId());
   }
 
   @Override

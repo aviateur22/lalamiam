@@ -389,11 +389,20 @@ public class Factory {
   }
 
   /**
-   * Renvoie un status Waiting pour les commandes
+   * Renvoie le status initial à la création d'une commande
    * @return StatusEntity
    */
   public static StatusEntity getWaitingStatus() {
     final int waitingstatus = 1;
     return new StatusEntity(waitingstatus);
+  }
+
+  /**
+   * Renvoie un status pour les commandes
+   * @param status Ineteger - Status
+   * @return StatusEntity
+   */
+  public static StatusEntity getCommandStatus(Integer status) {
+    return new StatusEntity(status);
   }
 }
