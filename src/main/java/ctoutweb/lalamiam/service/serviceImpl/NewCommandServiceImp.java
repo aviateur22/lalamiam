@@ -21,7 +21,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -92,14 +91,15 @@ public class NewCommandServiceImp implements NewCommandService {
     if(!findCommand.getStore().getId().equals(proUpdateCommandStatus.storeId()))
       throw new CommandException("Cette commande n'est pas rattaché au commerce", HttpStatus.BAD_REQUEST);
 
-    // Status valide
+    // Vérification validité du statut
     if(!CommandStatus.isStatusValid(proUpdateCommandStatus.commandStatus()))
       throw new CommandException("Le statut de la commande n'existe pas", HttpStatus.BAD_REQUEST);
 
-    // Mise à jour de la commande
-    findCommand.setPreparedBy(Factory.getUSer(proUpdateCommandStatus.proId()));
-    findCommand.setCommandStatus(Factory.getCommandStatus(proUpdateCommandStatus.commandStatus()));
-    commandRepository.save(findCommand);
+    // Action faite par un pro
+    final boolean IS_PRO_UPDATE_STATUS = true;
+
+    // Mise a jour du statut et mise a jour du suivi de l'évolution du statut
+    commandTransactionSession.updateCommandStatus(findCommand, proUpdateCommandStatus, IS_PRO_UPDATE_STATUS);
 
     // Récuperation de la commande
     return getCommand(proUpdateCommandStatus.storeId(), proUpdateCommandStatus.commandId());
@@ -216,16 +216,18 @@ public class NewCommandServiceImp implements NewCommandService {
 
     CommandEntity command = persitCommand.commandId() == null ?
 
-      commandTransactionSession.saveCommand(
+      commandTransactionSession.proSaveCommand(
         Factory.getCommandInformationToSave(
           persitCommand,
           commandCode,
           preparationTime,
           numberOfProductInCommand,
-          commandPrice
+          commandPrice,
+          persitCommand.proId()
+
         ))
             :
-      commandTransactionSession.updateCommand(
+      commandTransactionSession.proUpdateCommand(
         Factory.getCommandInformationToUpdate(
           persitCommand,
           preparationTime,
@@ -283,16 +285,16 @@ public class NewCommandServiceImp implements NewCommandService {
 
     CommandEntity command = persitCommand.commandId() == null ?
 
-            commandTransactionSession.saveClientCommand(
+            commandTransactionSession.clientSaveCommand(
                     Factory.getCommandInformationToSave(
                             persitCommand,
                             commandCode,
                             preparationTime,
                             numberOfProductInCommand,
                             commandPrice
-                    ), persitCommand.clientId())
+                    ))
             :
-            commandTransactionSession.updateClientCommand(
+            commandTransactionSession.clientUpdateCommand(
                     Factory.getCommandInformationToUpdate(
                             persitCommand,
                             preparationTime,

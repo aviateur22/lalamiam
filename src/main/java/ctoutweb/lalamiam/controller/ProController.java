@@ -112,6 +112,9 @@ public class ProController {
     Long commandId = proUpdateCommandStatus.commandId();
     Long storeId = proUpdateCommandStatus.storeId();
 
+    // Action mené par un professionel
+    final boolean IS_PRO_ACTION = true;
+
     // Validation professionel
     if(!proHelper.isProfessionalValid(proId))
       throw new ProException("Vous ne pouvez pas acceder à cette commande", HttpStatus.FORBIDDEN);

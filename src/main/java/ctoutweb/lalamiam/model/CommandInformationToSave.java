@@ -17,6 +17,7 @@ import java.util.List;
 public record CommandInformationToSave(
         Long storeId,
         String clientPhone,
+        Long userId,
         List<ProductWithQuantity> selectProducts,
         LocalDateTime slotTime,
         String commandCode,

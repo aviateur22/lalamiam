@@ -70,12 +70,12 @@ public class CommandTransactionSessionTest {
         entityManagerFactory,
         commandProductListMapper,
         clientCommandRepository,
-        clientService)
+        clientService, commandStatusProRepository)
     );
 
     doReturn(fakeFindCommand(commandId, storeId)).when(commandTransactionSessionSpy).getCommand(commandId);
 
-    CommandEntity updateCommand = commandTransactionSessionSpy.updateCommand(updatedCommandInfo);
+    CommandEntity updateCommand = commandTransactionSessionSpy.proUpdateCommand(updatedCommandInfo);
 
     Assertions.assertEquals(updateCommand.getId(), updatedCommandInfo.commandId());
     Assertions.assertEquals(updateCommand.getStore().getId(), updatedCommandInfo.storeId());
@@ -128,13 +128,13 @@ public class CommandTransactionSessionTest {
                     entityManagerFactory,
                     commandProductListMapper,
                     clientCommandRepository,
-                    clientService)
+                    clientService, commandStatusProRepository)
     );
 
     // Renvoir une commande qui n'existe pas
     doReturn(null).when(commandTransactionSessionSpy).getCommand(commandId);
 
-    Exception exception = Assertions.assertThrows(RuntimeException.class, ()->commandTransactionSessionSpy.updateCommand(updatedCommandInfo));
+    Exception exception = Assertions.assertThrows(RuntimeException.class, ()->commandTransactionSessionSpy.proUpdateCommand(updatedCommandInfo));
     Assertions.assertEquals("La commande N° 1 n'existe pas", exception.getMessage());
 
   }
@@ -180,12 +180,12 @@ public class CommandTransactionSessionTest {
                     entityManagerFactory,
                     commandProductListMapper,
                     clientCommandRepository,
-                    clientService)
+                    clientService, commandStatusProRepository)
     );
 
     doReturn(fakeFindCommand(commandId, Long.valueOf(2))).when(commandTransactionSessionSpy).getCommand(commandId);
 
-    Exception exception = Assertions.assertThrows(RuntimeException.class, ()->commandTransactionSessionSpy.updateCommand(updatedCommandInfo));
+    Exception exception = Assertions.assertThrows(RuntimeException.class, ()->commandTransactionSessionSpy.proUpdateCommand(updatedCommandInfo));
     Assertions.assertEquals("La commande N° 1 n'est pas rattaché au commerce", exception.getMessage());
 
   }
@@ -236,10 +236,10 @@ public class CommandTransactionSessionTest {
       entityManagerFactory,
       commandProductListMapper,
             clientCommandRepository,
-            clientService));
+            clientService, commandStatusProRepository));
 
 
-    CommandEntity savedCommand = commandTransactionSessionSpy.saveCommand(commandInformationToSave);
+    CommandEntity savedCommand = commandTransactionSessionSpy.proSaveCommand(commandInformationToSave);
 
     Assertions.assertNotNull(savedCommand);
     Assertions.assertEquals(15, savedCommand.getPreparationTime());

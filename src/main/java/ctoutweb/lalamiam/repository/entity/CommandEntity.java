@@ -61,7 +61,7 @@ public class CommandEntity implements Serializable {
 
   @ManyToOne
   @JoinColumn(name="command_status")
-  private StatusEntity commandStatus;
+  private CommandStatusEntity commandStatus;
 
   /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -104,7 +104,7 @@ public class CommandEntity implements Serializable {
     this.commandPrice = commandInformationToSave.commandPrice();
     this.slotTime = commandInformationToSave.slotTime();
     this.isReady = false;
-    this.commandStatus = Factory.getWaitingStatus();
+    this.commandStatus = Factory.getInitialCommandStatus();
     this.productQuantity = commandInformationToSave.numberOfProductInCommand();
   }
 
@@ -212,11 +212,11 @@ public class CommandEntity implements Serializable {
     this.preparedBy = preparedBy;
   }
 
-  public StatusEntity getCommandStatus() {
+  public CommandStatusEntity getCommandStatus() {
     return commandStatus;
   }
 
-  public void setCommandStatus(StatusEntity commandStatus) {
+  public void setCommandStatus(CommandStatusEntity commandStatus) {
     this.commandStatus = commandStatus;
   }
 

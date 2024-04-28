@@ -16,6 +16,11 @@ import java.util.stream.Collectors;
 
 public class Factory {
 
+  /**
+   * Id par default si une action est menée par un Client
+   */
+  private final static long CLIENT_ACTION_ID = -1;
+
   public static UserEntity getUSer(Long userId) {
     // Todo faire test
     return new UserEntity(userId);
@@ -222,11 +227,13 @@ public class Factory {
           String commandCode,
           Integer preparationtime,
           Integer numberOfProductInCommand,
-          Double commandPrice
+          Double commandPrice,
+          Long proId
   ){
     return new CommandInformationToSave(
             commandInformationToPersist.storeId(),
             commandInformationToPersist.clientPhone(),
+            proId,
             commandInformationToPersist.selectProducts(),
             commandInformationToPersist.selectSlotTime(),
             commandCode,
@@ -255,6 +262,7 @@ public class Factory {
     return new CommandInformationToSave(
             commandInformationToPersist.storeId(),
             commandInformationToPersist.clientPhone(),
+            commandInformationToPersist.clientId(),
             commandInformationToPersist.selectProducts(),
             commandInformationToPersist.selectSlotTime(),
             commandCode,
@@ -390,19 +398,45 @@ public class Factory {
 
   /**
    * Renvoie le status initial à la création d'une commande
-   * @return StatusEntity
+   * @return CommandStatusEntity
    */
-  public static StatusEntity getWaitingStatus() {
-    final int waitingstatus = 1;
-    return new StatusEntity(waitingstatus);
+  public static CommandStatusEntity getInitialCommandStatus() {
+    final int initialStatus = 1;
+    return new CommandStatusEntity(initialStatus);
   }
 
   /**
    * Renvoie un status pour les commandes
    * @param status Ineteger - Status
-   * @return StatusEntity
+   * @return CommandStatusEntity
    */
-  public static StatusEntity getCommandStatus(Integer status) {
-    return new StatusEntity(status);
+  public static CommandStatusEntity getCommandStatus(Integer status) {
+    return new CommandStatusEntity(status);
   }
+
+  /**
+   * Renvoie un CommandStatusPro pour une initilaisation de commande
+   * @param commandId Long - Identifiant commande
+   * @param commandStatusId Int - Identifiant du statut
+   * @param userId Long - Identitifaint utilisateur
+   * @param isProAction boolean - Action menée par un pro
+   * @return CommandStatusPro
+   */
+  public static CommandStatusUserEntity getInitialCommandStatusProFromId(Long commandId, Integer commandStatusId, Long userId, boolean isProAction) {
+    return new CommandStatusUserEntity(getCommand(commandId), getCommandStatus(commandStatusId), getUSer(userId), isProAction);
+  }
+
+  /**
+   * Renvoie un CommandStatusPro pour une mise a jour de statut
+   * @param commandId Long - Identifiant commande
+   * @param commandStatusId Int - Identifiant du statut
+   * @param userId Long - Identitifaint utilisateur
+   * @param isProAction boolean - Action menée par un pro
+   * @return CommandStatusPro
+   */
+  public static CommandStatusUserEntity getUpdateCommandStatusProFromId(Long commandId, Integer commandStatusId, Long userId, boolean isProAction) {
+    LocalDateTime updatedCommandStatus = LocalDateTime.now();
+    return new CommandStatusUserEntity(getCommand(commandId), getCommandStatus(commandStatusId), getUSer(userId), isProAction, updatedCommandStatus);
+  }
+
 }
