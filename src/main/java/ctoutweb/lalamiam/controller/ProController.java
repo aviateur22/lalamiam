@@ -106,4 +106,29 @@ public class ProController {
     return new ResponseEntity<>(commandService.proPersistCommand(persitCommandInformation), HttpStatus.CREATED);
   }
 
+  @PutMapping("/command/update-status")
+  ResponseEntity<RegisterCommandDto> updateCommandStatus(@RequestBody ProUpdateCommandStatusDto proUpdateCommandStatus) {
+    Long proId = proUpdateCommandStatus.proId();
+    Long commandId = proUpdateCommandStatus.commandId();
+    Long storeId = proUpdateCommandStatus.storeId();
+
+    // Action mené par un professionel
+    final boolean IS_PRO_ACTION = true;
+
+    // Validation professionel
+    if(!proHelper.isProfessionalValid(proId))
+      throw new ProException("Vous ne pouvez pas acceder à cette commande", HttpStatus.FORBIDDEN);
+
+    if(commandId != null) {
+      if(!proHelper.isProWorkingInStore(proId, storeId))
+        throw new ProException("Vous n'êtes pas rattaché au commerce", HttpStatus.FORBIDDEN);
+
+      if(!proHelper.isCommandVisibleByPro(proId, commandId))
+        throw new ProException("Vous ne pouvez pas acceder à cette commande", HttpStatus.FORBIDDEN);
+    }
+
+    return new ResponseEntity<>(commandService.updateCommandStatus(proUpdateCommandStatus), HttpStatus.OK);
+
+  }
+
 }

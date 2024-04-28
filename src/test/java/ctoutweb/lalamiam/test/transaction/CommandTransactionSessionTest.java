@@ -8,6 +8,7 @@ import ctoutweb.lalamiam.model.ProductWithQuantity;
 import ctoutweb.lalamiam.repository.ClientCommandRepository;
 import ctoutweb.lalamiam.repository.CommandProductRepository;
 import ctoutweb.lalamiam.repository.CommandRepository;
+import ctoutweb.lalamiam.repository.CommandStatusUserRepository;
 import ctoutweb.lalamiam.repository.entity.CommandEntity;
 import ctoutweb.lalamiam.repository.entity.CommandProductEntity;
 import ctoutweb.lalamiam.repository.entity.ProductEntity;
@@ -61,6 +62,7 @@ public class CommandTransactionSessionTest {
     CommandRepository commandRepository = mock(CommandRepository.class);
     ClientService clientService = mock(ClientService.class);
     ClientCommandRepository clientCommandRepository = mock(ClientCommandRepository.class);
+    CommandStatusUserRepository commandStatusProRepository = mock(CommandStatusUserRepository.class);
 
     // Spy CommandTransactionSession
     CommandTransactionSession commandTransactionSessionSpy = spy( new CommandTransactionSession
@@ -70,12 +72,12 @@ public class CommandTransactionSessionTest {
         entityManagerFactory,
         commandProductListMapper,
         clientCommandRepository,
-        clientService)
+        clientService, commandStatusProRepository)
     );
 
     doReturn(fakeFindCommand(commandId, storeId)).when(commandTransactionSessionSpy).getCommand(commandId);
 
-    CommandEntity updateCommand = commandTransactionSessionSpy.updateCommand(updatedCommandInfo);
+    CommandEntity updateCommand = commandTransactionSessionSpy.proUpdateCommand(updatedCommandInfo);
 
     Assertions.assertEquals(updateCommand.getId(), updatedCommandInfo.commandId());
     Assertions.assertEquals(updateCommand.getStore().getId(), updatedCommandInfo.storeId());
@@ -119,6 +121,7 @@ public class CommandTransactionSessionTest {
     CommandRepository commandRepository = mock(CommandRepository.class);
     ClientService clientService = mock(ClientService.class);
     ClientCommandRepository clientCommandRepository = mock(ClientCommandRepository.class);
+    CommandStatusUserRepository commandStatusProRepository = mock(CommandStatusUserRepository.class);
 
     // Spy CommandTransactionSession
     CommandTransactionSession commandTransactionSessionSpy = spy( new CommandTransactionSession
@@ -128,13 +131,13 @@ public class CommandTransactionSessionTest {
                     entityManagerFactory,
                     commandProductListMapper,
                     clientCommandRepository,
-                    clientService)
+                    clientService, commandStatusProRepository)
     );
 
     // Renvoir une commande qui n'existe pas
     doReturn(null).when(commandTransactionSessionSpy).getCommand(commandId);
 
-    Exception exception = Assertions.assertThrows(RuntimeException.class, ()->commandTransactionSessionSpy.updateCommand(updatedCommandInfo));
+    Exception exception = Assertions.assertThrows(RuntimeException.class, ()->commandTransactionSessionSpy.proUpdateCommand(updatedCommandInfo));
     Assertions.assertEquals("La commande N° 1 n'existe pas", exception.getMessage());
 
   }
@@ -171,6 +174,7 @@ public class CommandTransactionSessionTest {
     CommandRepository commandRepository = mock(CommandRepository.class);
     ClientService clientService = mock(ClientService.class);
     ClientCommandRepository clientCommandRepository = mock(ClientCommandRepository.class);
+    CommandStatusUserRepository commandStatusProRepository = mock(CommandStatusUserRepository.class);
 
     // Spy CommandTransactionSession
     CommandTransactionSession commandTransactionSessionSpy = spy( new CommandTransactionSession
@@ -180,12 +184,12 @@ public class CommandTransactionSessionTest {
                     entityManagerFactory,
                     commandProductListMapper,
                     clientCommandRepository,
-                    clientService)
+                    clientService, commandStatusProRepository)
     );
 
     doReturn(fakeFindCommand(commandId, Long.valueOf(2))).when(commandTransactionSessionSpy).getCommand(commandId);
 
-    Exception exception = Assertions.assertThrows(RuntimeException.class, ()->commandTransactionSessionSpy.updateCommand(updatedCommandInfo));
+    Exception exception = Assertions.assertThrows(RuntimeException.class, ()->commandTransactionSessionSpy.proUpdateCommand(updatedCommandInfo));
     Assertions.assertEquals("La commande N° 1 n'est pas rattaché au commerce", exception.getMessage());
 
   }
@@ -195,6 +199,7 @@ public class CommandTransactionSessionTest {
     Long storeId = Long.valueOf(1);
     String clientPhone = "06232741";
     String commandCode = "ddddd";
+    Long clientId = Long.valueOf(1);
     List<ProductWithQuantity> selectProducts = Arrays.asList(
             new ProductWithQuantity(Long.valueOf(1),2),
             new ProductWithQuantity(Long.valueOf(2),2),
@@ -210,6 +215,7 @@ public class CommandTransactionSessionTest {
     CommandInformationToSave commandInformationToSave = new CommandInformationToSave(
             storeId,
             clientPhone,
+            clientId,
             selectProducts,
             slotTime,
             commandCode,
@@ -228,6 +234,7 @@ public class CommandTransactionSessionTest {
 
     ClientService clientService = mock(ClientService.class);
     ClientCommandRepository clientCommandRepository = mock(ClientCommandRepository.class);
+    CommandStatusUserRepository commandStatusProRepository = mock(CommandStatusUserRepository.class);
 
     // Spy CommandTransactionSession
     CommandTransactionSession commandTransactionSessionSpy = spy( new CommandTransactionSession(
@@ -236,10 +243,10 @@ public class CommandTransactionSessionTest {
       entityManagerFactory,
       commandProductListMapper,
             clientCommandRepository,
-            clientService));
+            clientService, commandStatusProRepository));
 
 
-    CommandEntity savedCommand = commandTransactionSessionSpy.saveCommand(commandInformationToSave);
+    CommandEntity savedCommand = commandTransactionSessionSpy.proSaveCommand(commandInformationToSave);
 
     Assertions.assertNotNull(savedCommand);
     Assertions.assertEquals(15, savedCommand.getPreparationTime());

@@ -5,12 +5,15 @@ import ctoutweb.lalamiam.exception.CommandException;
 import ctoutweb.lalamiam.factory.Factory;
 import ctoutweb.lalamiam.mapper.CommandProductListMapper;
 import ctoutweb.lalamiam.model.*;
+import ctoutweb.lalamiam.model.dto.ProUpdateCommandStatusDto;
 import ctoutweb.lalamiam.repository.ClientCommandRepository;
 import ctoutweb.lalamiam.repository.CommandProductRepository;
 import ctoutweb.lalamiam.repository.CommandRepository;
+import ctoutweb.lalamiam.repository.CommandStatusUserRepository;
 import ctoutweb.lalamiam.repository.entity.ClientCommandEntity;
 import ctoutweb.lalamiam.repository.entity.CommandEntity;
 import ctoutweb.lalamiam.repository.entity.CommandProductEntity;
+import ctoutweb.lalamiam.repository.entity.CommandStatusUserEntity;
 import ctoutweb.lalamiam.service.ClientService;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.transaction.Transactional;
@@ -35,6 +38,7 @@ public class CommandTransactionSession  {
   private final CommandProductListMapper commandProductListMapper;
   private final ClientCommandRepository clientCommandRepository;
   private final ClientService clientService;
+  private final CommandStatusUserRepository commandStatusUserRepository;
 
   public CommandTransactionSession(
           CommandProductRepository commandProductRepository,
@@ -42,18 +46,19 @@ public class CommandTransactionSession  {
           EntityManagerFactory entityManagerFactory,
           CommandProductListMapper commandProductListMapper,
           ClientCommandRepository clientCommandRepository,
-          ClientService clientService
-  ) {
+          ClientService clientService,
+          CommandStatusUserRepository commandStatusProRepository) {
     this.commandProductRepository = commandProductRepository;
     this.commandRepository = commandRepository;
     this.entityManagerFactory = entityManagerFactory;
     this.commandProductListMapper = commandProductListMapper;
     this.clientCommandRepository = clientCommandRepository;
     this.clientService = clientService;
+    this.commandStatusUserRepository = commandStatusProRepository;
   }
 
   @Transactional
-  public CommandEntity updateCommand(CommandInformationToUpdate commandInformationToUpdate) {
+  public CommandEntity proUpdateCommand(CommandInformationToUpdate commandInformationToUpdate) {
 
     CommandEntity findCommand = getCommand(commandInformationToUpdate.commandId());
 
@@ -89,7 +94,7 @@ public class CommandTransactionSession  {
   }
 
   @Transactional
-  public CommandEntity updateClientCommand(CommandInformationToUpdate commandInformationToUpdate, Long clientId) {
+  public CommandEntity clientUpdateCommand(CommandInformationToUpdate commandInformationToUpdate, Long clientId) {
     // Todo faire test
     CommandEntity findCommand = getCommand(commandInformationToUpdate.commandId());
 
@@ -133,7 +138,7 @@ public class CommandTransactionSession  {
     return findCommand;
   }
   @Transactional
-  public CommandEntity saveCommand(CommandInformationToSave commandInformation) {
+  public CommandEntity proSaveCommand(CommandInformationToSave commandInformation) {
     // Todo faire test uintaire
     CommandEntity commandInformationToSave = Factory.getCommand(commandInformation);
 
@@ -149,10 +154,25 @@ public class CommandTransactionSession  {
     commandProductRepository.saveAllAndFlush(selectCommandProducts);
 
     commandInformationToSave.setCommandProducts(selectCommandProducts);
+
+    // Mise a jour du suivi de l'évolution du statut pour une initialisation de commande
+    Long commandId = commandSaved.getId();
+    Long proId = commandInformation.userId();
+    final int INITIAL_COMMAND_STATUS_ID = 1;
+    final boolean IS_PRO_ACTION = true;
+
+    CommandStatusUserEntity commandStatusPro = Factory.getUpdateCommandStatusProFromId(
+            commandId,
+            INITIAL_COMMAND_STATUS_ID,
+            proId, IS_PRO_ACTION);
+    saveFollowedStatusAction(commandStatusPro);
+
     return commandInformationToSave;
   }
   @Transactional
-  public CommandEntity saveClientCommand(CommandInformationToSave commandInformation, Long clientId) {
+  public CommandEntity clientSaveCommand(CommandInformationToSave commandInformation) {
+
+    final Long clientId = commandInformation.userId();
 
     // Verification existance client
     if(clientService.findClient(clientId).isEmpty())
@@ -177,7 +197,44 @@ public class CommandTransactionSession  {
     commandProductRepository.saveAllAndFlush(selectCommandProducts);
 
     commandInformationToSave.setCommandProducts(selectCommandProducts);
+
+    // Mise a jour du suivi de l'évolution du statut pour une initialisation de commande
+    Long commandId = commandSaved.getId();
+    final int INITIAL_COMMAND_STATUS_ID = 1;
+    final boolean IS_PRO_ACTION = false;
+
+    CommandStatusUserEntity commandStatusPro = Factory.getUpdateCommandStatusProFromId(
+            commandId,
+            INITIAL_COMMAND_STATUS_ID,
+            clientId,
+            IS_PRO_ACTION);
+    saveFollowedStatusAction(commandStatusPro);
+
     return commandInformationToSave;
+  }
+
+  @Transactional
+  public void updateCommandStatus(
+          CommandEntity findCommand,
+          ProUpdateCommandStatusDto proUpdateCommandStatus,
+          boolean isProAction
+  ) {
+    Long commandId = findCommand.getId();
+    int commandStatusId = proUpdateCommandStatus.commandStatus();
+    Long userId = proUpdateCommandStatus.proId();
+
+    // Mise à jour de la commande
+    findCommand.setPreparedBy(Factory.getUSer(proUpdateCommandStatus.proId()));
+    findCommand.setCommandStatus(Factory.getCommandStatus(proUpdateCommandStatus.commandStatus()));
+    commandRepository.save(findCommand);
+
+    // Mise à jour du suivi de modification du statuts
+    CommandStatusUserEntity commandStatusPro = Factory.getUpdateCommandStatusProFromId(commandId, commandStatusId, userId, isProAction);
+    saveFollowedStatusAction(commandStatusPro);
+  }
+
+  public void saveFollowedStatusAction(CommandStatusUserEntity commandStatusUser) {
+    commandStatusUserRepository.save(commandStatusUser);
   }
 
   /**

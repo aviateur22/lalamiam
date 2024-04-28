@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(name = "status")
-public class StatusEntity {
+@Table(name = "command_status")
+public class CommandStatusEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
@@ -32,9 +32,9 @@ public class StatusEntity {
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-  public StatusEntity() {}
+  public CommandStatusEntity() {}
 
-  public StatusEntity(Integer id) {
+  public CommandStatusEntity(Integer id) {
     this.id = id;
   }
 
@@ -82,7 +82,7 @@ public class StatusEntity {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    StatusEntity that = (StatusEntity) o;
+    CommandStatusEntity that = (CommandStatusEntity) o;
     return Objects.equals(id, that.id) && Objects.equals(createdAt, that.createdAt) && Objects.equals(statusName, that.statusName) && Objects.equals(updatedAt, that.updatedAt) && Objects.equals(commands, that.commands);
   }
 

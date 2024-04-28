@@ -4,6 +4,7 @@ import ctoutweb.lalamiam.exception.CommandException;
 import ctoutweb.lalamiam.factory.Factory;
 import ctoutweb.lalamiam.helper.NewCommandServiceHelper;
 import ctoutweb.lalamiam.helper.NewSlotHelper;
+import ctoutweb.lalamiam.model.CommandStatus;
 import ctoutweb.lalamiam.model.dto.*;
 import ctoutweb.lalamiam.repository.CommandRepository;
 import ctoutweb.lalamiam.repository.entity.CommandEntity;
@@ -79,6 +80,29 @@ public class NewCommandServiceImp implements NewCommandService {
 
     // Recherche d'une commande
     return commandServiceHelper.findRegisterCommandInformation(command);
+  }
+
+  @Override
+  public RegisterCommandDto updateCommandStatus(ProUpdateCommandStatusDto proUpdateCommandStatus) {
+    CommandEntity findCommand = commandRepository.findById(proUpdateCommandStatus.commandId()).orElseThrow(()->
+            new CommandException("La commande à mettre à jour n'existe pas", HttpStatus.NOT_FOUND));
+
+    // Si commande existante alors vérification du storeId
+    if(!findCommand.getStore().getId().equals(proUpdateCommandStatus.storeId()))
+      throw new CommandException("Cette commande n'est pas rattaché au commerce", HttpStatus.BAD_REQUEST);
+
+    // Vérification validité du statut
+    if(!CommandStatus.isStatusValid(proUpdateCommandStatus.commandStatus()))
+      throw new CommandException("Le statut de la commande n'existe pas", HttpStatus.BAD_REQUEST);
+
+    // Action faite par un pro
+    final boolean IS_PRO_UPDATE_STATUS = true;
+
+    // Mise a jour du statut et mise a jour du suivi de l'évolution du statut
+    commandTransactionSession.updateCommandStatus(findCommand, proUpdateCommandStatus, IS_PRO_UPDATE_STATUS);
+
+    // Récuperation de la commande
+    return getCommand(proUpdateCommandStatus.storeId(), proUpdateCommandStatus.commandId());
   }
 
   @Override
@@ -192,16 +216,18 @@ public class NewCommandServiceImp implements NewCommandService {
 
     CommandEntity command = persitCommand.commandId() == null ?
 
-      commandTransactionSession.saveCommand(
+      commandTransactionSession.proSaveCommand(
         Factory.getCommandInformationToSave(
           persitCommand,
           commandCode,
           preparationTime,
           numberOfProductInCommand,
-          commandPrice
+          commandPrice,
+          persitCommand.proId()
+
         ))
             :
-      commandTransactionSession.updateCommand(
+      commandTransactionSession.proUpdateCommand(
         Factory.getCommandInformationToUpdate(
           persitCommand,
           preparationTime,
@@ -259,16 +285,16 @@ public class NewCommandServiceImp implements NewCommandService {
 
     CommandEntity command = persitCommand.commandId() == null ?
 
-            commandTransactionSession.saveClientCommand(
+            commandTransactionSession.clientSaveCommand(
                     Factory.getCommandInformationToSave(
                             persitCommand,
                             commandCode,
                             preparationTime,
                             numberOfProductInCommand,
                             commandPrice
-                    ), persitCommand.clientId())
+                    ))
             :
-            commandTransactionSession.updateClientCommand(
+            commandTransactionSession.clientUpdateCommand(
                     Factory.getCommandInformationToUpdate(
                             persitCommand,
                             preparationTime,

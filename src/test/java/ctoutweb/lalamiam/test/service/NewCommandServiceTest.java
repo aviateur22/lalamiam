@@ -1116,12 +1116,12 @@ public class NewCommandServiceTest {
 
     // Mock CommandeTransactionCommand
     CommandTransactionSession commandTransactionSession = mock(CommandTransactionSession.class);
-    when(commandTransactionSession.saveCommand(any(CommandInformationToSave.class))).thenReturn(getFakeCommandEntity(
+    when(commandTransactionSession.proSaveCommand(any(CommandInformationToSave.class))).thenReturn(getFakeCommandEntity(
             persitCommandInformation.storeId(),
             persitCommandInformation.commandId(),
             persitCommandInformation.selectSlotTime()
     ));
-    when(commandTransactionSession.updateCommand(any(CommandInformationToUpdate.class))).thenReturn(getFakeCommandEntity(
+    when(commandTransactionSession.proUpdateCommand(any(CommandInformationToUpdate.class))).thenReturn(getFakeCommandEntity(
             persitCommandInformation.storeId(),
             persitCommandInformation.commandId(),
             persitCommandInformation.selectSlotTime()

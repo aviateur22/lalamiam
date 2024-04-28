@@ -51,8 +51,8 @@ public class WebSecurity {
       .formLogin(AbstractHttpConfigurer::disable)
       .authorizeHttpRequests(httpRequest->httpRequest
         .requestMatchers("/api/v1/auth/**").permitAll()
-        .requestMatchers("/api/v1/pro/**").hasRole("PRO")
-        .requestMatchers("/api/v1/client/**").hasRole("CLIENT")
+        .requestMatchers("/api/v1/pro/**").hasAnyRole("PRO", "EMPLOYE", "ADMIN")
+        .requestMatchers("/api/v1/client/**").hasAnyRole("CLIENT", "PRO", "EMPLOYE", "ADMIN")
         .anyRequest().authenticated());
     return http.build();
   }
