@@ -439,4 +439,19 @@ public class Factory {
     return new CommandStatusUserEntity(getCommand(commandId), getCommandStatus(commandStatusId), getUSer(userId), isProAction, updatedCommandStatus);
   }
 
+  /**
+   * DashboardCommandDto à partir RegisterCommandDto
+   * @param registerCommand RegisterCommandDto
+   * @return DashboardCommandDto
+   */
+  public static DashboardCommandDto getDashboardCommand(RegisterCommandDto registerCommand) {
+    return new DashboardCommandDto(
+            registerCommand.getCalculatedCommandInformation().getCommandCode(),
+            registerCommand.getCalculatedCommandInformation().getProductQuantity(),
+            registerCommand.getCalculatedCommandInformation().getCommandePrice(),
+            registerCommand.getCalculatedCommandInformation().getCommandPreparationTime(),
+            registerCommand.getManualCommandInformation().getSlotTime()
+    );
+  }
+
 }

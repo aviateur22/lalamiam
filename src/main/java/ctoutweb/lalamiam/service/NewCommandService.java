@@ -1,8 +1,8 @@
 package ctoutweb.lalamiam.service;
 
-import ctoutweb.lalamiam.model.dto.ProUpdateCommandStatusDto;
-import ctoutweb.lalamiam.model.dto.StoreProductsInformationDto;
-import ctoutweb.lalamiam.model.dto.RegisterCommandDto;
+import ctoutweb.lalamiam.model.dto.*;
+
+import java.util.List;
 
 public interface NewCommandService extends Command {
 
@@ -35,4 +35,11 @@ public interface NewCommandService extends Command {
    * @return StoreProductsInformationDto
    */
   RegisterCommandDto updateCommandStatus(ProUpdateCommandStatusDto proUpdateCommandStatus);
+
+  /**
+   * Récuperation des commandes du dashboard
+   * @param getDashboard
+   * @return List<DashboardCommandDto>
+   */
+  List<DashboardCommandDto> getDashboardCommands(GetDashboardCommandDto getDashboard);
 }

@@ -359,4 +359,9 @@ public class NewCommandServiceImp implements NewCommandService {
             .collect(Collectors.toList())
             .size() == 0) throw new CommandException("Le créneau demandé n'est pas disponible", HttpStatus.BAD_REQUEST);
   }
+
+  @Override
+  public List<DashboardCommandDto> getDashboardCommands(GetDashboardCommandDto getDashboard) {
+    return null;
+  }
 }

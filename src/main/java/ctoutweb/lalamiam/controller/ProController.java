@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("api/v1/pro")
 public class ProController {
@@ -129,6 +131,23 @@ public class ProController {
 
     return new ResponseEntity<>(commandService.updateCommandStatus(proUpdateCommandStatus), HttpStatus.OK);
 
+  }
+
+  @GetMapping("/dasboard/get-commands")
+  ResponseEntity<List<DashboardCommandDto>> getDashboardCommands(@RequestBody GetDashboardCommandDto getDashboardCommand) {
+
+    Long proId = getDashboardCommand.proId();
+    Long storeId = getDashboardCommand.storeId();
+
+    // Validation professionel
+    if(!proHelper.isProfessionalValid(proId))
+      throw new ProException("Vous ne pouvez pas acceder à cette commande", HttpStatus.FORBIDDEN);
+
+    if(!proHelper.isProWorkingInStore(proId, storeId))
+      throw new ProException("Vous n'êtes pas rattaché au commerce", HttpStatus.FORBIDDEN);
+
+    commandService.getDashboardCommands(getDashboardCommand);
+    return null;
   }
 
 }
