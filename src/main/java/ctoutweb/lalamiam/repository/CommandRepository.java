@@ -1,12 +1,12 @@
 package ctoutweb.lalamiam.repository;
 
 import ctoutweb.lalamiam.repository.entity.CommandEntity;
+import ctoutweb.lalamiam.repository.entity.CommandStatusEntity;
 import ctoutweb.lalamiam.repository.entity.StoreEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +26,18 @@ public interface CommandRepository extends JpaRepository<CommandEntity, Long> {
 
   public Optional<CommandEntity> findFirstCommandByStoreIn(List<StoreEntity> stores);
 
+  public List<CommandEntity> findCommandByStoreAndSlotTimeBetweenOrderBySlotTimeAsc(StoreEntity store, LocalDateTime startOfDay, LocalDateTime endOfDay);
 
+  public List<CommandEntity> findCommandByStoreAndSlotTimeBetweenAndCommandStatusOrderBySlotTimeAsc(
+          StoreEntity store,
+          LocalDateTime startOfDay,
+          LocalDateTime endOfDay,
+          CommandStatusEntity commandStatus);
 
+  public List<CommandEntity> findCommandByStoreAndSlotTimeBetweenAndCommandCode(
+          StoreEntity store,
+          LocalDateTime startOfDay,
+          LocalDateTime endOfDay,
+          String commandCode
+  );
 }

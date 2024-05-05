@@ -5,10 +5,12 @@ import ctoutweb.lalamiam.helper.ProHelper;
 import ctoutweb.lalamiam.model.dto.*;
 import ctoutweb.lalamiam.service.NewCommandService;
 import ctoutweb.lalamiam.service.ProService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -133,12 +135,12 @@ public class ProController {
 
   }
 
-  @GetMapping("/dasboard/get-commands")
-  ResponseEntity<List<DashboardCommandDto>> getDashboardCommands(@RequestBody GetDashboardCommandDto getDashboardCommand) {
-
-    Long proId = getDashboardCommand.proId();
-    Long storeId = getDashboardCommand.storeId();
-
+  @GetMapping("/dashboard/pro-id/{proId}/store-id/{storeId}/command-date/{commandDate}/get-commands")
+  ResponseEntity<DashboardDto> getDashboard(
+          @PathVariable Long storeId,
+          @PathVariable Long proId,
+          @PathVariable("commandDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate commandDate
+  ) {
     // Validation professionel
     if(!proHelper.isProfessionalValid(proId))
       throw new ProException("Vous ne pouvez pas acceder à cette commande", HttpStatus.FORBIDDEN);
@@ -146,8 +148,40 @@ public class ProController {
     if(!proHelper.isProWorkingInStore(proId, storeId))
       throw new ProException("Vous n'êtes pas rattaché au commerce", HttpStatus.FORBIDDEN);
 
-    commandService.getDashboardCommands(getDashboardCommand);
-    return null;
+    return new ResponseEntity<>(commandService.getDashboardInformation(proId, storeId, commandDate), HttpStatus.OK);
   }
 
+  @GetMapping("/dashboard/pro-id/{proId}/store-id/{storeId}/command-date/{commandDate}/command-status/{commandStatus}/get-commands")
+  ResponseEntity<DashboardDto> getDashboardCommandsFilterByStatus(
+          @PathVariable Long storeId,
+          @PathVariable Long proId,
+          @PathVariable("commandDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate commandDate,
+          @PathVariable Integer commandStatus
+  ) {
+    // Validation professionel
+    if(!proHelper.isProfessionalValid(proId))
+      throw new ProException("Vous ne pouvez pas acceder à cette commande", HttpStatus.FORBIDDEN);
+
+    if(!proHelper.isProWorkingInStore(proId, storeId))
+      throw new ProException("Vous n'êtes pas rattaché au commerce", HttpStatus.FORBIDDEN);
+
+    return new ResponseEntity<>(commandService.getDashboardCommandsByStatus(proId, storeId, commandDate, commandStatus), HttpStatus.OK);
+  }
+
+  @GetMapping("/dashboard/pro-id/{proId}/store-id/{storeId}/command-date/{commandDate}/command-code/{commandCode}/get-commands")
+  ResponseEntity<DashboardDto> getDashboardCommandFilterByCode(
+          @PathVariable Long storeId,
+          @PathVariable Long proId,
+          @PathVariable("commandDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate commandDate,
+          @PathVariable String commandCode
+  ) {
+    // Validation professionel
+    if(!proHelper.isProfessionalValid(proId))
+      throw new ProException("Vous ne pouvez pas acceder à cette commande", HttpStatus.FORBIDDEN);
+
+    if(!proHelper.isProWorkingInStore(proId, storeId))
+      throw new ProException("Vous n'êtes pas rattaché au commerce", HttpStatus.FORBIDDEN);
+
+    return new ResponseEntity<>(commandService.getDashboardCommandByCode(proId, storeId, commandDate, commandCode), HttpStatus.OK);
+  }
 }

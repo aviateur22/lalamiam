@@ -1,16 +1,14 @@
 package ctoutweb.lalamiam.mapper;
 
+import ctoutweb.lalamiam.factory.Factory;
 import ctoutweb.lalamiam.model.dto.DashboardCommandDto;
-import ctoutweb.lalamiam.model.dto.RegisterCommandDto;
+import ctoutweb.lalamiam.repository.entity.CommandEntity;
 
 import java.util.function.Function;
 
-/**
- * Convertion RegisterCommandDto en DashboardCommandDto
- */
-public class DashboardCommandMapper implements Function<RegisterCommandDto, DashboardCommandDto> {
+public class DashboardCommandMapper implements Function<CommandEntity, DashboardCommandDto> {
   @Override
-  public DashboardCommandDto apply(RegisterCommandDto registerCommandDto) {
-    return null;
+  public DashboardCommandDto apply(CommandEntity command) {
+    return Factory.getDashboardCommand(command);
   }
 }

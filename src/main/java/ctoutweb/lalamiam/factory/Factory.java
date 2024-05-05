@@ -440,18 +440,30 @@ public class Factory {
   }
 
   /**
-   * DashboardCommandDto à partir RegisterCommandDto
-   * @param registerCommand RegisterCommandDto
+   * DashboardCommandDto à partir CommandEntity
+   * @param command CommandEntity
    * @return DashboardCommandDto
    */
-  public static DashboardCommandDto getDashboardCommand(RegisterCommandDto registerCommand) {
+  public static DashboardCommandDto getDashboardCommand(CommandEntity command) {
     return new DashboardCommandDto(
-            registerCommand.getCalculatedCommandInformation().getCommandCode(),
-            registerCommand.getCalculatedCommandInformation().getProductQuantity(),
-            registerCommand.getCalculatedCommandInformation().getCommandePrice(),
-            registerCommand.getCalculatedCommandInformation().getCommandPreparationTime(),
-            registerCommand.getManualCommandInformation().getSlotTime()
+            command.getId(),
+            command.getCommandCode(),
+            command.getProductQuantity(),
+            command.getCommandPrice(),
+            command.getPreparationTime(),
+            command.getCommandStatus().getId(),
+            command.getSlotTime()
     );
   }
+
+  /**
+   * Renvoie un DashboardDto
+   * @param dashboardCommands List<DashboardCommandDto>
+   * @param commandDate LocalDate
+   * @return DashboardDto
+   */
+ public static  DashboardDto getDashboard(List<DashboardCommandDto> dashboardCommands, LocalDate commandDate) {
+    return new DashboardDto(dashboardCommands, commandDate);
+ }
 
 }
