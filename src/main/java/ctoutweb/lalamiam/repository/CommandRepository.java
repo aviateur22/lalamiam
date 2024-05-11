@@ -34,6 +34,12 @@ public interface CommandRepository extends JpaRepository<CommandEntity, Long> {
           LocalDateTime endOfDay,
           CommandStatusEntity commandStatus);
 
+  public List<CommandEntity> findCommandByStoreAndSlotTimeBetweenAndCommandStatusInOrderBySlotTimeAsc(
+          StoreEntity store,
+          LocalDateTime startOfDay,
+          LocalDateTime endOfDay,
+          List<CommandStatusEntity> commandStatusList);
+
   public List<CommandEntity> findCommandByStoreAndSlotTimeBetweenAndCommandCode(
           StoreEntity store,
           LocalDateTime startOfDay,

@@ -382,10 +382,10 @@ public class NewCommandServiceImp implements NewCommandService {
   }
 
   @Override
-  public DashboardDto getDashboardCommandsByStatus(Long proId, Long storeId, LocalDate commandDate, Integer statusId) {
+  public DashboardDto getDashboardCommandsByStatus(Long proId, Long storeId, LocalDate commandDate, List<Integer> statusIdList) {
 
     // Vérification validité du statut
-    if(!CommandStatus.isStatusValid(statusId))
+    if(!CommandStatus.areListOfStatusValid(statusIdList))
       throw new CommandException("Le statut de la commande n'existe pas", HttpStatus.BAD_REQUEST);
 
     // Début de la journée à la date de la commande
@@ -395,11 +395,11 @@ public class NewCommandServiceImp implements NewCommandService {
     LocalDateTime endOfDay = commandDate.atTime(LocalTime.MAX);
 
     // Recherche des commandes
-    List<CommandEntity> commandList = commandRepository.findCommandByStoreAndSlotTimeBetweenAndCommandStatusOrderBySlotTimeAsc(
+    List<CommandEntity> commandList = commandRepository.findCommandByStoreAndSlotTimeBetweenAndCommandStatusInOrderBySlotTimeAsc(
             Factory.getStore(storeId),
             startOfDay,
             endOfDay,
-            Factory.getCommandStatus(statusId)
+            Factory.getCommandStatusList(statusIdList)
     );
 
     DashboardCommandMapper dashboardCommandMapper = FactoryMapper.getDashboardCommandMapper();

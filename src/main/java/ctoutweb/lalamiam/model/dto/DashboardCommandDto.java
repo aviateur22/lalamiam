@@ -3,10 +3,10 @@ package ctoutweb.lalamiam.model.dto;
 import java.time.LocalDateTime;
 
 public record DashboardCommandDto(
-  Long commandId,
+ Long commandId,
  String commandCode,
  int productQuantity,
- double commandePrice,
+ double commandPrice,
  int commandPreparationTime,
  int commandStatus,
  LocalDateTime slotTime

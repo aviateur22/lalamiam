@@ -51,10 +51,10 @@ public interface NewCommandService extends Command {
    * @param proId Long - identifiant pro
    * @param storeId Long - Identifiant commerce
    * @param commandDate LocalDate- date de commande
-   * @param statusId Integer - Identitifiant du statut des commandes
+   * @param statusIdList List<Integer> - Liste des identitifiants du statut des commandes
    * @return DashboardDto
    */
-  DashboardDto getDashboardCommandsByStatus(Long proId, Long storeId, LocalDate commandDate, Integer statusId);
+  DashboardDto getDashboardCommandsByStatus(Long proId, Long storeId, LocalDate commandDate, List<Integer> statusIdList);
 
   /**
    * Récupération d'une commande sur le dashboard filtrer par code de commande

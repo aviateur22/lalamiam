@@ -416,6 +416,17 @@ public class Factory {
 
   /**
    * Renvoie un CommandStatusPro pour une initilaisation de commande
+   * @param statusIdList List<Integer> - Liste des statut
+   * @return List<CommandStatusEntity>
+   */
+  public static List<CommandStatusEntity> getCommandStatusList (List<Integer> statusIdList) {
+    return statusIdList.stream()
+            .map(statusId -> getCommandStatus(statusId))
+            .collect(Collectors.toList());
+  }
+
+  /**
+   * Renvoie un CommandStatusPro pour une initilaisation de commande
    * @param commandId Long - Identifiant commande
    * @param commandStatusId Int - Identifiant du statut
    * @param userId Long - Identitifaint utilisateur

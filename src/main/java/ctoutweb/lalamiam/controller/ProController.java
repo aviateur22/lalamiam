@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -151,12 +152,12 @@ public class ProController {
     return new ResponseEntity<>(commandService.getDashboardInformation(proId, storeId, commandDate), HttpStatus.OK);
   }
 
-  @GetMapping("/dashboard/pro-id/{proId}/store-id/{storeId}/command-date/{commandDate}/command-status/{commandStatus}/get-commands")
+  @GetMapping("/dashboard/pro-id/{proId}/store-id/{storeId}/command-date/{commandDate}/command-status/{commandStatusList}/get-commands")
   ResponseEntity<DashboardDto> getDashboardCommandsFilterByStatus(
           @PathVariable Long storeId,
           @PathVariable Long proId,
           @PathVariable("commandDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate commandDate,
-          @PathVariable Integer commandStatus
+          @PathVariable Integer[] commandStatusList
   ) {
     // Validation professionel
     if(!proHelper.isProfessionalValid(proId))
@@ -165,7 +166,7 @@ public class ProController {
     if(!proHelper.isProWorkingInStore(proId, storeId))
       throw new ProException("Vous n'êtes pas rattaché au commerce", HttpStatus.FORBIDDEN);
 
-    return new ResponseEntity<>(commandService.getDashboardCommandsByStatus(proId, storeId, commandDate, commandStatus), HttpStatus.OK);
+    return new ResponseEntity<>(commandService.getDashboardCommandsByStatus(proId, storeId, commandDate, Arrays.asList(commandStatusList)), HttpStatus.OK);
   }
 
   @GetMapping("/dashboard/pro-id/{proId}/store-id/{storeId}/command-date/{commandDate}/command-code/{commandCode}/get-commands")
