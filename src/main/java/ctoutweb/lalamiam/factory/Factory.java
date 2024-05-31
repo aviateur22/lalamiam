@@ -416,6 +416,17 @@ public class Factory {
 
   /**
    * Renvoie un CommandStatusPro pour une initilaisation de commande
+   * @param statusIdList List<Integer> - Liste des statut
+   * @return List<CommandStatusEntity>
+   */
+  public static List<CommandStatusEntity> getCommandStatusList (List<Integer> statusIdList) {
+    return statusIdList.stream()
+            .map(statusId -> getCommandStatus(statusId))
+            .collect(Collectors.toList());
+  }
+
+  /**
+   * Renvoie un CommandStatusPro pour une initilaisation de commande
    * @param commandId Long - Identifiant commande
    * @param commandStatusId Int - Identifiant du statut
    * @param userId Long - Identitifaint utilisateur
@@ -438,5 +449,32 @@ public class Factory {
     LocalDateTime updatedCommandStatus = LocalDateTime.now();
     return new CommandStatusUserEntity(getCommand(commandId), getCommandStatus(commandStatusId), getUSer(userId), isProAction, updatedCommandStatus);
   }
+
+  /**
+   * DashboardCommandDto à partir CommandEntity
+   * @param command CommandEntity
+   * @return DashboardCommandDto
+   */
+  public static DashboardCommandDto getDashboardCommand(CommandEntity command) {
+    return new DashboardCommandDto(
+            command.getId(),
+            command.getCommandCode(),
+            command.getProductQuantity(),
+            command.getCommandPrice(),
+            command.getPreparationTime(),
+            command.getCommandStatus().getId(),
+            command.getSlotTime()
+    );
+  }
+
+  /**
+   * Renvoie un DashboardDto
+   * @param dashboardCommands List<DashboardCommandDto>
+   * @param commandDate LocalDate
+   * @return DashboardDto
+   */
+ public static  DashboardDto getDashboard(List<DashboardCommandDto> dashboardCommands, LocalDate commandDate) {
+    return new DashboardDto(dashboardCommands, commandDate);
+ }
 
 }

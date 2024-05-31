@@ -1,8 +1,9 @@
 package ctoutweb.lalamiam.service;
 
-import ctoutweb.lalamiam.model.dto.ProUpdateCommandStatusDto;
-import ctoutweb.lalamiam.model.dto.StoreProductsInformationDto;
-import ctoutweb.lalamiam.model.dto.RegisterCommandDto;
+import ctoutweb.lalamiam.model.dto.*;
+
+import java.time.LocalDate;
+import java.util.List;
 
 public interface NewCommandService extends Command {
 
@@ -35,4 +36,33 @@ public interface NewCommandService extends Command {
    * @return StoreProductsInformationDto
    */
   RegisterCommandDto updateCommandStatus(ProUpdateCommandStatusDto proUpdateCommandStatus);
+
+  /**
+   * Récupération liste des commandes pour dashboard
+   * @param proId Long - identifiant pro
+   * @param storeId Long - Identifiant commerce
+   * @param commandDate LocalDate- date de commande
+   * @return DashboardDto
+   */
+  DashboardDto getDashboardInformation(Long proId, Long storeId, LocalDate commandDate);
+
+  /**
+   * Récupération liste des commandes pour dashboard filtrer par statut de commande
+   * @param proId Long - identifiant pro
+   * @param storeId Long - Identifiant commerce
+   * @param commandDate LocalDate- date de commande
+   * @param statusIdList List<Integer> - Liste des identitifiants du statut des commandes
+   * @return DashboardDto
+   */
+  DashboardDto getDashboardCommandsByStatus(Long proId, Long storeId, LocalDate commandDate, List<Integer> statusIdList);
+
+  /**
+   * Récupération d'une commande sur le dashboard filtrer par code de commande
+   * @param proId Long - identifiant pro
+   * @param storeId Long - Identifiant commerce
+   * @param commandDate LocalDate- date de commande
+   * @param commandCode String - code de la commande
+   * @return DashboardDto
+   */
+  DashboardDto getDashboardCommandByCode(Long proId, Long storeId, LocalDate commandDate, String commandCode);
 }

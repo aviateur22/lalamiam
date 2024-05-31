@@ -2,8 +2,10 @@ package ctoutweb.lalamiam.service.serviceImpl;
 
 import ctoutweb.lalamiam.exception.CommandException;
 import ctoutweb.lalamiam.factory.Factory;
+import ctoutweb.lalamiam.factory.FactoryMapper;
 import ctoutweb.lalamiam.helper.NewCommandServiceHelper;
 import ctoutweb.lalamiam.helper.NewSlotHelper;
+import ctoutweb.lalamiam.mapper.DashboardCommandMapper;
 import ctoutweb.lalamiam.model.CommandStatus;
 import ctoutweb.lalamiam.model.dto.*;
 import ctoutweb.lalamiam.repository.CommandRepository;
@@ -358,5 +360,71 @@ public class NewCommandServiceImp implements NewCommandService {
             .filter(storeSlot->commandInformation.selectSlotTime().equals(storeSlot))
             .collect(Collectors.toList())
             .size() == 0) throw new CommandException("Le créneau demandé n'est pas disponible", HttpStatus.BAD_REQUEST);
+  }
+
+  @Override
+  public DashboardDto getDashboardInformation(Long proId, Long storeId, LocalDate commandDate) {
+
+    // Début de la journée à la date de la commande
+    LocalDateTime startOfDay = commandDate.atStartOfDay();
+
+    // Fin de la journée à la date de la commande
+    LocalDateTime endOfDay = commandDate.atTime(LocalTime.MAX);
+    List<CommandEntity> commandList = commandRepository.findCommandByStoreAndSlotTimeBetweenOrderBySlotTimeAsc(
+            Factory.getStore(storeId),
+            startOfDay,
+            endOfDay
+    );
+
+    DashboardCommandMapper dashboardCommandMapper = FactoryMapper.getDashboardCommandMapper();
+    List<DashboardCommandDto> dashboardCommands = commandList.stream().map(dashboardCommandMapper::apply).collect(Collectors.toList());
+    return Factory.getDashboard(dashboardCommands, commandDate);
+  }
+
+  @Override
+  public DashboardDto getDashboardCommandsByStatus(Long proId, Long storeId, LocalDate commandDate, List<Integer> statusIdList) {
+
+    // Vérification validité du statut
+    if(!CommandStatus.areListOfStatusValid(statusIdList))
+      throw new CommandException("Le statut de la commande n'existe pas", HttpStatus.BAD_REQUEST);
+
+    // Début de la journée à la date de la commande
+    LocalDateTime startOfDay = commandDate.atStartOfDay();
+
+    // Fin de la journée à la date de la commande
+    LocalDateTime endOfDay = commandDate.atTime(LocalTime.MAX);
+
+    // Recherche des commandes
+    List<CommandEntity> commandList = commandRepository.findCommandByStoreAndSlotTimeBetweenAndCommandStatusInOrderBySlotTimeAsc(
+            Factory.getStore(storeId),
+            startOfDay,
+            endOfDay,
+            Factory.getCommandStatusList(statusIdList)
+    );
+
+    DashboardCommandMapper dashboardCommandMapper = FactoryMapper.getDashboardCommandMapper();
+    List<DashboardCommandDto> dashboardCommands = commandList.stream().map(dashboardCommandMapper::apply).collect(Collectors.toList());
+    return Factory.getDashboard(dashboardCommands, commandDate);
+  }
+
+  @Override
+  public DashboardDto  getDashboardCommandByCode(Long proId, Long storeId, LocalDate commandDate, String commandCode) {
+    // Début de la journée à la date de la commande
+    LocalDateTime startOfDay = commandDate.atStartOfDay();
+
+    // Fin de la journée à la date de la commande
+    LocalDateTime endOfDay = commandDate.atTime(LocalTime.MAX);
+
+    // Recherche des commandes
+    List<CommandEntity> commands = commandRepository.findCommandByStoreAndSlotTimeBetweenAndCommandCode(
+            Factory.getStore(storeId),
+            startOfDay,
+            endOfDay,
+            commandCode
+    );
+
+    DashboardCommandMapper dashboardCommandMapper = FactoryMapper.getDashboardCommandMapper();
+    List<DashboardCommandDto> dashboardCommands = commands.stream().map(dashboardCommandMapper::apply).collect(Collectors.toList());
+    return Factory.getDashboard(dashboardCommands, commandDate);
   }
 }

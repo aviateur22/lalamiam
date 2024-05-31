@@ -1,6 +1,9 @@
 package ctoutweb.lalamiam.model;
 
+import org.w3c.dom.stylesheets.LinkStyle;
+
 import java.util.Arrays;
+import java.util.List;
 
 public enum CommandStatus {
   New_ORDER(1),
@@ -27,5 +30,14 @@ public enum CommandStatus {
   public static boolean isStatusValid(int value) {
     return Arrays.stream(CommandStatus.values())
             .anyMatch(statusValue -> statusValue.getValue() == value);
+  }
+
+  /**
+   * Verification validité d'une liste de statut
+   * @param statusIdList List<Integer>
+   * @return boolean
+   */
+  public static boolean areListOfStatusValid(List<Integer> statusIdList) {
+    return statusIdList.stream().allMatch(statusId -> isStatusValid(statusId));
   }
 }
